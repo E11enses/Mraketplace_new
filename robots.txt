@@ -1,0 +1,9 @@
+User-agent: *
+Disallow: /order.js
+Disallow: /tooplate-minimal-script.js
+Disallow: /favicon/
+Allow: /
+
+Host: mraketplace.ru
+
+Sitemap: https://mraketplace.ru/sitemap.xml
