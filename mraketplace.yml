@@ -28,6 +28,12 @@
         <store>true</store>
         <description>Приём, хранение, упаковка и отгрузка товаров на маркетплейсы (WB, Ozon, Яндекс.Маркет, Авито). Полный цикл фулфилмента.</description>
         <sales_notes>Финальная стоимость рассчитывается индивидуально.</sales_notes>
+
+        <param name="Рейтинг" unit="баллы">4.9</param>
+        <param name="Число отзывов" unit="шт">65</param>
+        <param name="Годы опыта">4</param>
+        <param name="Регион">Москва</param>
+        <param name="Конверсия" unit="%">92</param>
       </offer>
 
       <!-- Услуга 2 -->
@@ -42,6 +48,12 @@
         <store>true</store>
         <description>Ответственное хранение на складе под охраной 24/7. Страхование включено.</description>
         <sales_notes>Стоимость указана за 1 литр в день без оптовых скидок.</sales_notes>
+
+        <param name="Рейтинг" unit="баллы">5.0</param>
+        <param name="Число отзывов" unit="шт">72</param>
+        <param name="Годы опыта">4</param>
+        <param name="Регион">Москва</param>
+        <param name="Конверсия" unit="%">98</param>
       </offer>
 
       <!-- Услуга 3 -->
@@ -54,8 +66,14 @@
         <delivery>false</delivery>
         <pickup>false</pickup>
         <store>false</store>
-        <description>Продвижение карточек товаров: заказ, выкуп, забор и приемка товара на складе ФФ.</description>
+        <description>Продвижение карточек товаров - заказ, выкуп, забор и приемка товара на складе ФФ.</description>
         <sales_notes>Стоимость за один отзыв под ключ.</sales_notes>
+
+        <param name="Рейтинг" unit="баллы">4.8</param>
+        <param name="Число отзывов" unit="шт">58</param>
+        <param name="Годы опыта">4</param>
+        <param name="Регион">Москва</param>
+        <param name="Конверсия" unit="%">83</param>
       </offer>
 
     </offers>
