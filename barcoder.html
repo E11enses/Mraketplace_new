@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Online Barcode Generator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        --bg: #0f1220;
+        --panel: #171a2b;
+        --panel-2: #1e2235;
+        --text: #e7e9f3;
+        --muted: #a6accd;
+        --accent: #7aa2f7;
+        --danger: #ff757f;
+        --ok: #7bd88f;
+        --border: #2a2f4a;
+        --radius: 12px;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+          Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji",
+          "Segoe UI Symbol";
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      .wrap {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 16px;
+        display: grid;
+        gap: 16px;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      h1 {
+        font-size: 18px;
+        margin: 0;
+        letter-spacing: 0.2px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 16px;
+      }
+
+      @media (max-width: 960px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 12px;
+      }
+
+      .panel h2 {
+        font-size: 14px;
+        margin: 0 0 10px 0;
+        color: var(--muted);
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 130px 1fr;
+        gap: 10px;
+        align-items: center;
+        padding: 6px 0;
+      }
+
+      @media (max-width: 600px) {
+        .form-row {
+          grid-template-columns: 1fr;
+          gap: 6px;
+        }
+        .form-row label {
+          font-size: 13px;
+        }
+      }
+
+      .form-row label {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      input[type="text"],
+      input[type="number"],
+      select,
+      textarea,
+      input[type="color"] {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px;
+        background: var(--panel-2);
+        color: var(--text);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        outline: none;
+        font-size: 15px;
+      }
+
+      input[type="number"] {
+        appearance: textfield;
+        -webkit-appearance: textfield;
+        -moz-appearance: textfield;
+      }
+      input[type="number"]::-webkit-outer-spin-button,
+      input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      textarea {
+        min-height: 72px;
+        resize: vertical;
+      }
+
+      input[type="checkbox"] {
+        transform: scale(1.2);
+        accent-color: var(--accent);
+      }
+
+      .row-inline {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .help {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 4px;
+      }
+
+      .btns {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      button {
+        border: 1px solid var(--border);
+        background: linear-gradient(180deg, #202542, #171a2b);
+        color: var(--text);
+        padding: 12px 14px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 14px;
+        touch-action: manipulation;
+      }
+
+      button.primary {
+        background: linear-gradient(180deg, #3853a1, #2d3a8c);
+        border-color: #2f448f;
+      }
+
+      button:active {
+        transform: translateY(1px);
+      }
+
+      .preview {
+        display: grid;
+        place-items: center;
+        min-height: 260px;
+        background: radial-gradient(
+          1200px 500px at 50% -10%,
+          #1a1e31,
+          #111425
+        );
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .preview-inner {
+        background: #fff;
+        color: #000;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        width: 100%;
+        max-width: 100%;
+        overflow: auto;
+      }
+
+      /* Make barcode responsive within preview */
+      #labelFigure {
+        margin: 0;
+        display: block;
+        max-width: 100%;
+      }
+      #barcode {
+        display: block;
+        width: 100%;
+        height: auto;
+        max-width: 100%;
+      }
+      .extra-text {
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+          sans-serif;
+        font-size: 12px;
+        margin-top: 8px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+
+      .status {
+        font-size: 13px;
+        color: var(--muted);
+        min-height: 18px;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: var(--panel-2);
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .pill.ok {
+        color: var(--ok);
+        border-color: #2c5f3a;
+      }
+
+      .pill.err {
+        color: var(--danger);
+        border-color: #6b2e36;
+      }
+
+      footer {
+        color: var(--muted);
+        font-size: 12px;
+        text-align: center;
+        padding-bottom: 72px; /* space for mobile sticky bar */
+      }
+
+      /* Mobile sticky action bar */
+      .sticky-actions {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(17, 20, 37, 0.9);
+        backdrop-filter: blur(6px);
+        border-top: 1px solid var(--border);
+        padding: 8px 12px;
+        display: none;
+      }
+      .sticky-actions .btns {
+        justify-content: center;
+      }
+
+      @media (max-width: 600px) {
+        .sticky-actions {
+          display: block;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>Online Barcode Generator</h1>
+        <div class="pill" id="status-pill">Ready</div>
+      </header>
+
+      <div class="grid">
+        <section class="panel">
+          <h2>Options</h2>
+
+          <div class="form-row">
+            <label for="text">Data</label>
+            <input
+              id="text"
+              type="text"
+              inputmode="numeric"
+              placeholder="Enter data (e.g., 123456789012)"
+              value="5901234123457"
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="form-row">
+            <label for="format">Format</label>
+            <select id="format">
+              <option value="CODE128">CODE128 (most flexible)</option>
+              <option value="EAN13">EAN-13 (12 digits; checksum auto)</option>
+              <option value="EAN8">EAN-8 (7 digits; checksum auto)</option>
+              <option value="UPC">UPC-A (11 digits; checksum auto)</option>
+              <option value="ITF14">ITF-14</option>
+              <option value="MSI">MSI</option>
+              <option value="pharmacode">Pharmacode</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label>Size</label>
+            <div class="row-inline">
+              <input
+                id="width"
+                type="number"
+                inputmode="numeric"
+                min="1"
+                max="10"
+                value="2"
+              />
+              <input
+                id="height"
+                type="number"
+                inputmode="numeric"
+                min="20"
+                max="300"
+                value="100"
+              />
+              <span class="help">bar width / height (px)</span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label>Margins</label>
+            <div class="row-inline">
+              <input
+                id="margin"
+                type="number"
+                inputmode="numeric"
+                min="0"
+                max="50"
+                value="10"
+              />
+              <span class="help">quiet zone</span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label>Appearance</label>
+            <div class="row-inline">
+              <label class="row-inline"
+                ><input id="displayValue" type="checkbox" checked />
+                Show text</label
+              >
+              <label class="row-inline"
+                ><input id="flat" type="checkbox" /> Flat</label
+              >
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label>Colors</label>
+            <div class="row-inline" style="gap:12px">
+              <div style="display:flex;align-items:center;gap:6px">
+                <input id="lineColor" type="color" value="#000000" />
+                <input
+                  id="lineColorHex"
+                  type="text"
+                  value="#000000"
+                  style="width:110px"
+                />
+              </div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <input id="bgColor" type="color" value="#FFFFFF" />
+                <input
+                  id="bgColorHex"
+                  type="text"
+                  value="#FFFFFF"
+                  style="width:110px"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label for="extraText">Extra label text</label>
+            <textarea
+              id="extraText"
+              placeholder="Optional text shown below the barcode"
+            ></textarea>
+          </div>
+
+          <div class="form-row">
+            <label for="fontSize">Text font size</label>
+            <div class="row-inline">
+              <input
+                id="fontSize"
+                type="number"
+                inputmode="numeric"
+                min="8"
+                max="48"
+                value="12"
+              />
+              <span class="help">pixels</span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label for="textAlign">Text alignment</label>
+            <select id="textAlign">
+              <option value="left">Left</option>
+              <option value="center" selected>Center</option>
+              <option value="right">Right</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label for="pageSize">PDF Page Size</label>
+            <select id="pageSize">
+              <option value="A4">A4 (210 × 297 mm)</option>
+              <option value="A5">A5 (148 × 210 mm)</option>
+              <option value="58x40mm">58 × 40 mm</option>
+              <option value="75x120mm">75 × 120 mm</option>
+              <option value="40x30mm">40 × 30 mm</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label for="dpiScale">Export quality</label>
+            <div class="row-inline">
+              <select id="dpiScale">
+                <option value="2" selected>High (2x)</option>
+                <option value="3">Very High (3x)</option>
+                <option value="4">Ultra (4x)</option>
+              </select>
+              <span class="help">affects PNG and PDF raster fallback</span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label>Actions</label>
+            <div class="btns">
+              <button class="primary" id="generateBtn">Generate</button>
+              <button id="downloadPngBtn">PNG</button>
+              <button id="downloadSvgBtn">SVG</button>
+              <button id="downloadPdfBtn">PDF</button>
+              <button id="clearBtn">Clear</button>
+            </div>
+          </div>
+
+          <div class="spacer"></div>
+          <div class="status" id="status">Tip: Type and it updates live.</div>
+        </section>
+
+        <section class="panel">
+          <h2>Preview</h2>
+          <div class="preview">
+            <div class="preview-inner" id="preview">
+              <figure id="labelFigure">
+                <svg id="barcode" role="img" aria-label="Barcode preview"></svg>
+                <figcaption id="extraTextPreview" class="extra-text"></figcaption>
+              </figure>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <footer>
+        Built with JsBarcode (MIT) and jsPDF (MIT). Everything runs locally.
+      </footer>
+    </div>
+
+    <!-- Mobile sticky actions -->
+    <div class="sticky-actions" aria-hidden="false">
+      <div class="wrap" style="padding:0 12px">
+        <div class="btns">
+          <button class="primary" id="mGenerateBtn">Generate</button>
+          <button id="mPngBtn">PNG</button>
+          <button id="mSvgBtn">SVG</button>
+          <button id="mPdfBtn">PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- JsBarcode -->
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+    <!-- jsPDF -->
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+
+    <script>
+      const $ = (sel) => document.querySelector(sel);
+
+      const els = {
+        text: $("#text"),
+        format: $("#format"),
+        width: $("#width"),
+        height: $("#height"),
+        margin: $("#margin"),
+        displayValue: $("#displayValue"),
+        flat: $("#flat"),
+        lineColor: $("#lineColor"),
+        lineColorHex: $("#lineColorHex"),
+        bgColor: $("#bgColor"),
+        bgColorHex: $("#bgColorHex"),
+        extraText: $("#extraText"),
+        extraTextPreview: $("#extraTextPreview"),
+        fontSize: $("#fontSize"),
+        textAlign: $("#textAlign"),
+        pageSize: $("#pageSize"),
+        dpiScale: $("#dpiScale"),
+        barcode: $("#barcode"),
+        generateBtn: $("#generateBtn"),
+        downloadPngBtn: $("#downloadPngBtn"),
+        downloadSvgBtn: $("#downloadSvgBtn"),
+        downloadPdfBtn: $("#downloadPdfBtn"),
+        mGenerateBtn: $("#mGenerateBtn"),
+        mPngBtn: $("#mPngBtn"),
+        mSvgBtn: $("#mSvgBtn"),
+        mPdfBtn: $("#mPdfBtn"),
+        clearBtn: $("#clearBtn"),
+        status: $("#status"),
+        statusPill: $("#status-pill"),
+      };
+
+      const setPill = (msg, kind = "ok") => {
+        els.statusPill.textContent = msg;
+        els.statusPill.classList.remove("ok", "err");
+        els.statusPill.classList.add(kind === "ok" ? "ok" : "err");
+      };
+
+      // Filename from Data field
+      function getSafeFileBase() {
+        const raw = (els.text.value || "").trim();
+        const fallback = "label";
+        const cleaned = raw
+          .replace(/[\u0000-\u001f\u007f]/g, "")
+          .replace(/[\\/:*?"<>|]/g, "_")
+          .replace(/\s+/g, "_")
+          .slice(0, 200);
+        return cleaned || fallback;
+      }
+
+      function validateInput(format, text) {
+        const onlyDigits = /^[0-9]+$/;
+        switch (format) {
+          case "EAN13":
+            return onlyDigits.test(text) && (text.length === 12 || text.length === 13);
+          case "EAN8":
+            return onlyDigits.test(text) && (text.length === 7 || text.length === 8);
+          case "UPC":
+            return onlyDigits.test(text) && (text.length === 11 || text.length === 12);
+          case "ITF14":
+            return onlyDigits.test(text) && (text.length === 13 || text.length === 14);
+          case "MSI":
+            return onlyDigits.test(text);
+          case "pharmacode":
+            return onlyDigits.test(text);
+          case "CODE128":
+          default:
+            return text.length > 0;
+        }
+      }
+
+      function clampInt(val, min, max) {
+        const n = parseInt(val, 10);
+        if (Number.isNaN(n)) return min;
+        return Math.min(max, Math.max(min, n));
+      }
+
+      // ---- Word wrapping for extra text ----
+      const WRAP_LINE_HEIGHT_EM = 1.2;
+      const WRAP_SIDE_PADDING = 8;
+      const WRAP_MAX_WIDTH_FACTOR = 1.0; // fraction of barcode width
+      const measureCtx = document.createElement("canvas").getContext("2d");
+
+      function wrapTextToLines(text, maxWidthPx, fontPx) {
+        if (!text) return [];
+        measureCtx.font = `${fontPx}px Arial, Helvetica, sans-serif`;
+
+        const paragraphs = text.split(/\r?\n/);
+        const lines = [];
+
+        for (const p of paragraphs) {
+          if (p.trim() === "") {
+            lines.push("");
+            continue;
+          }
+          const words = p.split(/\s+/);
+          let current = "";
+
+          for (let i = 0; i < words.length; i++) {
+            const word = words[i];
+            const test = current ? current + " " + word : word;
+            const w = measureCtx.measureText(test).width;
+
+            if (w <= maxWidthPx) {
+              current = test;
+            } else {
+              if (!current) {
+                lines.push(...hardBreakWord(word, maxWidthPx, fontPx));
+              } else {
+                lines.push(current);
+                if (measureCtx.measureText(word).width > maxWidthPx) {
+                  lines.push(...hardBreakWord(word, maxWidthPx, fontPx));
+                  current = "";
+                } else {
+                  current = word;
+                }
+              }
+            }
+          }
+          if (current) lines.push(current);
+        }
+        return lines;
+      }
+
+      function hardBreakWord(word, maxWidthPx, fontPx) {
+        measureCtx.font = `${fontPx}px Arial, Helvetica, sans-serif`;
+        const chars = Array.from(word);
+        let buf = "";
+        const out = [];
+        for (const ch of chars) {
+          const test = buf + ch;
+          if (measureCtx.measureText(test).width <= maxWidthPx) {
+            buf = test;
+          } else {
+            if (buf) out.push(buf);
+            buf = ch;
+          }
+        }
+        if (buf) out.push(buf);
+        return out;
+      }
+
+      // ---- Color inputs sync (picker <-> hex) ----
+      function syncColorInputs() {
+        els.lineColor.addEventListener("input", () => {
+          els.lineColorHex.value = els.lineColor.value.toUpperCase();
+          generateDebounced();
+        });
+        els.lineColorHex.addEventListener("input", () => {
+          const val = els.lineColorHex.value.trim();
+          if (/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(val)) {
+            els.lineColor.value = val;
+            generateDebounced();
+          }
+        });
+        els.bgColor.addEventListener("input", () => {
+          els.bgColorHex.value = els.bgColor.value.toUpperCase();
+          generateDebounced();
+        });
+        els.bgColorHex.addEventListener("input", () => {
+          const val = els.bgColorHex.value.trim();
+          if (/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(val)) {
+            els.bgColor.value = val;
+            generateDebounced();
+          }
+        });
+      }
+
+      // ---- Render / preview ----
+      function generate() {
+        const text = els.text.value.trim();
+        const format = els.format.value;
+
+        if (!text) {
+          setPill("Enter data", "err");
+          els.status.textContent = "Data is empty.";
+          els.barcode.innerHTML = "";
+          els.extraTextPreview.textContent = "";
+          return;
+        }
+
+        const valid = validateInput(format, text);
+        if (!valid) {
+          setPill("Invalid input", "err");
+          els.status.textContent =
+            "Input does not match the requirements for " + format + ".";
+          els.barcode.innerHTML = "";
+          els.extraTextPreview.textContent = "";
+          return;
+        }
+
+        try {
+          els.barcode.innerHTML = "";
+
+          // Render barcode
+          JsBarcode(els.barcode, text, {
+            format,
+            lineColor: els.lineColorHex.value || "#000000",
+            background: els.bgColorHex.value || "#FFFFFF",
+            width: clampInt(els.width.value, 1, 10),
+            height: clampInt(els.height.value, 20, 300),
+            margin: clampInt(els.margin.value, 0, 50),
+            displayValue: els.displayValue.checked,
+            flat: els.flat.checked,
+            fontOptions: "bold",
+            font: "monospace",
+            textMargin: 6,
+          });
+
+          // Wrapped preview text
+          const fontPx = clampInt(els.fontSize.value, 8, 48);
+          const barcodeW = els.barcode.getBBox
+            ? els.barcode.getBBox().width
+            : 300;
+          const maxWrapWidth = Math.max(
+            60,
+            Math.floor(barcodeW * WRAP_MAX_WIDTH_FACTOR)
+          );
+          const lines = wrapTextToLines(
+            els.extraText.value.trim(),
+            maxWrapWidth,
+            fontPx
+          );
+          els.extraTextPreview.textContent = lines.join("\n");
+          els.extraTextPreview.style.fontSize = `${fontPx}px`;
+          els.extraTextPreview.style.textAlign = els.textAlign.value;
+
+          setPill("Generated", "ok");
+          els.status.textContent = "Barcode generated successfully.";
+        } catch (e) {
+          setPill("Error", "err");
+          els.status.textContent = "Error: " + (e?.message || String(e));
+          console.error(e);
+        }
+      }
+
+      function figureBBox(wrappedLines, fontPx) {
+        const svgEl = els.barcode;
+        const svgBox = svgEl.getBBox
+          ? svgEl.getBBox()
+          : { x: 0, y: 0, width: 600, height: 200 };
+
+        const lineH = Math.round(fontPx * WRAP_LINE_HEIGHT_EM);
+        const extraH = wrappedLines.length ? 8 + wrappedLines.length * lineH : 0;
+
+        return {
+          width: Math.max(svgBox.width, 10) + 16,
+          height: svgBox.height + extraH + 16,
+          lineH,
+          barcodeH: svgBox.height,
+          barcodeW: svgBox.width,
+        };
+      }
+
+      function wrapFigureInSVG() {
+        const barcodeClone = els.barcode.cloneNode(true);
+        const fontPx = clampInt(els.fontSize.value, 8, 48);
+        const align = els.textAlign.value;
+
+        const barcodeBox = els.barcode.getBBox
+          ? els.barcode.getBBox()
+          : { width: 300, height: 200 };
+        const maxWrapWidth = Math.max(
+          60,
+          Math.floor(barcodeBox.width * WRAP_MAX_WIDTH_FACTOR)
+        );
+        const wrappedLines = wrapTextToLines(
+          (els.extraText.value || "").trim(),
+          maxWrapWidth,
+          fontPx
+        );
+
+        const { width, height, lineH, barcodeH, barcodeW } = figureBBox(
+          wrappedLines,
+          fontPx
+        );
+
+        const xmlns = "http://www.w3.org/2000/svg";
+        const out = document.createElementNS(xmlns, "svg");
+        out.setAttribute("xmlns", xmlns);
+        out.setAttribute("version", "1.1");
+        out.setAttribute("width", String(width));
+        out.setAttribute("height", String(height));
+        out.setAttribute("viewBox", `0 0 ${width} ${height}`);
+
+        // Background
+        const bg = document.createElementNS(xmlns, "rect");
+        bg.setAttribute("x", "0");
+        bg.setAttribute("y", "0");
+        bg.setAttribute("width", String(width));
+        bg.setAttribute("height", String(height));
+        bg.setAttribute("fill", els.bgColorHex.value || "#FFFFFF");
+        out.appendChild(bg);
+
+        // Barcode
+        const g = document.createElementNS(xmlns, "g");
+        g.setAttribute("transform", "translate(8,8)");
+        barcodeClone.setAttribute("style", "background: transparent;");
+        g.appendChild(barcodeClone);
+        out.appendChild(g);
+
+        // Wrapped text aligned to barcode width
+        if (wrappedLines.length) {
+          const text = document.createElementNS(xmlns, "text");
+          let anchor = "start";
+          let x = WRAP_SIDE_PADDING;
+          if (align === "center") {
+            anchor = "middle";
+            x = 8 + barcodeW / 2;
+          } else if (align === "right") {
+            anchor = "end";
+            x = 8 + barcodeW - WRAP_SIDE_PADDING;
+          }
+          const yStart = 8 + barcodeH + 12;
+          text.setAttribute("x", String(x));
+          text.setAttribute("y", String(yStart));
+          text.setAttribute("fill", "#000000");
+          text.setAttribute("font-size", String(fontPx));
+          text.setAttribute("font-family", "Arial, Helvetica, sans-serif");
+          text.setAttribute("text-anchor", anchor);
+
+          wrappedLines.forEach((line, i) => {
+            const tspan = document.createElementNS(xmlns, "tspan");
+            tspan.setAttribute("x", String(x));
+            tspan.setAttribute("dy", i === 0 ? "0" : `${lineH}px`);
+            tspan.textContent = line;
+            text.appendChild(tspan);
+          });
+
+          out.appendChild(text);
+        }
+        return out;
+      }
+
+      function serializeSVG(el) {
+        const s = new XMLSerializer();
+        return s.serializeToString(el);
+      }
+
+      // ---- Downloads ----
+      function downloadSVG() {
+        const svgWrap = wrapFigureInSVG();
+        const svgText = serializeSVG(svgWrap);
+        const blob = new Blob([svgText], { type: "image/svg+xml;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const base = getSafeFileBase();
+        triggerDownload(url, base + ".svg");
+      }
+
+      function downloadPNG() {
+        const scale = parseInt(els.dpiScale.value, 10) || 2;
+        const svgWrap = wrapFigureInSVG();
+        const svgText = serializeSVG(svgWrap);
+
+        const img = new Image();
+        const svgBlob = new Blob([svgText], {
+          type: "image/svg+xml;charset=utf-8",
+        });
+        const url = URL.createObjectURL(svgBlob);
+
+        img.onload = function () {
+          const baseW = img.naturalWidth || 800;
+          const baseH = img.naturalHeight || 300;
+          const w = Math.round(baseW * scale);
+          const h = Math.round(baseH * scale);
+
+          const canvas = document.createElement("canvas");
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          ctx.imageSmoothingEnabled = false;
+          ctx.scale(scale, scale);
+          ctx.fillStyle = els.bgColorHex.value || "#FFFFFF";
+          ctx.fillRect(0, 0, baseW, baseH);
+          ctx.drawImage(img, 0, 0);
+
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) {
+                setPill("PNG failed", "err");
+                return;
+              }
+              const pngUrl = URL.createObjectURL(blob);
+              const base = getSafeFileBase();
+              triggerDownload(pngUrl, base + ".png");
+              URL.revokeObjectURL(url);
+            },
+            "image/png",
+            1
+          );
+        };
+        img.onerror = () => {
+          setPill("PNG failed", "err");
+          URL.revokeObjectURL(url);
+        };
+        img.src = url;
+      }
+
+      function triggerDownload(url, filename) {
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+      }
+
+      // ---- PDF export: landscape, minimal margins, high DPI fallback ----
+      function mmToPt(mm) {
+        return (mm * 72) / 25.4;
+      }
+
+      function pageSizeToJsPDF(pageKey) {
+        switch (pageKey) {
+          case "A4":
+            return { size: [mmToPt(210), mmToPt(297)], landscape: true };
+          case "A5":
+            return { size: [mmToPt(148), mmToPt(210)], landscape: true };
+          case "58x40mm":
+            return { size: [mmToPt(58), mmToPt(40)], landscape: true };
+          case "75x120mm":
+            return { size: [mmToPt(75), mmToPt(120)], landscape: true };
+          case "40x30mm":
+            return { size: [mmToPt(40), mmToPt(30)], landscape: true };
+          default:
+            return { size: "a4", landscape: true };
+        }
+      }
+
+      async function downloadPDF() {
+        const { size, landscape } = pageSizeToJsPDF(els.pageSize.value);
+        const { jsPDF } = window.jspdf;
+
+        const doc = new jsPDF({
+          unit: "pt",
+          format: size,
+          orientation: landscape ? "landscape" : "portrait",
+        });
+
+        const pageW = doc.internal.pageSize.getWidth();
+        const pageH = doc.internal.pageSize.getHeight();
+
+        const labelSVG = wrapFigureInSVG();
+        const svgText = serializeSVG(labelSVG);
+        const margin = 4; // tiny safe margin
+
+        try {
+          if (typeof doc.addSvg === "function") {
+            const srcW = parseFloat(labelSVG.getAttribute("width")) || 800;
+            const srcH = parseFloat(labelSVG.getAttribute("height")) || 300;
+
+            const maxW = pageW - margin * 2;
+            const maxH = pageH - margin * 2;
+            const scale = Math.min(maxW / srcW, maxH / srcH, 1e9);
+            const renderW = srcW * scale;
+            const renderH = srcH * scale;
+            const x = (pageW - renderW) / 2;
+            const y = (pageH - renderH) / 2;
+
+            await doc.addSvg(svgText, x, y, { width: renderW, height: renderH });
+            const base = getSafeFileBase();
+            doc.save(base + ".pdf");
+            setPill("PDF saved", "ok");
+            return;
+          }
+        } catch (e) {
+          console.warn("Vector PDF failed; using high-DPI PNG fallback:", e);
+        }
+
+        // Raster fallback
+        const scale = parseInt(els.dpiScale.value, 10) || 2;
+        const pngDataUrl = await svgTextToPng(svgText, scale);
+
+        const img = new Image();
+        img.src = pngDataUrl;
+        await img.decode();
+
+        const srcW = img.width / scale;
+        const srcH = img.height / scale;
+        const maxW = pageW - margin * 2;
+        const maxH = pageH - margin * 2;
+        const fitScale = Math.min(maxW / srcW, maxH / srcH, 1e9);
+        const renderW = srcW * fitScale;
+        const renderH = srcH * fitScale;
+        const x = (pageW - renderW) / 2;
+        const y = (pageH - renderH) / 2;
+
+        doc.addImage(pngDataUrl, "PNG", x, y, renderW, renderH);
+        const base = getSafeFileBase();
+        doc.save(base + ".pdf");
+        setPill("PDF saved", "ok");
+      }
+
+      function svgTextToPng(svgText, scale = 2) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          const svgBlob = new Blob([svgText], {
+            type: "image/svg+xml;charset=utf-8",
+          });
+          const url = URL.createObjectURL(svgBlob);
+
+          img.onload = function () {
+            const baseW = img.naturalWidth || 800;
+            const baseH = img.naturalHeight || 300;
+
+            const canvas = document.createElement("canvas");
+            canvas.width = Math.round(baseW * scale);
+            canvas.height = Math.round(baseH * scale);
+            const ctx = canvas.getContext("2d");
+            ctx.imageSmoothingEnabled = false;
+            ctx.scale(scale, scale);
+            ctx.drawImage(img, 0, 0);
+
+            URL.revokeObjectURL(url);
+            resolve(canvas.toDataURL("image/png", 1));
+          };
+          img.onerror = () => {
+            URL.revokeObjectURL(url);
+            reject(new Error("Failed to rasterize SVG"));
+          };
+          img.src = url;
+        });
+      }
+
+      // ---- Events ----
+      function attachEvents() {
+        const inputs = [
+          "text",
+          "format",
+          "width",
+          "height",
+          "margin",
+          "displayValue",
+          "flat",
+          "lineColorHex",
+          "bgColorHex",
+          "extraText",
+          "fontSize",
+          "textAlign",
+        ].map((k) => els[k]);
+
+        inputs.forEach((el) => {
+          el.addEventListener("input", generateDebounced);
+          el.addEventListener("change", generate);
+        });
+
+        syncColorInputs();
+
+        // Buttons
+        els.generateBtn.addEventListener("click", generate);
+        els.mGenerateBtn.addEventListener("click", generate);
+
+        const pngHandlers = [els.downloadPngBtn, els.mPngBtn];
+        const svgHandlers = [els.downloadSvgBtn, els.mSvgBtn];
+        const pdfHandlers = [els.downloadPdfBtn, els.mPdfBtn];
+
+        pngHandlers.forEach((b) => b.addEventListener("click", downloadPNG));
+        svgHandlers.forEach((b) => b.addEventListener("click", downloadSVG));
+        pdfHandlers.forEach((b) => b.addEventListener("click", downloadPDF));
+
+        els.clearBtn.addEventListener("click", () => {
+          els.text.value = "";
+          els.extraText.value = "";
+          els.extraTextPreview.textContent = "";
+          els.barcode.innerHTML = "";
+          setPill("Cleared", "ok");
+          els.status.textContent = "Input cleared.";
+        });
+
+        // Improve keyboard on mobile: submit on Enter in data field
+        els.text.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            generate();
+          }
+        });
+      }
+
+      let t = 0;
+      function generateDebounced() {
+        clearTimeout(t);
+        t = setTimeout(generate, 120);
+      }
+
+      // Init
+      attachEvents();
+      generate();
+    </script>
+  </body>
+</html>
