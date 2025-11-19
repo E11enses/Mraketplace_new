@@ -49,7 +49,7 @@
     }
 
     h1 {
-      font-size: 24px;
+      font-size: 18px;
       margin: 0;
       letter-spacing: 0.2px;
     }
@@ -284,13 +284,30 @@
         display: block;
       }
     }
+
+    .back-to-site {
+      margin-top: 16px;
+      font-size: 16px;
+    }
+
+    .back-to-site a {
+      color: var(--accent);
+      text-decoration: none;
+      padding: 6px 6px;
+      border: 2px solid var(--accent);
+    }
+
+    .back-to-site a:hover {
+      background: var(--accent);
+      color: var(--bg);
+    }
   </style>
 </head>
 
 <body>
   <div class="wrap">
     <header>
-      <h1>[М] Баркодер. Генератор штрихкодов от МРАКЕТПЛЕЙСОВ</h1>
+      <h1>Генератор штрихкодов | МРАКЕТПЛЕЙСЫ</h1>
       <div class="pill" id="status-pill">Ready</div>
     </header>
 
@@ -333,10 +350,14 @@
         <div class="form-row">
           <label>Цифры под штрихкодом</label>
           <div class="row-inline">
-            <label class="row-inline"><input id="displayValue" type="checkbox" checked />
-              Показать цифры</label>
-            <label class="row-inline "><input id="flat" type="checkbox" /> Спрятать
-              цифры</label>
+            <label class="row-inline">
+              <input type="radio" name="digits" id="digitsShow" value="show" checked />
+              Показать цифры
+            </label>
+            <label class="row-inline">
+              <input type="radio" name="digits" id="digitsHide" value="hide" />
+              Спрятать цифры
+            </label>
           </div>
         </div>
 
@@ -428,6 +449,8 @@
 
     <footer>
       Создано на основе JsBarcode (MIT) и jsPDF (MIT). Данные не сохраняются.
+      <div class="back-to-site"><a href="/index.html">Обратно на сайт</a></div>
+
     </footer>
   </div>
 
@@ -457,8 +480,8 @@
       width: $("#width"),
       height: $("#height"),
       margin: $("#margin"),
-      displayValue: $("#displayValue"),
-      flat: $("#flat"),
+      digitsShow: $("#digitsShow"),
+      digitsHide: $("#digitsHide"),
       lineColor: $("#lineColor"),
       lineColorHex: $("#lineColorHex"),
       bgColor: $("#bgColor"),
@@ -653,8 +676,8 @@
           width: clampInt(els.width.value, 1, 10),
           height: clampInt(els.height.value, 20, 300),
           margin: clampInt(els.margin.value, 0, 50),
-          displayValue: els.displayValue.checked,
-          flat: els.flat.checked,
+          displayValue: els.digitsShow.checked, // show digits if "show" is selected
+          flat: els.digitsHide.checked, // if hiding digits, we also flatten (no descenders)  
           fontOptions: "bold",
           font: "monospace",
           textMargin: 6,
@@ -984,8 +1007,8 @@
         "width",
         "height",
         "margin",
-        "displayValue",
-        "flat",
+        "digitsShow",
+        "digitsHide",
         "lineColorHex",
         "bgColorHex",
         "extraText",
