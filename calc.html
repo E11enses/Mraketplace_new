@@ -642,6 +642,9 @@
     </footer>
   </div>
 
+  <!-- LZ-String for hash compression -->
+  <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+
   <script>
     // Tooltips toggle for mobile/tap and accessibility
     (function () {
@@ -758,8 +761,7 @@
       // Налог по режиму
       let taxCost = 0;
       if (taxRegime === "USN6") {
-        // Если хотите базу netOfVAT: taxCost = netOfVAT * 0.06;
-        taxCost = price * 0.06;
+        taxCost = price * 0.06; // или netOfVAT * 0.06
       } else if (taxRegime === "USN15") {
         const profitBeforeTax = netRevenueBase - opCostsExTax;
         taxCost = Math.max(0, 0.15 * profitBeforeTax);
@@ -891,7 +893,7 @@
       setPill("Очищено");
     }
 
-    // --------------- Share helpers ---------------
+    // --------------- State helpers (compressed hash) ---------------
     function getState() {
       return {
         price: els.price.value,
@@ -913,7 +915,70 @@
       };
     }
 
+    // Compact mapping to reduce size before compression
+    function compactState(state) {
+      return {
+        p: state.price,
+        tr: state.tax,
+        v: state.vat,
+        rf: state.ref,
+        dr: state.drr,
+        c: state.cogs,
+        f: state.fulf,
+        l: state.last,
+        r: state.ret,
+        rc: state.retc,
+        ib: state.inb,
+        st: state.stor,
+        pk: state.pack,
+        o: state.other,
+        tm: state.tm,
+        cm: state.cmt,
+      };
+    }
+    function expandState(c) {
+      if (!c) return undefined;
+      return {
+        price: c.p,
+        tax: c.tr,
+        vat: c.v,
+        ref: c.rf,
+        drr: c.dr,
+        cogs: c.c,
+        fulf: c.f,
+        last: c.l,
+        ret: c.r,
+        retc: c.rc,
+        inb: c.ib,
+        stor: c.st,
+        pack: c.pk,
+        other: c.o,
+        tm: c.tm,
+        cmt: c.cm,
+      };
+    }
+
+    function encodeStateToHash(state) {
+      const compact = compactState(state);
+      const json = JSON.stringify(compact);
+      const compressed = LZString.compressToEncodedURIComponent(json);
+      return "#" + compressed;
+    }
+
+    function decodeStateFromHash() {
+      const hash = location.hash?.slice(1);
+      if (!hash) return undefined;
+      try {
+        const json = LZString.decompressFromEncodedURIComponent(hash);
+        if (!json) return undefined;
+        return expandState(JSON.parse(json));
+      } catch {
+        return undefined;
+      }
+    }
+
     function applyState(s) {
+      if (!s) return;
       if ("price" in s && s.price != null) els.price.value = s.price;
       if ("tax" in s && s.tax != null) els.taxRegime.value = s.tax;
       if ("vat" in s && s.vat != null) els.vatRate.value = s.vat;
@@ -932,61 +997,29 @@
       if ("cmt" in s && s.cmt != null) els.comment.value = s.cmt;
     }
 
-    function stateToQuery(s) {
-      const usp = new URLSearchParams();
-      Object.entries(s).forEach(([k, v]) => {
-        if (v !== "" && v != null) usp.set(k, v);
-      });
-      return usp.toString();
-    }
-
-    function queryToState() {
-      const usp = new URLSearchParams(location.search);
-      const g = (k) => usp.get(k) ?? undefined;
-      return {
-        price: g("price"),
-        tax: g("tax"),
-        vat: g("vat"),
-        ref: g("ref"),
-        drr: g("drr"),
-        cogs: g("cogs"),
-        fulf: g("fulf"),
-        last: g("last"),
-        ret: g("ret"),
-        retc: g("retc"),
-        inb: g("inb"),
-        stor: g("stor"),
-        pack: g("pack"),
-        other: g("other"),
-        tm: g("tm"),
-        cmt: g("cmt"),
-      };
-    }
-
     async function shareLink() {
       const state = getState();
-      const qs = stateToQuery(state);
-      const url = location.origin + location.pathname + (qs ? "?" + qs : "");
+      const hash = encodeStateToHash(state);
+      const url = location.origin + location.pathname + hash;
       const comment = (els.comment.value || "").trim();
 
-      // If Web Share API is available, use native share sheet
+      // Use native share if available
       if (navigator.share) {
         try {
           await navigator.share({
             title: "Юнит-экономика — расчёт",
-            text: comment ? comment.split("\n")[0].slice(0, 150) : "Расчёт юнит-экономики",
+            text: comment
+              ? comment.split("\n")[0].slice(0, 150)
+              : "Расчёт юнит-экономики",
             url,
           });
           setPill("Ссылка отправлена");
           els.shareStatus.textContent = "Ссылка отправлена через системное меню";
           return;
-        } catch (err) {
-          // If user cancels or share fails, gracefully fallback to clipboard
-          // (ignore AbortError / user cancel)
-          // console.warn("navigator.share failed:", err);
+        } catch {
+          // ignore and fall back to clipboard
         }
       }
-
       // Clipboard fallback
       try {
         await navigator.clipboard.writeText(url);
@@ -1032,10 +1065,19 @@
       els.resetBtn.addEventListener("click", clearAll);
       els.shareBtn.addEventListener("click", shareLink);
 
-      // Load state from URL (if any), then calculate
-      const initial = queryToState();
+      // Load state from URL hash (if any), then calculate
+      const initial = decodeStateFromHash();
       applyState(initial);
       calc();
+
+      // If the hash changes (user pastes a different link), reload state
+      window.addEventListener("hashchange", () => {
+        const st = decodeStateFromHash();
+        if (st) {
+          applyState(st);
+          calc();
+        }
+      });
     }
 
     function debounce(fn, wait) {
