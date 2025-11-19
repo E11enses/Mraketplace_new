@@ -1003,24 +1003,26 @@
       const url = location.origin + location.pathname + hash;
       const comment = (els.comment.value || "").trim();
 
-      // Use native share if available
-      if (navigator.share) {
+      const isMobile =
+        /Android|iPhone|iPad|iPod|Mobile|Silk|Kindle|BlackBerry|Opera Mini|IEMobile/i.test(
+          navigator.userAgent
+        );
+
+      if (isMobile && navigator.share) {
         try {
           await navigator.share({
             title: "Юнит-экономика — расчёт",
-            text: comment
-              ? comment.split("\n")[0].slice(0, 150)
-              : "Расчёт юнит-экономики",
+            text: comment ? comment.split("\n")[0].slice(0, 150) : "Расчёт юнит-экономики",
             url,
           });
           setPill("Ссылка отправлена");
           els.shareStatus.textContent = "Ссылка отправлена через системное меню";
           return;
         } catch {
-          // ignore and fall back to clipboard
+          // user canceled or share unsupported — fall through to clipboard
         }
       }
-      // Clipboard fallback
+
       try {
         await navigator.clipboard.writeText(url);
         setPill("Ссылка скопирована");
