@@ -3,8 +3,7 @@
 
 <head>
   <meta charset="utf-8" />
-  <title>Сделать штрихкод | Мракетплейсы
-  </title>
+  <title>Сделать штрихкод | Мракетплейсы</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
@@ -258,31 +257,7 @@
       color: var(--muted);
       font-size: 12px;
       text-align: center;
-      padding-bottom: 72px;
-      /* space for mobile sticky bar */
-    }
-
-    /* Mobile sticky action bar */
-    .sticky-actions {
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(17, 20, 37, 0.9);
-      backdrop-filter: blur(6px);
-      border-top: 1px solid var(--border);
-      padding: 8px 12px;
-      display: none;
-    }
-
-    .sticky-actions .btns {
-      justify-content: center;
-    }
-
-    @media (max-width: 600px) {
-      .sticky-actions {
-        display: block;
-      }
+      padding-bottom: 24px;
     }
 
     .back-to-site {
@@ -363,14 +338,14 @@
 
         <div class="form-row">
           <label>Цвета</label>
-          <div class="row-inline" style="gap:12px">
-            <div style="display:flex;align-items:center;gap:6px">
+          <div class="row-inline" style="gap: 12px">
+            <div style="display: flex; align-items: center; gap: 6px">
               <input id="lineColor" type="color" value="#000000" />
-              <input id="lineColorHex" type="text" value="#000000" style="width:110px" />
+              <input id="lineColorHex" type="text" value="#000000" style="width: 110px" />
             </div>
-            <div style="display:flex;align-items:center;gap:6px">
+            <div style="display: flex; align-items: center; gap: 6px">
               <input id="bgColor" type="color" value="#FFFFFF" />
-              <input id="bgColorHex" type="text" value="#FFFFFF" style="width:110px" />
+              <input id="bgColorHex" type="text" value="#FFFFFF" style="width: 110px" />
             </div>
           </div>
         </div>
@@ -412,9 +387,9 @@
           <label for="dpiScale">Детализация</label>
           <div class="row-inline">
             <select id="dpiScale">
-              <option value="2" selected>Обычная (1 строка)</option>
-              <option value="3">Высокая (3 строки)</option>
-              <option value="4">Ультра (4+ строки)</option>
+              <option value="2" selected>Обычная (2x)</option>
+              <option value="3">Высокая (3x)</option>
+              <option value="4">Ультра (4x)</option>
             </select>
           </div>
         </div>
@@ -448,9 +423,9 @@
     </div>
 
     <footer>
-      Создано на основе JsBarcode (MIT) и jsPDF (MIT). Данные не сохраняются на сервере.
+      Создано на основе JsBarcode (MIT) и jsPDF (MIT). Данные не сохраняются
+      на сервере.
       <div class="back-to-site"><a href="/index.html">Обратно на сайт</a></div>
-
     </footer>
   </div>
 
@@ -485,10 +460,6 @@
       downloadPngBtn: $("#downloadPngBtn"),
       downloadSvgBtn: $("#downloadSvgBtn"),
       downloadPdfBtn: $("#downloadPdfBtn"),
-      mGenerateBtn: $("#mGenerateBtn"),
-      mPngBtn: $("#mPngBtn"),
-      mSvgBtn: $("#mSvgBtn"),
-      mPdfBtn: $("#mPdfBtn"),
       clearBtn: $("#clearBtn"),
       status: $("#status"),
       statusPill: $("#status-pill"),
@@ -516,13 +487,17 @@
       const onlyDigits = /^[0-9]+$/;
       switch (format) {
         case "EAN13":
-          return onlyDigits.test(text) && (text.length === 12 || text.length === 13);
+          return (
+            onlyDigits.test(text) && (text.length === 12 || text.length === 13)
+          );
         case "EAN8":
           return onlyDigits.test(text) && (text.length === 7 || text.length === 8);
         case "UPC":
           return onlyDigits.test(text) && (text.length === 11 || text.length === 12);
         case "ITF14":
-          return onlyDigits.test(text) && (text.length === 13 || text.length === 14);
+          return (
+            onlyDigits.test(text) && (text.length === 13 || text.length === 14)
+          );
         case "MSI":
           return onlyDigits.test(text);
         case "pharmacode":
@@ -665,7 +640,7 @@
           height: clampInt(els.height.value, 20, 300),
           margin: clampInt(els.margin.value, 0, 50),
           displayValue: els.digitsShow.checked, // show digits if "show" is selected
-          flat: els.digitsHide.checked, // if hiding digits, we also flatten (no descenders)  
+          flat: els.digitsHide.checked, // if hiding digits, we also flatten (no descenders)
           fontOptions: "bold",
           font: "monospace",
           textMargin: 6,
@@ -870,7 +845,7 @@
       setTimeout(() => URL.revokeObjectURL(url), 1500);
     }
 
-    // ---- PDF export: landscape, minimal margins, high DPI fallback ----
+    // ---- PDF export ----
     function mmToPt(mm) {
       return (mm * 72) / 25.4;
     }
@@ -907,7 +882,7 @@
 
       const labelSVG = wrapFigureInSVG();
       const svgText = serializeSVG(labelSVG);
-      const margin = 4; // tiny safe margin
+      const margin = 4;
 
       try {
         if (typeof doc.addSvg === "function") {
@@ -932,7 +907,6 @@
         console.warn("Vector PDF failed; using high-DPI PNG fallback:", e);
       }
 
-      // Raster fallback
       const scale = parseInt(els.dpiScale.value, 10) || 2;
       const pngDataUrl = await svgTextToPng(svgText, scale);
 
@@ -1011,18 +985,11 @@
 
       syncColorInputs();
 
-      // Buttons
+      // Desktop buttons only (mobile sticky removed)
       els.generateBtn.addEventListener("click", generate);
-      els.mGenerateBtn.addEventListener("click", generate);
-
-      const pngHandlers = [els.downloadPngBtn, els.mPngBtn];
-      const svgHandlers = [els.downloadSvgBtn, els.mSvgBtn];
-      const pdfHandlers = [els.downloadPdfBtn, els.mPdfBtn];
-
-      pngHandlers.forEach((b) => b.addEventListener("click", downloadPNG));
-      svgHandlers.forEach((b) => b.addEventListener("click", downloadSVG));
-      pdfHandlers.forEach((b) => b.addEventListener("click", downloadPDF));
-
+      els.downloadPngBtn.addEventListener("click", downloadPNG);
+      els.downloadSvgBtn.addEventListener("click", downloadSVG);
+      els.downloadPdfBtn.addEventListener("click", downloadPDF);
       els.clearBtn.addEventListener("click", () => {
         els.text.value = "";
         els.extraText.value = "";
@@ -1032,7 +999,7 @@
         els.status.textContent = "Данные очищены.";
       });
 
-      // Improve keyboard on mobile: submit on Enter in data field
+      // Improve keyboard on mobile/desktop: Enter to generate
       els.text.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
           e.preventDefault();
