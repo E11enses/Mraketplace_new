@@ -163,7 +163,7 @@
       min-height: 18px;
     }
 
-    /* RESULTS: compact typography */
+    /* RESULTS compact */
     #resultsPanel.panel {
       padding: 10px;
     }
@@ -247,7 +247,7 @@
       padding-bottom: 24px;
     }
 
-    /* Info tooltips (light) */
+    /* Info tooltips */
     .info {
       display: inline-flex;
       align-items: center;
@@ -278,7 +278,7 @@
       background: #ffffff;
       color: #111827;
       border: 1px solid #e5e7eb;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
       border-radius: 8px;
       padding: 10px 12px;
       font-size: 13px;
@@ -298,7 +298,7 @@
       margin-bottom: 4px;
     }
 
-    @media (hover: hover) and (pointer: fine) {
+    @media (hover:hover) and (pointer:fine) {
       .info:hover .tooltip {
         display: block;
       }
@@ -336,8 +336,7 @@
             <span class="info" tabindex="0" aria-label="Цена реализации">i
               <span class="tooltip">
                 <span class="t-title">Цена реализации</span>
-                Фактическая цена продажи (!)без СПП. Именно её
-                используем как базу для расчётов.
+                Фактическая цена продажи (!)без СПП. Именно её используем как базу для расчётов.
               </span>
             </span>
           </label>
@@ -350,10 +349,8 @@
             <span class="info" tabindex="0">i
               <span class="tooltip">
                 <span class="t-title">Налоговый режим</span>
-                ОСНО: НДС убирается из цены для расчёта нетто‑выручки; налог по
-                режиму считается как 25% от прибыли.<br />
-                УСН 6%: 6% от цены реализации.<br />
-                УСН 15%: 15% от прибыли (если прибыль отрицательная — 0).
+                ОСНО: 25% от прибыли, НДС убирается из цены. УСН 6%: 6% от цены реализации. УСН 15%: 15% от прибыли
+                (если прибыль отрицательная — 0).
               </span>
             </span>
           </label>
@@ -370,8 +367,7 @@
             <span class="info" tabindex="0">i
               <span class="tooltip">
                 <span class="t-title">НДС</span>
-                Считаем, что цена реализации указана с НДС. Нетто‑выручка =
-                цена / (1 + НДС).
+                Считаем, что цена реализации указана с НДС. Нетто‑выручка = цена / (1 + НДС).
               </span>
             </span>
           </label>
@@ -403,8 +399,7 @@
             <span class="info" tabindex="0">i
               <span class="tooltip">
                 <span class="t-title">ДРР</span>
-                Доля рекламных расходов от цены реализации. Включается в
-                расходы и влияет на безубыточную и целевую цену.
+                Доля рекламных расходов от цены реализации. Включается в расходы и влияет на безубыточную цену.
               </span>
             </span>
           </label>
@@ -415,10 +410,8 @@
           <label for="cogs">
             Себестоимость, ₽
             <span class="info" tabindex="0">i
-              <span class="tooltip">
-                <span class="t-title">Себестоимость</span>
-                Закупка/производство единицы товара.
-              </span>
+              <span class="tooltip"><span class="t-title">Себестоимость</span> Закупка/производство единицы
+                товара.</span>
             </span>
           </label>
           <input id="cogs" type="number" inputmode="decimal" min="0" value="500" />
@@ -428,10 +421,7 @@
           <label for="fulfillment">
             Фулфилмент, ₽
             <span class="info" tabindex="0">i
-              <span class="tooltip">
-                <span class="t-title">Фулфилмент</span>
-                Сборка/обработка заказа на складе. Стоимость РАБОТЫ
-              </span>
+              <span class="tooltip"><span class="t-title">Фулфилмент</span> Сборка/обработка заказа на складе.</span>
             </span>
           </label>
           <input id="fulfillment" type="number" inputmode="decimal" min="0" value="51" />
@@ -441,10 +431,7 @@
           <label for="lastMile">
             Доставка покупателю, ₽
             <span class="info" tabindex="0">i
-              <span class="tooltip">
-                <span class="t-title">Доставка</span>
-                Цена логистики со склада маркетплейса до покупателя.
-              </span>
+              <span class="tooltip"><span class="t-title">Доставка</span> Цена логистики до покупателя.</span>
             </span>
           </label>
           <input id="lastMile" type="number" inputmode="decimal" min="0" value="119" />
@@ -454,10 +441,7 @@
           <label for="returns">
             Возвраты, %
             <span class="info" tabindex="0">i
-              <span class="tooltip">
-                <span class="t-title">Возвраты</span>
-                Ожидаемая доля заказов, которые вернутся.
-              </span>
+              <span class="tooltip"><span class="t-title">Возвраты</span> Ожидаемая доля возвратов.</span>
             </span>
           </label>
           <input id="returns" type="number" inputmode="decimal" min="0" max="100" value="6" />
@@ -467,10 +451,7 @@
           <label for="returnCost">
             Стоимость возврата, ₽
             <span class="info" tabindex="0">i
-              <span class="tooltip">
-                <span class="t-title">Стоимость возврата</span>
-                Стоимость обратной логистики от площадки
-              </span>
+              <span class="tooltip"><span class="t-title">Стоимость возврата</span> Обратная логистика/обработка.</span>
             </span>
           </label>
           <input id="returnCost" type="number" inputmode="decimal" min="0" value="40" />
@@ -480,10 +461,8 @@
           <label for="inbound">
             Входящая логистика, ₽
             <span class="info" tabindex="0">i
-              <span class="tooltip">
-                <span class="t-title">Входящая логистика</span>
-                Доставка на склад маркетплейса в расчёте на 1 шт.
-              </span>
+              <span class="tooltip"><span class="t-title">Входящая логистика</span> На склад МП в расчёте на 1
+                шт.</span>
             </span>
           </label>
           <input id="inbound" type="number" inputmode="decimal" min="0" value="19" />
@@ -493,10 +472,7 @@
           <label for="storage">
             Хранение, ₽
             <span class="info" tabindex="0">i
-              <span class="tooltip">
-                <span class="t-title">Хранение</span>
-                Стоимость хранения единицы товара за расчетный период.
-              </span>
+              <span class="tooltip"><span class="t-title">Хранение</span> Стоимость хранения за период.</span>
             </span>
           </label>
           <input id="storage" type="number" inputmode="decimal" min="0" value="11" />
@@ -506,10 +482,7 @@
           <label for="packaging">
             Упаковка, ₽
             <span class="info" tabindex="0">i
-              <span class="tooltip">
-                <span class="t-title">Упаковка</span>
-                Затраты на упаковочные материалы на 1 шт.
-              </span>
+              <span class="tooltip"><span class="t-title">Упаковка</span> Материалы на 1 шт.</span>
             </span>
           </label>
           <input id="packaging" type="number" inputmode="decimal" min="0" value="11" />
@@ -519,27 +492,11 @@
           <label for="other">
             Прочие расходы, ₽
             <span class="info" tabindex="0">i
-              <span class="tooltip">
-                <span class="t-title">Прочие расходы</span>
-                Доп. затраты: контент, страхование, брак на производстве и т. п.
-              </span>
+              <span class="tooltip"><span class="t-title">Прочие расходы</span> Контент, страхование и др.</span>
             </span>
           </label>
           <input id="other" type="number" inputmode="decimal" min="0" value="0" />
         </div>
-
-        <!-- <div class="form-row">
-          <label for="targetMargin">
-            Целевая маржа, %
-            <span class="info" tabindex="0">i
-              <span class="tooltip">
-                <span class="t-title">Целевая маржа</span>
-                Желаемая маржа на НЕТТО‑выручку. Рассчитываем требуемую цену.
-              </span>
-            </span>
-          </label>
-          <input id="targetMargin" type="number" inputmode="decimal" min="0" max="90" value="25" />
-        </div> -->
 
         <div class="btns">
           <button id="calcBtn" class="primary">Рассчитать</button>
@@ -596,25 +553,11 @@
                 <span class="info" tabindex="0">i
                   <span class="tooltip">
                     <span class="t-title">Точка безубыточности</span>
-                    Цена, при которой прибыль = 0 с учётом комиссий, ДРР и
-                    налогового режима.
+                    Цена, при которой прибыль = 0 с учётом комиссий, ДРР и налогового режима.
                   </span>
                 </span>
               </th>
               <td id="breakevenPrice">—</td>
-            </tr>
-            <tr>
-              <th>
-                Цена для целевой маржи, ₽
-                <span class="info" tabindex="0">i
-                  <span class="tooltip">
-                    <span class="t-title">Целевая цена</span>
-                    Цена реализации, обеспечивающая заданную маржу на
-                    нетто‑выручку.
-                  </span>
-                </span>
-              </th>
-              <td id="targetPrice">—</td>
             </tr>
           </tbody>
         </table>
@@ -646,12 +589,10 @@
   <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
 
   <script>
-    // Tooltips toggle for mobile/tap and accessibility
+    // Tooltips toggle
     (function () {
       function closeAll() {
-        document
-          .querySelectorAll('.info[data-open="true"]')
-          .forEach((el) => el.setAttribute("data-open", "false"));
+        document.querySelectorAll('.info[data-open="true"]').forEach((el) => el.setAttribute("data-open", "false"));
       }
       document.addEventListener("click", (e) => {
         const info = e.target.closest(".info");
@@ -664,14 +605,11 @@
           closeAll();
         }
       });
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") closeAll();
-      });
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeAll(); });
     })();
 
     const $ = (s) => document.querySelector(s);
-    const fmt = (n) =>
-      new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 }).format(n);
+    const fmt = (n) => new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 }).format(n);
 
     const els = {
       price: $("#price"),
@@ -688,7 +626,6 @@
       storage: $("#storage"),
       packaging: $("#packaging"),
       other: $("#other"),
-      targetMargin: $("#targetMargin"),
       calcBtn: $("#calcBtn"),
       resetBtn: $("#resetBtn"),
       profitVal: $("#profitVal"),
@@ -697,27 +634,19 @@
       totalCostVal: $("#totalCostVal"),
       breakdown: $("#breakdown"),
       breakevenPrice: $("#breakevenPrice"),
-      targetPrice: $("#targetPrice"),
       pill: $("#status-pill"),
       comment: $("#comment"),
       shareBtn: $("#shareBtn"),
       shareStatus: $("#shareStatus"),
     };
 
-    function setPill(msg) {
-      els.pill.textContent = msg;
-    }
-    function clamp(n, min, max) {
-      return Math.min(max, Math.max(min, n));
-    }
-    function num(el) {
-      const v = parseFloat(el.value);
-      return Number.isFinite(v) ? v : 0;
-    }
+    function setPill(msg) { els.pill.textContent = msg; }
+    function clamp(n, min, max) { return Math.min(max, Math.max(min, n)); }
+    function num(el) { const v = parseFloat(el.value); return Number.isFinite(v) ? v : 0; }
 
     function calc() {
       const price = Math.max(0, num(els.price));
-      const taxRegime = els.taxRegime.value; // OSNO | USN6 | USN15
+      const taxRegime = els.taxRegime.value;
       const vatPct = clamp(num(els.vatRate), 0, 100);
       const refFeePct = clamp(num(els.refFee), 0, 100);
       const drrPct = clamp(num(els.drr), 0, 100);
@@ -731,7 +660,6 @@
       const storage = Math.max(0, num(els.storage));
       const packaging = Math.max(0, num(els.packaging));
       const other = Math.max(0, num(els.other));
-      const targetMarginPct = clamp(num(els.targetMargin), 0, 90);
 
       // Выручка без НДС
       const netOfVAT = vatPct > 0 ? price / (1 + vatPct / 100) : price;
@@ -743,73 +671,56 @@
       // Ожидаемые возвраты
       const expectedReturnCost = (returnsPct / 100) * returnCost;
 
-      // База нетто-выручки (без НДС и комиссии)
+      // База нетто-выручки
       const netRevenueBase = netOfVAT - referralFee;
 
       // Операционные расходы без налога
       const opCostsExTax =
-        cogs +
-        fulfillment +
-        lastMile +
-        expectedReturnCost +
-        inbound +
-        storage +
-        packaging +
-        other +
-        drrCost;
+        cogs + fulfillment + lastMile + expectedReturnCost +
+        inbound + storage + packaging + other + drrCost;
 
       // Налог по режиму
       let taxCost = 0;
       if (taxRegime === "USN6") {
-        taxCost = price * 0.06; // или netOfVAT * 0.06
+        taxCost = price * 0.06;
       } else if (taxRegime === "USN15") {
-        const profitBeforeTax = netRevenueBase - opCostsExTax;
-        taxCost = Math.max(0, 0.15 * profitBeforeTax);
+        const pbt = netRevenueBase - opCostsExTax;
+        taxCost = Math.max(0, 0.15 * pbt);
       } else if (taxRegime === "OSNO") {
-        const profitBeforeTax = netRevenueBase - opCostsExTax;
-        taxCost = Math.max(0, 0.25 * profitBeforeTax);
+        const pbt = netRevenueBase - opCostsExTax;
+        taxCost = Math.max(0, 0.25 * pbt);
       }
 
       const totalCosts = opCostsExTax + taxCost;
       const netRevenue = netRevenueBase;
       const profit = netRevenue - totalCosts;
-      const margin =
-        netRevenue > 0 ? (profit / netRevenue) * 100 : profit < 0 ? -100 : 0;
+      const margin = netRevenue > 0 ? (profit / netRevenue) * 100 : (profit < 0 ? -100 : 0);
 
-      // Безубыточность / Целевая цена
-      const v = vatPct / 100,
-        r = refFeePct / 100,
-        a = drrPct / 100;
+      // Безубыточность
+      const v = vatPct / 100, r = refFeePct / 100, a = drrPct / 100;
       const C = 1 / (1 + v) - r - a;
       const K = opCostsExTax - drrCost;
 
-      function solvePriceForNetRevenue(netRevNeeded) {
+      function breakevenPriceForRegime() {
         if (C <= 0) return Infinity;
         if (taxRegime === "USN6") {
           const C2 = C - 0.06;
-          return C2 > 0 ? netRevNeeded / C2 : Infinity;
+          return C2 > 0 ? K / C2 : Infinity;
         } else if (taxRegime === "USN15") {
           const C2 = C * (1 - 0.15);
-          return C2 > 0 ? (netRevNeeded + 0.15 * K) / C2 : Infinity;
+          return C2 > 0 ? (K + 0.15 * K) / C2 : Infinity; // same as K/C adjusted; for zero margin it's effectively K/C2
         } else if (taxRegime === "OSNO") {
           const C2 = C * (1 - 0.25);
-          return C2 > 0 ? (netRevNeeded + 0.25 * K) / C2 : Infinity;
+          return C2 > 0 ? (K + 0.25 * K) / C2 : Infinity;
         }
-        return netRevNeeded / C;
+        return K / C;
       }
 
-      const breakeven = solvePriceForNetRevenue(K);
-      const m = clamp(targetMarginPct, 0, 0.9) / 100;
-      const targetNeed = K / (1 - m);
-      const targetPrice = solvePriceForNetRevenue(targetNeed);
+      const breakeven = breakevenPriceForRegime();
 
       // KPI
-      els.netRevVal.textContent = isFinite(netRevenue)
-        ? fmt(netRevenue) + " ₽"
-        : "—";
-      els.totalCostVal.textContent = isFinite(totalCosts)
-        ? fmt(totalCosts) + " ₽"
-        : "—";
+      els.netRevVal.textContent = isFinite(netRevenue) ? fmt(netRevenue) + " ₽" : "—";
+      els.totalCostVal.textContent = isFinite(totalCosts) ? fmt(totalCosts) + " ₽" : "—";
       els.profitVal.textContent = isFinite(profit) ? fmt(profit) + " ₽" : "—";
       els.marginVal.textContent = isFinite(margin) ? fmt(margin) + " %" : "—";
       $("#kpi-profit").classList.toggle("good", profit > 0);
@@ -817,24 +728,12 @@
       $("#kpi-margin").classList.toggle("good", margin >= 15);
       $("#kpi-margin").classList.toggle("bad", margin < 0);
 
-      els.breakevenPrice.textContent = isFinite(breakeven)
-        ? fmt(breakeven) + " ₽"
-        : "—";
-      els.targetPrice.textContent = isFinite(targetPrice)
-        ? fmt(targetPrice) + " ₽"
-        : "—";
+      els.breakevenPrice.textContent = isFinite(breakeven) ? fmt(breakeven) + " ₽" : "—";
 
       // Детализация
       const rows = [
         ["Цена реализации", fmt(price) + " ₽"],
-        [
-          "Налоговый режим",
-          taxRegime === "OSNO"
-            ? "ОСНО (25% от прибыли)"
-            : taxRegime === "USN6"
-              ? "УСН 6%"
-              : "УСН 15%",
-        ],
+        ["Налоговый режим", taxRegime === "OSNO" ? "ОСНО (25% от прибыли)" : taxRegime === "USN6" ? "УСН 6%" : "УСН 15%"],
         ["НДС, %", fmt(vatPct) + " %"],
         ["Выручка без НДС", fmt(netOfVAT) + " ₽"],
         ["Комиссия площадки", fmt(referralFee) + " ₽ (" + fmt(refFeePct) + " %)"],
@@ -842,24 +741,14 @@
         ["Себестоимость (COGS)", fmt(cogs) + " ₽"],
         ["Фулфилмент", fmt(fulfillment) + " ₽"],
         ["Доставка покупателю", fmt(lastMile) + " ₽"],
-        [
-          "Возвраты (ожидаемо)",
-          fmt(expectedReturnCost) +
-          " ₽ (" +
-          fmt(returnsPct) +
-          " % × " +
-          fmt(returnCost) +
-          " ₽)",
-        ],
+        ["Возвраты (ожидаемо)", fmt(expectedReturnCost) + " ₽ (" + fmt(returnsPct) + " % × " + fmt(returnCost) + " ₽)"],
         ["Входящая логистика", fmt(inbound) + " ₽"],
         ["Хранение", fmt(storage) + " ₽"],
         ["Упаковка", fmt(packaging) + " ₽"],
         ["Прочие расходы", fmt(other) + " ₽"],
         ["Налог по режиму", fmt(taxCost) + " ₽"],
       ];
-      els.breakdown.innerHTML = rows
-        .map((r) => `<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`)
-        .join("");
+      els.breakdown.innerHTML = rows.map((r) => `<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join("");
     }
 
     // Clear all numeric fields to blank
@@ -878,7 +767,6 @@
       els.storage.value = "";
       els.packaging.value = "";
       els.other.value = "";
-      els.targetMargin.value = "";
       els.comment.value = "";
 
       els.netRevVal.textContent = "—";
@@ -886,85 +774,40 @@
       els.profitVal.textContent = "—";
       els.marginVal.textContent = "—";
       els.breakevenPrice.textContent = "—";
-      els.targetPrice.textContent = "—";
       document.querySelector("#kpi-profit")?.classList.remove("good", "bad");
       document.querySelector("#kpi-margin")?.classList.remove("good", "bad");
       els.breakdown.innerHTML = "";
       setPill("Очищено");
     }
 
-    // --------------- State helpers (compressed hash) ---------------
+    // Share (compressed hash)
     function getState() {
       return {
-        price: els.price.value,
-        tax: els.taxRegime.value,
-        vat: els.vatRate.value,
-        ref: els.refFee.value,
-        drr: els.drr.value,
-        cogs: els.cogs.value,
-        fulf: els.fulfillment.value,
-        last: els.lastMile.value,
-        ret: els.returns.value,
-        retc: els.returnCost.value,
-        inb: els.inbound.value,
-        stor: els.storage.value,
-        pack: els.packaging.value,
-        other: els.other.value,
-        tm: els.targetMargin.value,
-        cmt: els.comment.value,
+        price: els.price.value, tax: els.taxRegime.value, vat: els.vatRate.value,
+        ref: els.refFee.value, drr: els.drr.value, cogs: els.cogs.value,
+        fulf: els.fulfillment.value, last: els.lastMile.value, ret: els.returns.value,
+        retc: els.returnCost.value, inb: els.inbound.value, stor: els.storage.value,
+        pack: els.packaging.value, other: els.other.value, cmt: els.comment.value,
       };
     }
-
-    // Compact mapping to reduce size before compression
-    function compactState(state) {
+    function compactState(s) {
       return {
-        p: state.price,
-        tr: state.tax,
-        v: state.vat,
-        rf: state.ref,
-        dr: state.drr,
-        c: state.cogs,
-        f: state.fulf,
-        l: state.last,
-        r: state.ret,
-        rc: state.retc,
-        ib: state.inb,
-        st: state.stor,
-        pk: state.pack,
-        o: state.other,
-        tm: state.tm,
-        cm: state.cmt,
+        p: s.price, tr: s.tax, v: s.vat, rf: s.ref, dr: s.drr, c: s.cogs, f: s.fulf, l: s.last,
+        r: s.ret, rc: s.retc, ib: s.inb, st: s.stor, pk: s.pack, o: s.other, cm: s.cmt
       };
     }
     function expandState(c) {
       if (!c) return undefined;
       return {
-        price: c.p,
-        tax: c.tr,
-        vat: c.v,
-        ref: c.rf,
-        drr: c.dr,
-        cogs: c.c,
-        fulf: c.f,
-        last: c.l,
-        ret: c.r,
-        retc: c.rc,
-        inb: c.ib,
-        stor: c.st,
-        pack: c.pk,
-        other: c.o,
-        tm: c.tm,
-        cmt: c.cm,
+        price: c.p, tax: c.tr, vat: c.v, ref: c.rf, drr: c.dr, cogs: c.c, fulf: c.f, last: c.l,
+        ret: c.r, retc: c.rc, inb: c.ib, stor: c.st, pack: c.pk, other: c.o, cmt: c.cm
       };
     }
-
     function encodeStateToHash(state) {
-      const compact = compactState(state);
-      const json = JSON.stringify(compact);
+      const json = JSON.stringify(compactState(state));
       const compressed = LZString.compressToEncodedURIComponent(json);
       return "#" + compressed;
     }
-
     function decodeStateFromHash() {
       const hash = location.hash?.slice(1);
       if (!hash) return undefined;
@@ -972,42 +815,31 @@
         const json = LZString.decompressFromEncodedURIComponent(hash);
         if (!json) return undefined;
         return expandState(JSON.parse(json));
-      } catch {
-        return undefined;
-      }
+      } catch { return undefined; }
     }
-
     function applyState(s) {
       if (!s) return;
-      if ("price" in s && s.price != null) els.price.value = s.price;
-      if ("tax" in s && s.tax != null) els.taxRegime.value = s.tax;
-      if ("vat" in s && s.vat != null) els.vatRate.value = s.vat;
-      if ("ref" in s && s.ref != null) els.refFee.value = s.ref;
-      if ("drr" in s && s.drr != null) els.drr.value = s.drr;
-      if ("cogs" in s && s.cogs != null) els.cogs.value = s.cogs;
-      if ("fulf" in s && s.fulf != null) els.fulfillment.value = s.fulf;
-      if ("last" in s && s.last != null) els.lastMile.value = s.last;
-      if ("ret" in s && s.ret != null) els.returns.value = s.ret;
-      if ("retc" in s && s.retc != null) els.returnCost.value = s.retc;
-      if ("inb" in s && s.inb != null) els.inbound.value = s.inb;
-      if ("stor" in s && s.stor != null) els.storage.value = s.stor;
-      if ("pack" in s && s.pack != null) els.packaging.value = s.pack;
-      if ("other" in s && s.other != null) els.other.value = s.other;
-      if ("tm" in s && s.tm != null) els.targetMargin.value = s.tm;
-      if ("cmt" in s && s.cmt != null) els.comment.value = s.cmt;
+      if (s.price != null) els.price.value = s.price;
+      if (s.tax != null) els.taxRegime.value = s.tax;
+      if (s.vat != null) els.vatRate.value = s.vat;
+      if (s.ref != null) els.refFee.value = s.ref;
+      if (s.drr != null) els.drr.value = s.drr;
+      if (s.cogs != null) els.cogs.value = s.cogs;
+      if (s.fulf != null) els.fulfillment.value = s.fulf;
+      if (s.last != null) els.lastMile.value = s.last;
+      if (s.ret != null) els.returns.value = s.ret;
+      if (s.retc != null) els.returnCost.value = s.retc;
+      if (s.inb != null) els.inbound.value = s.inb;
+      if (s.stor != null) els.storage.value = s.stor;
+      if (s.pk != null) els.packaging.value = s.pk;
+      if (s.o != null) els.other.value = s.o;
+      if (s.cm != null) els.comment.value = s.cm;
     }
-
     async function shareLink() {
       const state = getState();
-      const hash = encodeStateToHash(state);
-      const url = location.origin + location.pathname + hash;
+      const url = location.origin + location.pathname + encodeStateToHash(state);
       const comment = (els.comment.value || "").trim();
-
-      const isMobile =
-        /Android|iPhone|iPad|iPod|Mobile|Silk|Kindle|BlackBerry|Opera Mini|IEMobile/i.test(
-          navigator.userAgent
-        );
-
+      const isMobile = /Android|iPhone|iPad|iPod|Mobile|Silk|Kindle|BlackBerry|Opera Mini|IEMobile/i.test(navigator.userAgent);
       if (isMobile && navigator.share) {
         try {
           await navigator.share({
@@ -1018,11 +850,8 @@
           setPill("Ссылка отправлена");
           els.shareStatus.textContent = "Ссылка отправлена через системное меню";
           return;
-        } catch {
-          // user canceled or share unsupported — fall through to clipboard
-        }
+        } catch { }
       }
-
       try {
         await navigator.clipboard.writeText(url);
         setPill("Ссылка скопирована");
@@ -1033,61 +862,36 @@
       }
     }
 
-    // --------------- Events ---------------
+    // Events
     function attachEvents() {
       const inputs = [
-        "price",
-        "taxRegime",
-        "vatRate",
-        "refFee",
-        "drr",
-        "cogs",
-        "fulfillment",
-        "lastMile",
-        "returns",
-        "returnCost",
-        "inbound",
-        "storage",
-        "packaging",
-        "other",
-        "targetMargin",
-        "comment",
+        "price", "taxRegime", "vatRate", "refFee", "drr", "cogs", "fulfillment", "lastMile",
+        "returns", "returnCost", "inbound", "storage", "packaging", "other", "comment",
       ].map((k) => els[k]);
 
       inputs.forEach((el) => {
         el.addEventListener("input", debounce(calc, 80));
         el.addEventListener("change", calc);
-        if (el.tagName === "INPUT")
-          el.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") calc();
-          });
+        if (el.tagName === "INPUT") el.addEventListener("keydown", (e) => { if (e.key === "Enter") calc(); });
       });
 
       els.calcBtn.addEventListener("click", calc);
       els.resetBtn.addEventListener("click", clearAll);
       els.shareBtn.addEventListener("click", shareLink);
 
-      // Load state from URL hash (if any), then calculate
       const initial = decodeStateFromHash();
       applyState(initial);
       calc();
 
-      // If the hash changes (user pastes a different link), reload state
       window.addEventListener("hashchange", () => {
         const st = decodeStateFromHash();
-        if (st) {
-          applyState(st);
-          calc();
-        }
+        if (st) { applyState(st); calc(); }
       });
     }
 
     function debounce(fn, wait) {
       let t = 0;
-      return (...args) => {
-        clearTimeout(t);
-        t = setTimeout(() => fn.apply(null, args), wait);
-      };
+      return (...args) => { clearTimeout(t); t = setTimeout(() => fn.apply(null, args), wait); };
     }
 
     attachEvents();
