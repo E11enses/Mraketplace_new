@@ -658,11 +658,6 @@ nav.scrolled {
     flex: 1;
 }
 
-.timeline-item a {
-    display: flex;
-    gap: 20px;
-}
-
 .timeline-dot {
     width: 40px;
     height: 40px;
@@ -1462,6 +1457,11 @@ footer ul li a {
         align-items: center;
         gap: 30px;
         text-align: left;
+    }
+
+    .timeline-item a {
+        display: flex;
+        gap: 20px;
     }
 
     .timeline-dot {
