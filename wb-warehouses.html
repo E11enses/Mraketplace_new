@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <title>Доступность складов WB</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        --bg: #f5f7fa;
+        --card: #ffffff;
+        --border: #e2e6ee;
+        --text: #20242e;
+        --muted: #6e7580;
+
+        --green: #2f855a;
+        --amber: #d97706;
+        --red: #c53030;
+
+        /* новые цвета типов тары */
+        --bt-box: #4466aa;      /* Короба — синий */
+        --bt-pallet: #3d8560;   /* Паллеты — зелёный */
+        --bt-safe: #7b5aa6;     /* Суперсейф — фиолетовый */
+
+        /* чипы коэффициентов */
+        --coef-green-bg: #e9f6ef;
+        --coef-amber-bg: #fff6e5;
+        --coef-red-bg: #fdecec;
+        --coef-gray-bg: #eef2f7;
+
+        --coef-green-border: #b7e2c8;
+        --coef-amber-border: #f6d48a;
+        --coef-red-border: #f3b4b4;
+        --coef-gray-border: #d7dde6;
+
+        --coef-green-text: #14532d;
+        --coef-amber-text: #7a4b00;
+        --coef-red-text: #7f1d1d;
+        --coef-gray-text: #374151;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 16px; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+      .wrap { max-width: 1100px; margin: 0 auto; }
+      h1 { margin: 0 0 10px; font-size: 20px; font-weight: 600; }
+      .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 12px; }
+      .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+      .spacer { flex: 1 1 auto; }
+
+      input[type="text"], input[type="number"] {
+        padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: #fff;
+      }
+      label.chk {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 6px 8px; border: 1px solid var(--border);
+        border-radius: 8px; background: #fff; color: var(--text);
+      }
+      .muted { color: var(--muted); font-size: 12px; }
+
+      .pill { padding: 2px 7px; border-radius: 999px; color: #fff; font-size: 11px; display: inline-block; font-weight: 700; }
+      .pill.available{ background: var(--green) } .pill.partial{ background: var(--amber); color:#000 } .pill.unavailable{ background: var(--red) }
+
+      /* компактные чипы типов */
+      .bt { display:inline-block; padding:2px 6px; border-radius:6px; color:#fff; font-size:11px; margin-right:6px; margin-bottom:4px; font-weight:600 }
+      .bt-box{ background:var(--bt-box)} .bt-pallet{ background:var(--bt-pallet)} .bt-safe{ background:var(--bt-safe)}
+
+      /* компактные чипы коэффициентов */
+      .coef{
+        display:inline-flex; align-items:center; gap:4px;
+        padding:2px 6px; border-radius:999px; font-size:11px;
+        margin-left:8px; margin-bottom:4px;
+        border:1px solid var(--coef-gray-border);
+        background:var(--coef-gray-bg); color:var(--coef-gray-text); line-height:1;
+      }
+      .coef .label{ font-weight:700 }
+      .coef.green{ background:var(--coef-green-bg); color:var(--coef-green-text); border-color:var(--coef-green-border) }
+      .coef.amber{ background:var(--coef-amber-bg); color:var(--coef-amber-text); border-color:var(--coef-amber-border) }
+      .coef.red{ background:var(--coef-red-bg); color:var(--coef-red-text); border-color:var(--coef-red-border) }
+
+      .line{ margin-top:4px; display:flex; flex-wrap:wrap; align-items:center }
+      .nowrap{ white-space:nowrap }
+
+      table{ width:100%; border-collapse:collapse }
+      th,td{ border:1px solid var(--border); padding:10px; font-size:14px; vertical-align:top }
+      th{ background:#f9fbfe; text-align:left; font-weight:600; position: sticky; top: 0; z-index: 1; }
+
+      #error{ color:#b00020; font-size:13px }
+
+      @media (max-width: 820px){
+        body{ margin:12px }
+        h1{ font-size:18px }
+        th,td{ padding:8px; font-size:13px }
+        .pill{ padding:2px 6px; font-size:10px }
+        .bt{ padding:2px 5px; font-size:10.5px; margin-right:6px; margin-bottom:4px }
+        .coef{ padding:2px 5px; font-size:10.5px; margin-left:6px; margin-bottom:4px }
+        .row{ gap:8px }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="card">
+        <div class="row">
+          <h1>Доступность складов Wildberries</h1>
+          <div class="spacer"></div>
+          <div id="lastUpdated" class="muted"></div>
+        </div>
+
+        <div class="row" style="margin-top:8px; gap:12px;">
+          <input id="search" type="text" placeholder="Поиск по названию..." />
+          <label class="chk"><input type="checkbox" id="onlyAvail" /> Только доступные</label>
+          <div class="field">
+            <span class="muted">Объём вашего товара, л</span>
+            <input id="vol" type="number" min="0" step="0.01" value="1" style="width:120px;" />
+          </div>
+        </div>
+
+        <div id="error"></div>
+        <div id="summary" style="margin-top:8px;">Загрузка…</div>
+      </div>
+
+      <div class="card" style="padding:0;">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 360px;">Склад</th>
+              <th>Типы тары и коэффициенты</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      const state = { items: [], filtered: [] };
+
+      // Базовые ставки (в памяти)
+      const BASE = {
+        storageFirst: 0.08,  // ₽ за первый литр
+        storageAdd: 0.08,    // ₽ за каждый дополнительный литр
+        deliveryFirst: 46,   // ₽ за первый литр
+        deliveryAdd: 14      // ₽ за каждый дополнительный литр
+      };
+
+      function escapeHtml(s){
+        return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")
+          .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+      }
+
+      // Доступность
+      function rowAvailable(r){
+        if (!r) return false;
+        if (r.coefficient === -1 || r.coefficient === -1.0) return false;
+        return !!r.allowUnload;
+      }
+      function isAvailable(wh){ return (wh.rows || []).some(rowAvailable); }
+      function isPartial(wh){
+        const rows = wh.rows || [];
+        const anyAvail = rows.some(rowAvailable);
+        const anyUnavail = rows.some(r => !rowAvailable(r));
+        return anyAvail && anyUnavail;
+      }
+
+      function boxLabelClass(id){
+        return id === 2 ? ["Короба","bt-box"] : id === 5 ? ["Паллеты","bt-pallet"] : id === 6 ? ["Суперсейф","bt-safe"] : ["Тип "+id,"bt-box"];
+      }
+      function coefClass(v){
+        if (v == null) return "gray";
+        if (v >= 60 && v <= 100) return "green";
+        if (v >= 101 && v <= 149) return "amber";
+        if (v >= 150 && v <= 1000) return "red";
+        return "gray";
+      }
+
+      // База за единицу по объёму V (руб)
+      function basePerUnit(first, add, V){
+        V = Math.max(0, Number(V) || 0);
+        const vAdd = Math.max(0, V - 1);
+        return (V > 0 ? first : 0) + add * vAdd;
+      }
+      function computeBases(){
+        const V = Number(document.getElementById("vol").value) || 0;
+        return {
+          baseStorage: basePerUnit(BASE.storageFirst, BASE.storageAdd, V),
+          baseDelivery: basePerUnit(BASE.deliveryFirst, BASE.deliveryAdd, V)
+        };
+      }
+      function calcYourCostsByRow(row, bases){
+        const storageCoefPct = row.storageCoef;
+        const deliveryCoefPct = row.deliveryCoef;
+        const yourStor = storageCoefPct != null ? bases.baseStorage * (storageCoefPct / 100) : null;
+        const yourDel  = deliveryCoefPct != null ? bases.baseDelivery * (deliveryCoefPct / 100) : null;
+        return { yourStor, yourDel };
+      }
+      function fmtMoney(x){
+        if (x == null || !isFinite(x)) return "—";
+        return x.toFixed(2) + " ₽";
+      }
+
+      function applyFilter(){
+        const q = (document.getElementById("search").value || "").toLowerCase().trim();
+        const onlyAvail = document.getElementById("onlyAvail").checked;
+        state.filtered = state.items.filter(i=>{
+          if (q){
+            const t = `${i.name||""}`.toLowerCase();
+            if (!t.includes(q)) return false;
+          }
+          if (onlyAvail && !isAvailable(i)) return false;
+          return true;
+        });
+      }
+
+      const MAX_LINES_COLLAPSED = 8;
+
+      function renderTypes(rows){
+        if (!rows || !rows.length) return "<span class='muted'>Нет данных</span>";
+        const wrapClass = rows.length > MAX_LINES_COLLAPSED ? "types-wrap collapsible" : "types-wrap";
+        let html = `<div class="${wrapClass}">`;
+        const bases = computeBases();
+
+        rows.forEach((r, idx)=>{
+          const show = rows.length > MAX_LINES_COLLAPSED ? (idx < MAX_LINES_COLLAPSED ? "show" : "") : "show";
+          const [label, clsName] = boxLabelClass(r.boxTypeID);
+          const rowAvail = rowAvailable(r);
+          const acc = rowAvail ? "Да" : "Нет";
+          const accColor = rowAvail ? "style='color: var(--green)'" : "style='color: var(--red)'";
+          const dClass = coefClass(r.deliveryCoef);
+          const sClass = coefClass(r.storageCoef);
+
+          const { yourStor, yourDel } = calcYourCostsByRow(r, bases);
+
+          html += `
+            <div class="line ${show}">
+              <span class="bt ${clsName}">${escapeHtml(label)}</span>
+              <span ${accColor} class="nowrap" style="margin-right:10px;">Приём: ${acc}</span>
+              <span class="coef ${dClass}"><span class="label">Дост.</span> ${r.deliveryCoef ?? "—"}%</span>
+              <span class="coef ${sClass}"><span class="label">Хран.</span> ${r.storageCoef ?? "—"}%</span>
+              <span class="coef" style="margin-left:10px;"><span class="label">Ваша лог-а:</span> ${fmtMoney(yourDel)}</span>
+              <span class="coef" style="margin-left:6px;"><span class="label">Ваше хран-е:</span> ${fmtMoney(yourStor)}</span>
+            </div>
+          `;
+        });
+        html += `</div>`;
+        if (rows.length > MAX_LINES_COLLAPSED){
+          html += `<div class="toggle-more" onclick="toggleMore(this)">Показать ещё</div>`;
+        }
+        return html;
+      }
+
+      window.toggleMore = function(el){
+        const wrap = el.previousElementSibling;
+        const hidden = wrap.querySelectorAll(".line:not(.show)");
+        const showingAll = hidden.length === 0;
+        if (showingAll){
+          wrap.querySelectorAll(".line").forEach((node, i)=>{ node.classList.toggle("show", i < MAX_LINES_COLLAPSED); });
+          el.textContent = "Показать ещё";
+        } else {
+          wrap.querySelectorAll(".line").forEach(node => node.classList.add("show"));
+          el.textContent = "Скрыть";
+        }
+      };
+
+      function renderTable(){
+        const tbody = document.getElementById("tbody");
+
+        tbody.innerHTML = state.filtered.map(i=>{
+          const avail = isAvailable(i);
+          const partial = isPartial(i);
+          let statusClass = "unavailable";
+          let statusLabel = "НЕДОСТУПЕН";
+          if (avail && partial){ statusClass = "partial"; statusLabel = "ЧАСТИЧНО"; }
+          else if (avail){ statusClass = "available"; statusLabel = "ДОСТУПЕН"; }
+
+          const types = renderTypes(i.rows);
+
+          return `
+            <tr>
+              <td>
+                <div><strong>${escapeHtml(i.name)}</strong></div>
+                <div class="muted" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                  <span>ID: ${escapeHtml(String(i.warehouseId))}${i.isSortingCenter ? " • СЦ" : ""}</span>
+                  <span class="pill ${statusClass}">${statusLabel}</span>
+                </div>
+              </td>
+              <td>${types}</td>
+            </tr>
+          `;
+        }).join("");
+
+        const total = state.filtered.length;
+        const availCnt = state.filtered.filter(isAvailable).length;
+        document.getElementById("summary").textContent =
+          `Складов: ${total} — Доступно: ${availCnt}, Недоступно: ${total - availCnt}`;
+        document.getElementById("lastUpdated").textContent =
+          "Последнее обновление: " + new Date().toLocaleTimeString();
+      }
+
+      function render(){ renderTable(); }
+
+      async function load(){
+        document.getElementById("error").textContent = "";
+        try{
+          const res = await fetch("/api/wb-availability.php");
+          if (!res.ok){ const t = await res.text(); throw new Error(`API ${res.status}: ${t}`); }
+          const data = await res.json();
+          state.items = Array.isArray(data) ? data : [];
+          applyFilter(); render();
+        } catch(e){
+          document.getElementById("error").textContent = e.message;
+        }
+      }
+
+      document.getElementById("search").oninput = ()=>{ applyFilter(); render(); };
+      document.getElementById("onlyAvail").onchange = ()=>{ applyFilter(); render(); };
+      document.getElementById("vol").addEventListener("input", ()=>{ applyFilter(); render(); });
+
+      load();
+    </script>
+  </body>
+</html>

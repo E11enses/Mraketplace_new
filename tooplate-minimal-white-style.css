@@ -686,6 +686,10 @@ nav.scrolled {
     background: grey;
 }
 
+.timeline-item-3:hover .timeline-dot {
+    background: #d4b4dc;
+}
+
 .timeline-link {
     text-decoration: none;
     color: inherit;
