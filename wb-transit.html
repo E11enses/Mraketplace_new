@@ -36,7 +36,7 @@
     }
 
     .header {
-      padding: 16px;
+      padding: 12px 16px;
       border-bottom: 1px solid var(--border);
       background: #ffffffcc;
       backdrop-filter: saturate(150%) blur(6px);
@@ -46,35 +46,46 @@
     }
 
     h1 {
-      margin: 0 0 10px;
+      margin: 0 0 8px;
       font-size: 20px;
     }
 
-    .row {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 8px;
       align-items: center;
     }
 
-    label.inline {
+    .search-wrap {
       display: flex;
-      gap: 6px;
+      gap: 8px;
       align-items: center;
-      font-size: 14px;
     }
 
-    input[type='text'] {
+    .search-wrap input[type='text'] {
       background: #fff;
       color: var(--text);
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 8px 10px;
-      width: 260px;
+      width: 100%;
+      min-width: 140px;
     }
 
-    input[type='checkbox'] {
-      transform: translateY(1px);
+    .controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .checkbox {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      color: var(--text);
+      white-space: nowrap;
     }
 
     button {
@@ -85,59 +96,67 @@
       padding: 8px 12px;
       font-weight: 600;
       cursor: pointer;
+      font-size: 14px;
+      white-space: nowrap;
     }
 
-    button.secondary {
-      background: #fff;
-      color: var(--accent);
-      border-color: var(--accent);
-    }
-
-    .status {
+    .status-row {
       margin-top: 8px;
-      font-size: 13px;
-      color: var(--muted);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      font-size: 14px;
     }
 
-    .updated-at {
-      margin-left: auto;
-      font-size: 12px;
+    .page-updated {
       color: var(--muted);
+      margin-left: auto;
+    }
+
+    .status-inline {
+      color: #059669;
+      white-space: nowrap;
     }
 
     .container {
-      padding: 16px;
+      padding: 12px 16px 16px;
     }
 
     .layout {
       display: grid;
-      grid-template-columns: 340px 1fr;
-      gap: 16px;
+      grid-template-columns: 1fr;
+      gap: 12px;
     }
 
     .panel {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 12px;
-      min-height: 460px;
+      padding: 10px;
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     }
 
     .panel h3 {
-      margin: 0 0 10px;
+      margin: 0 0 8px;
       font-size: 16px;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
     }
 
     .list {
       display: grid;
       gap: 8px;
-      max-height: 408px;
+      max-height: 50vh;
       overflow: auto;
     }
 
     .item {
-      padding: 12px;
+      padding: 10px;
       border: 1px solid var(--border);
       border-radius: 10px;
       cursor: pointer;
@@ -157,28 +176,28 @@
     }
 
     .item .sub {
-      margin-top: 4px;
+      margin-top: 2px;
       font-size: 12px;
       color: var(--muted);
     }
 
     .targets {
-      min-height: 408px;
+      min-height: 40vh;
     }
 
     .card {
       background: #fff;
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 12px;
-      margin-bottom: 12px;
+      padding: 10px;
+      margin-bottom: 10px;
       display: grid;
-      gap: 10px;
+      gap: 8px;
     }
 
     .card-head {
       display: flex;
-      gap: 12px;
+      gap: 8px;
       align-items: center;
       flex-wrap: wrap;
     }
@@ -188,7 +207,7 @@
     }
 
     .status-badge {
-      padding: 4px 10px;
+      padding: 3px 8px;
       border-radius: 999px;
       font-size: 12px;
       font-weight: 700;
@@ -216,15 +235,15 @@
     .badges {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 6px;
     }
 
     .badge {
       background: var(--badge-bg);
       border: 1px solid var(--badge-border);
       border-radius: 10px;
-      padding: 6px 10px;
-      font-size: 13px;
+      padding: 5px 8px;
+      font-size: 12px;
       display: inline-flex;
       gap: 6px;
       align-items: baseline;
@@ -240,20 +259,24 @@
       font-variant-numeric: tabular-nums;
     }
 
-    .muted {
-      color: var(--muted);
-    }
+    /* планшет/десктоп */
+    @media (min-width: 900px) {
+      .layout {
+        grid-template-columns: minmax(320px, 380px) 1fr;
+        gap: 16px;
+      }
 
-    .hint {
-      font-size: 12px;
-      color: var(--muted);
-    }
+      .panel {
+        padding: 12px;
+      }
 
-    .topbar {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
+      .list {
+        max-height: calc(100vh - 220px);
+      }
+
+      .targets {
+        min-height: calc(100vh - 220px);
+      }
     }
   </style>
 </head>
@@ -262,21 +285,27 @@
   <header class="header">
     <h1>Транзитные направления Wildberries (FBW)</h1>
     <div class="topbar">
-      <label class="inline">Поиск склада: <input type="text" id="search" placeholder="имя склада" /></label>
-      <label class="inline"><input type="checkbox" id="onlyActive" /> Только активные</label>
-      <button id="btnReload" class="secondary">Обновить</button>
-      <div id="pageUpdated" class="updated-at">Последнее обновление: —</div>
+      <div class="search-wrap">
+        <input type="text" id="search" placeholder="имя склада" />
+      </div>
+      <div class="controls">
+        <button id="btnReload">Обновить</button>
+      </div>
+      <label class="checkbox">
+        <input type="checkbox" id="onlyActive" /> Только активные
+      </label>
     </div>
-    <div id="status" class="status">Готов</div>
+    <div class="status-row">
+      <div id="statusCount" class="status-inline">Найдено направлений — 0</div>
+      <div id="pageUpdated" class="page-updated">Обновлено: —:—:—</div>
+    </div>
   </header>
 
   <main class="container">
     <div class="layout">
       <div class="panel">
         <h3>Транзитные склады</h3>
-        <div class="hint" style="margin-bottom:8px">
-          Кликните на склад — справа появятся назначения и цены
-        </div>
+        <div class="hint">Кликните на склад — справа появятся назначения и цены</div>
         <div id="listA" class="list"></div>
       </div>
       <div class="panel">
@@ -290,7 +319,7 @@
 
   <script>
     const els = {
-      status: document.getElementById('status'),
+      statusCount: document.getElementById('statusCount'),
       pageUpdated: document.getElementById('pageUpdated'),
       listA: document.getElementById('listA'),
       edges: document.getElementById('edges'),
@@ -303,42 +332,23 @@
     let filtered = [];
     let currentAKey = null;
 
-    function setStatus(msg, type = 'info') {
-      els.status.textContent = msg;
-      els.status.style.color =
-        type === 'error' ? '#dc2626' : type === 'ok' ? '#10b981' : '#6b7280';
-    }
-    function fmtDate(s) {
+    function fmtDateRU(s) {
       if (!s) return '—';
       const d = new Date(s);
       if (isNaN(d.getTime())) return s;
-      return (
-        d.getFullYear() +
-        '-' +
-        String(d.getMonth() + 1).padStart(2, '0') +
-        '-' +
-        String(d.getDate()).padStart(2, '0') +
-        ' ' +
-        String(d.getHours()).padStart(2, '0') +
-        ':' +
-        String(d.getMinutes()).padStart(2, '0')
-      );
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const yyyy = d.getFullYear();
+      const hh = String(d.getHours()).padStart(2, '0');
+      const mi = String(d.getMinutes()).padStart(2, '0');
+      return `${dd}.${mm}.${yyyy} ${hh}:${mi}`;
     }
-    function fmtNow() {
+    function fmtTimeNow() {
       const d = new Date();
-      return (
-        d.getFullYear() +
-        '-' +
-        String(d.getMonth() + 1).padStart(2, '0') +
-        '-' +
-        String(d.getDate()).padStart(2, '0') +
-        ' ' +
-        String(d.getHours()).padStart(2, '0') +
-        ':' +
-        String(d.getMinutes()).padStart(2, '0') +
-        ':' +
-        String(d.getSeconds()).padStart(2, '0')
-      );
+      const hh = String(d.getHours()).padStart(2, '0');
+      const mm = String(d.getMinutes()).padStart(2, '0');
+      const ss = String(d.getSeconds()).padStart(2, '0');
+      return `${hh}:${mm}:${ss}`;
     }
     function perLiterLabel(min, max) {
       if (min == null && max == null) return '—';
@@ -355,10 +365,7 @@
         const from = r.fromWarehouseName || '';
         const to = r.toWarehouseName || '';
         if (!q) return true;
-        return (
-          String(from).toLowerCase().includes(q) ||
-          String(to).toLowerCase().includes(q)
-        );
+        return from.toLowerCase().includes(q) || to.toLowerCase().includes(q);
       });
     }
 
@@ -369,30 +376,19 @@
     }
 
     async function loadData() {
-      setStatus('Загрузка…');
       try {
         const res = await fetch('/api/wb-transit.php', {
           headers: { Accept: 'application/json' },
         });
         const data = await safeJson(res);
-        if (!res.ok) {
-          console.error('Backend error', data);
-          setStatus('Ошибка загрузки', 'error');
-          fullData = [];
-        } else {
-          fullData = Array.isArray(data) ? data : [];
-          setStatus(`Готово: направлений — ${fullData.length}`, 'ok');
-          els.pageUpdated.textContent =
-            'Последнее обновление: ' + fmtNow();
-        }
-        currentAKey = null;
-        onStateChanged();
-      } catch (e) {
-        console.error(e);
-        setStatus('Сетевая ошибка', 'error');
+        fullData = res.ok && Array.isArray(data) ? data : [];
+        els.pageUpdated.textContent = 'Обновлено: ' + fmtTimeNow();
+      } catch {
         fullData = [];
-        onStateChanged();
+        els.pageUpdated.textContent = 'Обновлено: ошибка';
       }
+      currentAKey = null;
+      onStateChanged();
     }
 
     function escapeHtml(v) {
@@ -408,13 +404,7 @@
       const map = new Map();
       for (const r of list) {
         const key = (r.fromWarehouseName || '').toLowerCase();
-        if (!map.has(key)) {
-          map.set(key, {
-            key,
-            name: r.fromWarehouseName || '—',
-            items: [],
-          });
-        }
+        if (!map.has(key)) map.set(key, { key, name: r.fromWarehouseName || '—', items: [] });
         map.get(key).items.push(r);
       }
       return Array.from(map.values()).sort((a, b) =>
@@ -424,6 +414,8 @@
 
     function renderGraph() {
       const groups = groupBySource(filtered);
+
+      els.statusCount.textContent = `Найдено направлений — ${filtered.length}`;
 
       els.listA.innerHTML = groups
         .map(
@@ -463,11 +455,7 @@
         .map((r) => {
           const fromName = r.fromWarehouseName || '';
           const toName = r.toWarehouseName || '';
-
-          const perLiter = perLiterLabel(
-            r.boxMinPerLiter,
-            r.boxMaxPerLiter
-          );
+          const perLiter = perLiterLabel(r.boxMinPerLiter, r.boxMaxPerLiter);
           const pallet =
             r.palletTariff != null && r.palletTariff !== ''
               ? `${r.palletTariff} ₽/паллета`
@@ -475,32 +463,19 @@
 
           let statusClass = 'status-unknown';
           let statusText = 'Неизвестно';
-          if (r.active === true) {
-            statusClass = 'status-active';
-            statusText = 'Активно';
-          } else if (r.active === false) {
-            statusClass = 'status-inactive';
-            statusText = 'Неактивно';
-          }
+          if (r.active === true) { statusClass = 'status-active'; statusText = 'Активно'; }
+          else if (r.active === false) { statusClass = 'status-inactive'; statusText = 'Неактивно'; }
 
           return `
               <div class="card">
                 <div class="card-head">
                   <span class="status-badge ${statusClass}">${statusText}</span>
-                  <span class="title">${escapeHtml(fromName)} → ${escapeHtml(
-            toName,
-          )}</span>
+                  <span class="title">${escapeHtml(fromName)} → ${escapeHtml(toName)}</span>
                 </div>
                 <div class="badges">
-                  <span class="badge"><span class="k">За литр:</span><span class="v">${escapeHtml(
-            perLiter,
-          )}</span></span>
-                  <span class="badge"><span class="k">Паллета:</span><span class="v">${escapeHtml(
-            pallet,
-          )}</span></span>
-                  <span class="badge"><span class="k">Доступен с:</span><span class="v">${escapeHtml(
-            fmtDate(r.updatedAt),
-          )}</span></span>
+                  <span class="badge"><span class="k">За литр:</span><span class="v">${escapeHtml(perLiter)}</span></span>
+                  <span class="badge"><span class="k">Паллета:</span><span class="v">${escapeHtml(pallet)}</span></span>
+                  <span class="badge"><span class="k">Доступен с:</span><span class="v">${escapeHtml(fmtDateRU(r.updatedAt))}</span></span>
                 </div>
               </div>
             `;
