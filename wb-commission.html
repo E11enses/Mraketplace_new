@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>WB — Комиссии по предметам</title>
+    <title>WB — Комиссии по товарам</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
         :root {
@@ -167,10 +167,10 @@
 
 <body>
     <header class="header">
-        <h1>Комиссии по предметам</h1>
+        <h1>Комиссии по товарам</h1>
         <div class="topbar">
             <div class="search-wrap">
-                <input id="q" type="text" placeholder="поиск: предмет или родительская категория" />
+                <input id="q" type="text" placeholder="поиск: товар или категория" />
             </div>
             <button id="btnReload">Обновить</button>
         </div>
@@ -186,27 +186,27 @@
                 <table>
                     <thead>
                         <tr>
-                            <th class="th-help" title="Название предмета">Предмет</th>
-                            <th class="th-help" title="Название родительской категории">Родительская категория</th>
+                            <th class="th-help" title="Название товара (предмета)">Товар</th>
+                            <th class="th-help" title="Название родительской категории">Категория</th>
 
-                            <th class="th-help" title="Комиссия по модели «Витрина» (DBS) и «Курьер WB» (DBW), %">
-                                Комиссия: Витрина/Курьер WB<br /><small>(DBS/DBW, %)</small>
+                            <th class="th-help" title="Комиссия по модели «Склад WB» (FBW), %">
+                                Склад WB<br /><small>(FBW, %)</small>
                             </th>
                             <th class="th-help" title="Комиссия по модели «Маркетплейс» (FBS), %">
-                                Комиссия: Маркетплейс<br /><small>(FBS, %)</small>
+                                Маркетплейс<br /><small>(FBS, %)</small>
+                            </th>
+                            <th class="th-help" title="Комиссия по моделям «Витрина» (DBS) и «Курьер WB» (DBW), %">
+                                Витрина/Курьер WB<br /><small>(DBS/DBW, %)</small>
+                            </th>
+                            <th class="th-help" title="Комиссия по модели «Витрина экспресс» (EDBS), %">
+                                Витрина экспресс<br /><small>(EDBS, %)</small>
                             </th>
                             <th class="th-help"
                                 title="Комиссия по модели «Самовывоз из магазина продавца» (C&amp;C), %">
-                                Комиссия: Самовывоз<br /><small>(C&amp;C, %)</small>
+                                Самовывоз<br /><small>(C&amp;C, %)</small>
                             </th>
                             <th class="th-help" title="Комиссия по модели «Бронирование», %">
-                                Комиссия: Бронирование<br /><small>(%, kgvpBooking)</small>
-                            </th>
-                            <th class="th-help" title="Комиссия по модели «Витрина экспресс» (EDBS), %">
-                                Комиссия: Витрина экспресс<br /><small>(EDBS, %)</small>
-                            </th>
-                            <th class="th-help" title="Комиссия по модели «Склад WB» (FBW), %">
-                                Комиссия: Склад WB<br /><small>(FBW, %)</small>
+                                Бронирование<br /><small>(%, kgvpBooking)</small>
                             </th>
                         </tr>
                     </thead>
@@ -293,12 +293,12 @@
                 <td>${escapeHtml(r.subjectName || '—')}</td>
                 <td>${escapeHtml(r.parentName || '—')}</td>
 
-                <td class="num">${escapeHtml(s(r.kgvpSupplier))}</td>
+                <td class="num">${escapeHtml(s(r.paidStorageKgvp))}</td>
                 <td class="num">${escapeHtml(s(r.kgvpMarketplace))}</td>
+                <td class="num">${escapeHtml(s(r.kgvpSupplier))}</td>
+                <td class="num">${escapeHtml(s(r.kgvpSupplierExpress))}</td>
                 <td class="num">${escapeHtml(s(r.kgvpPickup))}</td>
                 <td class="num">${escapeHtml(s(r.kgvpBooking))}</td>
-                <td class="num">${escapeHtml(s(r.kgvpSupplierExpress))}</td>
-                <td class="num">${escapeHtml(s(r.paidStorageKgvp))}</td>
               </tr>
             `;
                 })
