@@ -1,1037 +1,1120 @@
 <!DOCTYPE html>
 <html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <title>Юнит‑экономика товара | МРАКЕТПЛЕЙСЫ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        --bg: #f7f8fa;
+        --panel: #ffffff;
+        --panel-2: #f2f3f5;
+        --text: #111827;
+        --muted: #6b7280;
+        --accent: #2563eb;
+        --danger: #dc2626;
+        --ok: #16a34a;
+        --border: #e5e7eb;
+        --radius: 12px;
+        --good: #15803d;
+        --bad: #b91c1c;
+      }
 
-<head>
-  <meta charset="utf-8" />
-  <title>Юнит‑экономика товара | МРАКЕТПЛЕЙСЫ</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    :root {
-      --bg: #f7f8fa;
-      --panel: #ffffff;
-      --panel-2: #f2f3f5;
-      --text: #111827;
-      --muted: #6b7280;
-      --accent: #2563eb;
-      --danger: #dc2626;
-      --ok: #16a34a;
-      --border: #e5e7eb;
-      --radius: 12px;
-      --good: #15803d;
-      --bad: #b91c1c;
-    }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+          Helvetica, Arial;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
 
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
-        Helvetica, Arial;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
+      .wrap {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 16px;
+        display: grid;
+        gap: 16px;
+      }
 
-    .wrap {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 16px;
-      display: grid;
-      gap: 16px;
-    }
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
 
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
+      h1 {
+        font-size: 18px;
+        margin: 0;
+        letter-spacing: 0.2px;
+      }
 
-    h1 {
-      font-size: 18px;
-      margin: 0;
-      letter-spacing: 0.2px;
-    }
+      .pill {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: var(--panel-2);
+        color: var(--muted);
+        font-size: 12px;
+      }
 
-    .pill {
-      display: inline-flex;
-      gap: 8px;
-      align-items: center;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: var(--panel-2);
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1.2fr;
-      gap: 16px;
-    }
-
-    @media (max-width: 960px) {
       .grid {
-        grid-template-columns: 1fr;
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 16px;
       }
-    }
 
-    .panel {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 12px;
-    }
+      @media (max-width: 960px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
 
-    .panel h2 {
-      font-size: 14px;
-      margin: 0 0 10px 0;
-      color: var(--muted);
-    }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 12px;
+      }
 
-    .form-row {
-      display: grid;
-      grid-template-columns: 220px 1fr;
-      gap: 10px;
-      align-items: center;
-      padding: 6px 0;
-    }
+      .panel h2 {
+        font-size: 14px;
+        margin: 0 0 10px 0;
+        color: var(--muted);
+      }
 
-    @media (max-width: 640px) {
       .form-row {
-        grid-template-columns: 1fr;
-        gap: 6px;
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        gap: 10px;
+        align-items: center;
+        padding: 6px 0;
       }
-    }
 
-    label {
-      color: var(--muted);
-      font-size: 14px;
-    }
+      @media (max-width: 640px) {
+        .form-row {
+          grid-template-columns: 1fr;
+          gap: 6px;
+        }
+      }
 
-    input[type="number"],
-    select,
-    textarea {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 12px;
-      background: var(--panel-2);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      outline: none;
-      font-size: 15px;
-    }
+      label {
+        color: var(--muted);
+        font-size: 14px;
+      }
 
-    textarea {
-      min-height: 120px;
-      resize: vertical;
-    }
+      input[type="number"],
+      select,
+      textarea {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px;
+        background: var(--panel-2);
+        color: var(--text);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        outline: none;
+        font-size: 15px;
+      }
 
-    .btns {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+      textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
 
-    button {
-      border: 1px solid var(--border);
-      background: linear-gradient(180deg, #ffffff, #f3f4f6);
-      color: #111827;
-      padding: 12px 14px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 14px;
-    }
+      .btns {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
 
-    button.primary {
-      background: linear-gradient(180deg, #3b82f6, #2563eb);
-      color: #ffffff;
-      border-color: #2563eb;
-    }
+      button {
+        border: 1px solid var(--border);
+        background: linear-gradient(180deg, #ffffff, #f3f4f6);
+        color: #111827;
+        padding: 12px 14px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 14px;
+      }
 
-    button:active {
-      transform: translateY(1px);
-    }
+      button.primary {
+        background: linear-gradient(180deg, #3b82f6, #2563eb);
+        color: #ffffff;
+        border-color: #2563eb;
+      }
 
-    .status {
-      font-size: 13px;
-      color: var(--muted);
-      min-height: 18px;
-    }
+      button:active {
+        transform: translateY(1px);
+      }
 
-    /* RESULTS: compact typography */
-    #resultsPanel.panel {
-      padding: 10px;
-    }
+      .status {
+        font-size: 13px;
+        color: var(--muted);
+        min-height: 18px;
+      }
 
-    #resultsPanel h2 {
-      font-size: 13px;
-      margin: 0 0 8px 0;
-    }
+      /* RESULTS: compact typography */
+      #resultsPanel.panel {
+        padding: 10px;
+      }
 
-    .kpis {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-    }
+      #resultsPanel h2 {
+        font-size: 13px;
+        margin: 0 0 8px 0;
+      }
 
-    @media (max-width: 640px) {
       .kpis {
-        grid-template-columns: 1fr;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
       }
-    }
 
-    .kpi {
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+      @media (max-width: 640px) {
+        .kpis {
+          grid-template-columns: 1fr;
+        }
+      }
 
-    .kpi>div:first-child {
-      font-size: 12px;
-      color: var(--muted);
-    }
+      .kpi {
+        background: #ffffff;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
 
-    .kpi .val {
-      font-size: 16px;
-      font-weight: 800;
-    }
+      .kpi > div:first-child {
+        font-size: 12px;
+        color: var(--muted);
+      }
 
-    .kpi.good .val {
-      color: var(--good);
-    }
+      .kpi .val {
+        font-size: 16px;
+        font-weight: 800;
+      }
 
-    .kpi.bad .val {
-      color: var(--bad);
-    }
+      .kpi.good .val {
+        color: var(--good);
+      }
 
-    .table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+      .kpi.bad .val {
+        color: var(--bad);
+      }
 
-    .table th,
-    .table td {
-      border-bottom: 1px dashed var(--border);
-      padding: 6px 6px;
-      font-size: 12px;
-      line-height: 1.3;
-      vertical-align: top;
-    }
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+      }
 
-    .table th {
-      color: var(--muted);
-      text-align: left;
-      font-weight: 600;
-      width: 55%;
-    }
+      .table th,
+      .table td {
+        border-bottom: 1px dashed var(--border);
+        padding: 6px 6px;
+        font-size: 12px;
+        line-height: 1.3;
+        vertical-align: top;
+      }
 
-    .table td {
-      width: 45%;
-      text-align: right;
-      white-space: nowrap;
-    }
+      .table th {
+        color: var(--muted);
+        text-align: left;
+        font-weight: 600;
+        width: 55%;
+      }
 
-    footer {
-      color: var(--muted);
-      font-size: 12px;
-      text-align: center;
-      padding-bottom: 24px;
-    }
+      .table td {
+        width: 45%;
+        text-align: right;
+        white-space: nowrap;
+      }
 
-    /* Info tooltips (light) */
-    .info {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 16px;
-      height: 16px;
-      margin-left: 6px;
-      border-radius: 50%;
-      font-size: 12px;
-      color: #374151;
-      background: #e5e7eb;
-      border: 1px solid #d1d5db;
-      cursor: help;
-      user-select: none;
-      line-height: 1;
-      position: relative;
-    }
+      footer {
+        color: var(--muted);
+        font-size: 12px;
+        text-align: center;
+        padding-bottom: 24px;
+      }
 
-    .info:hover {
-      color: #111827;
-      border-color: #9ca3af;
-    }
+      /* Info tooltips (light) */
+      .info {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 16px;
+        margin-left: 6px;
+        border-radius: 50%;
+        font-size: 12px;
+        color: #374151;
+        background: #e5e7eb;
+        border: 1px solid #d1d5db;
+        cursor: help;
+        user-select: none;
+        line-height: 1;
+        position: relative;
+      }
 
-    .tooltip {
-      position: absolute;
-      z-index: 1000;
-      max-width: 280px;
-      background: #ffffff;
-      color: #111827;
-      border: 1px solid #e5e7eb;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-      border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 13px;
-      line-height: 1.35;
-      transform: translate(-8px, -6px);
-      display: none;
-    }
+      .info:hover {
+        color: #111827;
+        border-color: #9ca3af;
+      }
 
-    .info[data-open="true"] .tooltip {
-      display: block;
-    }
+      .tooltip {
+        position: absolute;
+        z-index: 1000;
+        max-width: 280px;
+        background: #ffffff;
+        color: #111827;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 13px;
+        line-height: 1.35;
+        transform: translate(-8px, -6px);
+        display: none;
+      }
 
-    .tooltip .t-title {
-      display: block;
-      font-weight: 700;
-      color: #6b7280;
-      margin-bottom: 4px;
-    }
-
-    @media (hover: hover) and (pointer: fine) {
-      .info:hover .tooltip {
+      .info[data-open="true"] .tooltip {
         display: block;
       }
-    }
 
-    .back-to-site {
-      margin-top: 16px;
-      font-size: 16px;
-    }
+      .tooltip .t-title {
+        display: block;
+        font-weight: 700;
+        color: #6b7280;
+        margin-bottom: 4px;
+      }
 
-    .back-to-site a {
-      color: var(--accent);
-      text-decoration: none;
-      padding: 6px 6px;
-      border: 2px solid var(--accent);
-    }
-  </style>
-</head>
+      @media (hover: hover) and (pointer: fine) {
+        .info:hover .tooltip {
+          display: block;
+        }
+      }
 
-<body>
-  <div class="wrap">
-    <header>
-      <h1>Юнит-экономика товара с налогами</h1>
-      <div class="pill" id="status-pill">Готово</div>
-    </header>
+      .back-to-site {
+        margin-top: 16px;
+        font-size: 16px;
+      }
 
-    <div class="grid">
-      <!-- Panel 1: Params -->
-      <section class="panel">
-        <h2>Параметры</h2>
+      .back-to-site a {
+        color: var(--accent);
+        text-decoration: none;
+        padding: 6px 6px;
+        border: 2px solid var(--accent);
+      }
+    </style>
+  </head>
 
-        <div class="form-row">
-          <label for="price">
-            Цена реализации, ₽
-            <span class="info" tabindex="0" aria-label="Цена реализации">i
-              <span class="tooltip">
-                <span class="t-title">Цена реализации</span>
-                Фактическая цена продажи (!)без СПП. Именно её
-                используем как базу для расчётов.
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>Юнит-экономика товара с налогами</h1>
+        <div class="pill" id="status-pill">Готово</div>
+      </header>
+
+      <div class="grid">
+        <!-- Panel 1: Params -->
+        <section class="panel">
+          <h2>Параметры</h2>
+
+          <div class="form-row">
+            <label for="price">
+              Цена реализации, ₽
+              <span class="info" tabindex="0" aria-label="Цена реализации">i
+                <span class="tooltip">
+                  <span class="t-title">Цена реализации</span>
+                  Фактическая цена продажи (!)без СПП. Именно её
+                  используем как базу для расчётов.
+                </span>
               </span>
-            </span>
-          </label>
-          <input id="price" type="number" inputmode="decimal" min="0" value="1410" />
-        </div>
-
-        <div class="form-row">
-          <label for="taxRegime">
-            Налоговый режим
-            <span class="info" tabindex="0">i
-              <span class="tooltip">
-                <span class="t-title">Налоговый режим</span>
-                ОСНО: НДС убирается из цены для расчёта нетто‑выручки; налог по
-                режиму считается как 25% от прибыли.<br />
-                УСН 6%: 6% от цены реализации.<br />
-                УСН 15%: 15% от прибыли (если прибыль отрицательная — 0).
-              </span>
-            </span>
-          </label>
-          <select id="taxRegime">
-            <option value="OSNO">ОСНО</option>
-            <option value="USN6" selected>УСН 6%</option>
-            <option value="USN15">УСН 15%</option>
-          </select>
-        </div>
-
-        <div class="form-row">
-          <label for="vatRate">
-            НДС, %
-            <span class="info" tabindex="0">i
-              <span class="tooltip">
-                <span class="t-title">НДС</span>
-                Считаем, что цена реализации указана с НДС. Нетто‑выручка =
-                цена / (1 + НДС).
-              </span>
-            </span>
-          </label>
-          <select id="vatRate">
-            <option value="0" selected>0%</option>
-            <option value="5">5%</option>
-            <option value="7">7%</option>
-            <option value="10">10%</option>
-            <option value="22">22%</option>
-          </select>
-        </div>
-
-        <div class="form-row">
-          <label for="refFee">
-            Комиссия, %
-            <span class="info" tabindex="0">i
-              <span class="tooltip">
-                <span class="t-title">Комиссия площадки</span>
-                Процент от цены реализации. Учитываем как расход.
-              </span>
-            </span>
-          </label>
-          <input id="refFee" type="number" inputmode="decimal" min="0" max="40" value="22" />
-        </div>
-
-        <div class="form-row">
-          <label for="drr">
-            ДРР (реклама), %
-            <span class="info" tabindex="0">i
-              <span class="tooltip">
-                <span class="t-title">ДРР</span>
-                Доля рекламных расходов от цены реализации. Включается в
-                расходы и влияет на безубыточную и целевую цену.
-              </span>
-            </span>
-          </label>
-          <input id="drr" type="number" inputmode="decimal" min="0" max="100" value="5" />
-        </div>
-
-        <div class="form-row">
-          <label for="cogs">
-            Себестоимость, ₽
-            <span class="info" tabindex="0">i
-              <span class="tooltip">
-                <span class="t-title">Себестоимость</span>
-                Закупка/производство единицы товара.
-              </span>
-            </span>
-          </label>
-          <input id="cogs" type="number" inputmode="decimal" min="0" value="500" />
-        </div>
-
-        <div class="form-row">
-          <label for="fulfillment">
-            Фулфилмент, ₽
-            <span class="info" tabindex="0">i
-              <span class="tooltip">
-                <span class="t-title">Фулфилмент</span>
-                Сборка/обработка заказа на складе. Стоимость РАБОТЫ
-              </span>
-            </span>
-          </label>
-          <input id="fulfillment" type="number" inputmode="decimal" min="0" value="51" />
-        </div>
-
-        <div class="form-row">
-          <label for="lastMile">
-            Доставка покупателю, ₽
-            <span class="info" tabindex="0">i
-              <span class="tooltip">
-                <span class="t-title">Доставка</span>
-                Цена логистики со склада маркетплейса до покупателя.
-              </span>
-            </span>
-          </label>
-          <input id="lastMile" type="number" inputmode="decimal" min="0" value="119" />
-        </div>
-
-        <div class="form-row">
-          <label for="returns">
-            Возвраты, %
-            <span class="info" tabindex="0">i
-              <span class="tooltip">
-                <span class="t-title">Возвраты</span>
-                Ожидаемая доля заказов, которые вернутся.
-              </span>
-            </span>
-          </label>
-          <input id="returns" type="number" inputmode="decimal" min="0" max="100" value="6" />
-        </div>
-
-        <div class="form-row">
-          <label for="returnCost">
-            Стоимость возврата, ₽
-            <span class="info" tabindex="0">i
-              <span class="tooltip">
-                <span class="t-title">Стоимость возврата</span>
-                Стоимость обратной логистики от площадки
-              </span>
-            </span>
-          </label>
-          <input id="returnCost" type="number" inputmode="decimal" min="0" value="40" />
-        </div>
-
-        <div class="form-row">
-          <label for="inbound">
-            Входящая логистика, ₽
-            <span class="info" tabindex="0">i
-              <span class="tooltip">
-                <span class="t-title">Входящая логистика</span>
-                Доставка на склад маркетплейса в расчёте на 1 шт.
-              </span>
-            </span>
-          </label>
-          <input id="inbound" type="number" inputmode="decimal" min="0" value="19" />
-        </div>
-
-        <div class="form-row">
-          <label for="storage">
-            Хранение, ₽
-            <span class="info" tabindex="0">i
-              <span class="tooltip">
-                <span class="t-title">Хранение</span>
-                Стоимость хранения единицы товара за расчетный период.
-              </span>
-            </span>
-          </label>
-          <input id="storage" type="number" inputmode="decimal" min="0" value="" />
-        </div>
-
-        <div class="form-row">
-          <label for="packaging">
-            Упаковка, ₽
-            <span class="info" tabindex="0">i
-              <span class="tooltip">
-                <span class="t-title">Упаковка</span>
-                Затраты на упаковочные материалы на 1 шт.
-              </span>
-            </span>
-          </label>
-          <input id="packaging" type="number" inputmode="decimal" min="0" value="" />
-        </div>
-
-        <div class="form-row">
-          <label for="other">
-            Прочие расходы, ₽
-            <span class="info" tabindex="0">i
-              <span class="tooltip">
-                <span class="t-title">Прочие расходы</span>
-                Доп. затраты: контент, страхование, брак на производстве и т. п.
-              </span>
-            </span>
-          </label>
-          <input id="other" type="number" inputmode="decimal" min="0" value="0" />
-        </div>
-
-        <div class="btns">
-          <button id="calcBtn" class="primary">Рассчитать</button>
-          <button id="resetBtn">Сбросить</button>
-        </div>
-
-        <div class="status" id="status">
-          Совет: нажимайте Enter в любом поле для быстрого пересчёта.
-        </div>
-      </section>
-
-      <!-- Panel 2: Results -->
-      <section class="panel" id="resultsPanel">
-        <h2>Результаты</h2>
-
-        <div class="kpis" id="kpis">
-          <div class="kpi" id="kpi-profit">
-            <div>Прибыль / 1 шт</div>
-            <div class="val" id="profitVal">—</div>
+            </label>
+            <input
+              id="price"
+              type="number"
+              inputmode="decimal"
+              min="0"
+              placeholder="1410"
+            />
           </div>
-          <div class="kpi" id="kpi-margin">
-            <div>Маржа %</div>
-            <div class="val" id="marginVal">—</div>
-          </div>
-          <div class="kpi">
-            <div>
-              Выручка (нетто)
+
+          <div class="form-row">
+            <label for="taxRegime">
+              Налоговый режим
               <span class="info" tabindex="0">i
                 <span class="tooltip">
-                  <span class="t-title">Нетто‑выручка</span>
-                  Цена реализации без НДС минус комиссия площадки.
+                  <span class="t-title">Налоговый режим</span>
+                  ОСНО: НДС убирается из цены для расчёта нетто‑выручки; налог по
+                  режиму считается как 25% от прибыли.<br />
+                  УСН 6%: 6% от цены реализации.<br />
+                  УСН 15%: 15% от прибыли (если прибыль отрицательная — 0).
                 </span>
               </span>
+            </label>
+            <select id="taxRegime">
+              <option value="OSNO">ОСНО</option>
+              <option value="USN6" selected>УСН 6%</option>
+              <option value="USN15">УСН 15%</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label for="vatRate">
+              НДС, %
+              <span class="info" tabindex="0">i
+                <span class="tooltip">
+                  <span class="t-title">НДС</span>
+                  Считаем, что цена реализации указана с НДС. Нетто‑выручка =
+                  цена / (1 + НДС).
+                </span>
+              </span>
+            </label>
+            <select id="vatRate">
+              <option value="0">0%</option>
+              <option value="5">5%</option>
+              <option value="7">7%</option>
+              <option value="10">10%</option>
+              <option value="22" selected>22%</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label for="refFee">
+              Комиссия, %
+              <span class="info" tabindex="0">i
+                <span class="tooltip">
+                  <span class="t-title">Комиссия площадки</span>
+                  Процент от цены реализации. Учитываем как расход.
+                </span>
+              </span>
+            </label>
+            <input
+              id="refFee"
+              type="number"
+              inputmode="decimal"
+              min="0"
+              max="40"
+              placeholder="22"
+            />
+          </div>
+
+          <div class="form-row">
+            <label for="drr">
+              ДРР (реклама), %
+              <span class="info" tabindex="0">i
+                <span class="tooltip">
+                  <span class="t-title">ДРР</span>
+                  Доля рекламных расходов от цены реализации. Включается в
+                  расходы и влияет на безубыточную и целевую цену.
+                </span>
+              </span>
+            </label>
+            <input
+              id="drr"
+              type="number"
+              inputmode="decimal"
+              min="0"
+              max="100"
+              placeholder="5"
+            />
+          </div>
+
+          <div class="form-row">
+            <label for="cogs">
+              Себестоимость, ₽
+              <span class="info" tabindex="0">i
+                <span class="tooltip">
+                  <span class="t-title">Себестоимость</span>
+                  Закупка/производство единицы товара.
+                </span>
+              </span>
+            </label>
+            <input
+              id="cogs"
+              type="number"
+              inputmode="decimal"
+              min="0"
+              placeholder="500"
+            />
+          </div>
+
+          <div class="form-row">
+            <label for="fulfillment">
+              Фулфилмент, ₽
+              <span class="info" tabindex="0">i
+                <span class="tooltip">
+                  <span class="t-title">Фулфилмент</span>
+                  Сборка/обработка заказа на складе. Стоимость РАБОТЫ
+                </span>
+              </span>
+            </label>
+            <input
+              id="fulfillment"
+              type="number"
+              inputmode="decimal"
+              min="0"
+              placeholder="51"
+            />
+          </div>
+
+          <div class="form-row">
+            <label for="lastMile">
+              Доставка покупателю, ₽
+              <span class="info" tabindex="0">i
+                <span class="tooltip">
+                  <span class="t-title">Доставка</span>
+                  Цена логистики со склада маркетплейса до покупателя.
+                </span>
+              </span>
+            </label>
+            <input
+              id="lastMile"
+              type="number"
+              inputmode="decimal"
+              min="0"
+              placeholder="119"
+            />
+          </div>
+
+          <div class="form-row">
+            <label for="returns">
+              Возвраты, %
+              <span class="info" tabindex="0">i
+                <span class="tooltip">
+                  <span class="t-title">Возвраты</span>
+                  Ожидаемая доля заказов, которые вернутся.
+                </span>
+              </span>
+            </label>
+            <input
+              id="returns"
+              type="number"
+              inputmode="decimal"
+              min="0"
+              max="100"
+              placeholder="6"
+            />
+          </div>
+
+          <div class="form-row">
+            <label for="returnCost">
+              Стоимость возврата, ₽
+              <span class="info" tabindex="0">i
+                <span class="tooltip">
+                  <span class="t-title">Стоимость возврата</span>
+                  Стоимость обратной логистики от площадки
+                </span>
+              </span>
+            </label>
+            <input
+              id="returnCost"
+              type="number"
+              inputmode="decimal"
+              min="0"
+              placeholder="40"
+            />
+          </div>
+
+          <div class="form-row">
+            <label for="inbound">
+              Входящая логистика, ₽
+              <span class="info" tabindex="0">i
+                <span class="tooltip">
+                  <span class="t-title">Входящая логистика</span>
+                  Доставка на склад маркетплейса в расчёте на 1 шт.
+                </span>
+              </span>
+            </label>
+            <input
+              id="inbound"
+              type="number"
+              inputmode="decimal"
+              min="0"
+              placeholder="19"
+            />
+          </div>
+
+          <div class="form-row">
+            <label for="storage">
+              Хранение, ₽
+              <span class="info" tabindex="0">i
+                <span class="tooltip">
+                  <span class="t-title">Хранение</span>
+                  Стоимость хранения единицы товара за расчетный период.
+                </span>
+              </span>
+            </label>
+            <input
+              id="storage"
+              type="number"
+              inputmode="decimal"
+              min="0"
+              placeholder="11"
+            />
+          </div>
+
+          <div class="form-row">
+            <label for="packaging">
+              Упаковка, ₽
+              <span class="info" tabindex="0">i
+                <span class="tooltip">
+                  <span class="t-title">Упаковка</span>
+                  Затраты на упаковочные материалы на 1 шт.
+                </span>
+              </span>
+            </label>
+            <input
+              id="packaging"
+              type="number"
+              inputmode="decimal"
+              min="0"
+              placeholder="11"
+            />
+          </div>
+
+          <div class="form-row">
+            <label for="other">
+              Прочие расходы, ₽
+              <span class="info" tabindex="0">i
+                <span class="tooltip">
+                  <span class="t-title">Прочие расходы</span>
+                  Доп. затраты: контент, страхование, брак на производстве и т. п.
+                </span>
+              </span>
+            </label>
+            <input
+              id="other"
+              type="number"
+              inputmode="decimal"
+              min="0"
+              placeholder="0"
+            />
+          </div>
+
+          <div class="btns">
+            <button id="calcBtn" class="primary">Рассчитать</button>
+            <button id="resetBtn">Сбросить</button>
+          </div>
+
+          <div class="status" id="status">
+            Совет: нажимайте Enter в любом поле для быстрого пересчёта.
+          </div>
+        </section>
+
+        <!-- Panel 2: Results -->
+        <section class="panel" id="resultsPanel">
+          <h2>Результаты</h2>
+
+          <div class="kpis" id="kpis">
+            <div class="kpi" id="kpi-profit">
+              <div>Прибыль / 1 шт</div>
+              <div class="val" id="profitVal">—</div>
             </div>
-            <div class="val" id="netRevVal">—</div>
-          </div>
-          <div class="kpi">
-            <div>Полная себестоимость</div>
-            <div class="val" id="totalCostVal">—</div>
-          </div>
-        </div>
-
-        <h2 style="margin-top:10px">Детализация</h2>
-        <table class="table">
-          <tbody id="breakdown"></tbody>
-        </table>
-
-        <h2 style="margin-top:10px">Порог / Целевая цена</h2>
-        <table class="table">
-          <tbody>
-            <tr>
-              <th>
-                Точка безубыточности (цена реализации, ₽)
+            <div class="kpi" id="kpi-margin">
+              <div>Маржа %</div>
+              <div class="val" id="marginVal">—</div>
+            </div>
+            <div class="kpi">
+              <div>
+                Выручка (нетто)
                 <span class="info" tabindex="0">i
                   <span class="tooltip">
-                    <span class="t-title">Точка безубыточности</span>
-                    Цена, при которой прибыль = 0 с учётом комиссий, ДРР и
-                    налогового режима.
+                    <span class="t-title">Нетто‑выручка</span>
+                    Цена реализации без НДС минус комиссия площадки.
                   </span>
                 </span>
-              </th>
-              <td id="breakevenPrice">—</td>
-            </tr>
-          </tbody>
-        </table>
+              </div>
+              <div class="val" id="netRevVal">—</div>
+            </div>
+            <div class="kpi">
+              <div>Полная себестоимость</div>
+              <div class="val" id="totalCostVal">—</div>
+            </div>
+          </div>
+
+          <h2 style="margin-top:10px">Детализация</h2>
+          <table class="table">
+            <tbody id="breakdown"></tbody>
+          </table>
+
+          <h2 style="margin-top:10px">Порог / Целевая цена</h2>
+          <table class="table">
+            <tbody>
+              <tr>
+                <th>
+                  Точка безубыточности (цена реализации, ₽)
+                  <span class="info" tabindex="0">i
+                    <span class="tooltip">
+                      <span class="t-title">Точка безубыточности</span>
+                      Цена, при которой прибыль = 0 с учётом комиссий, ДРР и
+                      налогового режима.
+                    </span>
+                  </span>
+                </th>
+                <td id="breakevenPrice">—</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
+
+      <!-- Panel 3: Comment + Share -->
+      <section class="panel" id="commentsPanel">
+        <h2>Комментарий</h2>
+        <div class="form-row" style="grid-template-columns: 1fr">
+          <label
+            for="comment"
+            style="display:block;color:var(--muted);font-size:14px;margin-bottom:6px;"
+          >
+            Текстовый комментарий к расчёту
+          </label>
+          <textarea
+            id="comment"
+            placeholder="Добавьте детали: SKU, партия, условия, примечания..."
+          ></textarea>
+          <div class="btns" style="margin-top:10px;">
+            <button id="shareBtn">Поделиться расчётом</button>
+          </div>
+          <div
+            class="status"
+            id="shareStatus"
+            style="font-size:12px;color:var(--muted);"
+          ></div>
+        </div>
       </section>
+
+      <footer>
+        Все расчёты выполняются локально в браузере. Данные не сохраняются.
+        <div class="back-to-site"><a href="/index.html">Обратно на сайт</a></div>
+      </footer>
     </div>
 
-    <!-- Panel 3: Comment + Share -->
-    <section class="panel" id="commentsPanel">
-      <h2>Комментарий</h2>
-      <div class="form-row" style="grid-template-columns: 1fr">
-        <label for="comment" style="display:block;color:var(--muted);font-size:14px;margin-bottom:6px;">
-          Текстовый комментарий к расчёту
-        </label>
-        <textarea id="comment" placeholder="Добавьте детали: SKU, партия, условия, примечания..."></textarea>
-        <div class="btns" style="margin-top:10px;">
-          <button id="shareBtn">Поделиться расчётом</button>
-        </div>
-        <div class="status" id="shareStatus" style="font-size:12px;color:var(--muted);"></div>
-      </div>
-    </section>
-
-    <footer>
-      Все расчёты выполняются локально в браузере. Данные не сохраняются.
-      <div class="back-to-site"><a href="/index.html">Обратно на сайт</a></div>
-    </footer>
-  </div>
-
-  <script>
-    // Tooltips toggle
-    (function () {
-      function closeAll() {
-        document
-          .querySelectorAll('.info[data-open="true"]')
-          .forEach((el) => el.setAttribute("data-open", "false"));
-      }
-      document.addEventListener("click", (e) => {
-        const info = e.target.closest(".info");
-        if (info) {
-          const open = info.getAttribute("data-open") === "true";
-          closeAll();
-          info.setAttribute("data-open", open ? "false" : "true");
-          e.stopPropagation();
-        } else {
-          closeAll();
+    <script>
+      // Tooltips toggle
+      (function () {
+        function closeAll() {
+          document
+            .querySelectorAll('.info[data-open="true"]')
+            .forEach((el) => el.setAttribute("data-open", "false"));
         }
-      });
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") closeAll();
-      });
-    })();
+        document.addEventListener("click", (e) => {
+          const info = e.target.closest(".info");
+          if (info) {
+            const open = info.getAttribute("data-open") === "true";
+            closeAll();
+            info.setAttribute("data-open", open ? "false" : "true");
+            e.stopPropagation();
+          } else {
+            closeAll();
+          }
+        });
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") closeAll();
+        });
+      })();
 
-    const $ = (s) => document.querySelector(s);
-    const fmt = (n) =>
-      new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 }).format(n);
+      const $ = (s) => document.querySelector(s);
+      const fmt = (n) =>
+        new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 }).format(n);
 
-    const els = {
-      price: $("#price"),
-      taxRegime: $("#taxRegime"),
-      vatRate: $("#vatRate"),
-      refFee: $("#refFee"),
-      drr: $("#drr"),
-      cogs: $("#cogs"),
-      fulfillment: $("#fulfillment"),
-      lastMile: $("#lastMile"),
-      returns: $("#returns"),
-      returnCost: $("#returnCost"),
-      inbound: $("#inbound"),
-      storage: $("#storage"),
-      packaging: $("#packaging"),
-      other: $("#other"),
-      calcBtn: $("#calcBtn"),
-      resetBtn: $("#resetBtn"),
-      profitVal: $("#profitVal"),
-      marginVal: $("#marginVal"),
-      netRevVal: $("#netRevVal"),
-      totalCostVal: $("#totalCostVal"),
-      breakdown: $("#breakdown"),
-      breakevenPrice: $("#breakevenPrice"),
-      pill: $("#status-pill"),
-      comment: $("#comment"),
-      shareBtn: $("#shareBtn"),
-      shareStatus: $("#shareStatus"),
-    };
+      const els = {
+        price: $("#price"),
+        taxRegime: $("#taxRegime"),
+        vatRate: $("#vatRate"),
+        refFee: $("#refFee"),
+        drr: $("#drr"),
+        cogs: $("#cogs"),
+        fulfillment: $("#fulfillment"),
+        lastMile: $("#lastMile"),
+        returns: $("#returns"),
+        returnCost: $("#returnCost"),
+        inbound: $("#inbound"),
+        storage: $("#storage"),
+        packaging: $("#packaging"),
+        other: $("#other"),
+        calcBtn: $("#calcBtn"),
+        resetBtn: $("#resetBtn"),
+        profitVal: $("#profitVal"),
+        marginVal: $("#marginVal"),
+        netRevVal: $("#netRevVal"),
+        totalCostVal: $("#totalCostVal"),
+        breakdown: $("#breakdown"),
+        breakevenPrice: $("#breakevenPrice"),
+        pill: $("#status-pill"),
+        comment: $("#comment"),
+        shareBtn: $("#shareBtn"),
+        shareStatus: $("#shareStatus"),
+      };
 
-    function setPill(msg) {
-      els.pill.textContent = msg;
-    }
-    function clamp(n, min, max) {
-      return Math.min(max, Math.max(min, n));
-    }
-    function num(el) {
-      const v = parseFloat(el.value);
-      return Number.isFinite(v) ? v : 0;
-    }
-
-    function calc() {
-      const price = Math.max(0, num(els.price));
-      const taxRegime = els.taxRegime.value;
-      const vatPct = clamp(num(els.vatRate), 0, 100);
-      const refFeePct = clamp(num(els.refFee), 0, 100);
-      const drrPct = clamp(num(els.drr), 0, 100);
-
-      const cogs = Math.max(0, num(els.cogs));
-      const fulfillment = Math.max(0, num(els.fulfillment));
-      const lastMile = Math.max(0, num(els.lastMile));
-      const returnsPct = clamp(num(els.returns), 0, 100);
-      const returnCost = Math.max(0, num(els.returnCost));
-      const inbound = Math.max(0, num(els.inbound));
-      const storage = Math.max(0, num(els.storage));
-      const packaging = Math.max(0, num(els.packaging));
-      const other = Math.max(0, num(els.other));
-
-      // Выручка без НДС
-      const netOfVAT = vatPct > 0 ? price / (1 + vatPct / 100) : price;
-
-      // Пропорциональные цене расходы
-      const referralFee = (price * refFeePct) / 100;
-      const drrCost = (price * drrPct) / 100;
-
-      // Ожидаемые возвраты
-      const expectedReturnCost = (returnsPct / 100) * returnCost;
-
-      // База нетто-выручки
-      const netRevenueBase = netOfVAT - referralFee;
-
-      // Операционные расходы без налога
-      const opCostsExTax =
-        cogs +
-        fulfillment +
-        lastMile +
-        expectedReturnCost +
-        inbound +
-        storage +
-        packaging +
-        other +
-        drrCost;
-
-      // Налог по режиму
-      let taxCost = 0;
-      if (taxRegime === "USN6") {
-        taxCost = price * 0.06;
-      } else if (taxRegime === "USN15") {
-        const pbt = netRevenueBase - opCostsExTax;
-        taxCost = Math.max(0, 0.15 * pbt);
-      } else if (taxRegime === "OSNO") {
-        const pbt = netRevenueBase - opCostsExTax;
-        taxCost = Math.max(0, 0.25 * pbt);
+      function setPill(msg) {
+        els.pill.textContent = msg;
+      }
+      function clamp(n, min, max) {
+        return Math.min(max, Math.max(min, n));
+      }
+      function num(el) {
+        const v = parseFloat(el.value);
+        return Number.isFinite(v) ? v : 0;
       }
 
-      const totalCosts = opCostsExTax + taxCost;
-      const netRevenue = netRevenueBase;
-      const profit = netRevenue - totalCosts;
-      const margin =
-        netRevenue > 0 ? (profit / netRevenue) * 100 : profit < 0 ? -100 : 0;
+      function calc() {
+        const price = Math.max(0, num(els.price));
+        const taxRegime = els.taxRegime.value;
+        const vatPct = clamp(num(els.vatRate), 0, 100);
+        const refFeePct = clamp(num(els.refFee), 0, 100);
+        const drrPct = clamp(num(els.drr), 0, 100);
 
-      // Безубыточность
-      const v = vatPct / 100,
-        r = refFeePct / 100,
-        a = drrPct / 100;
-      const C = 1 / (1 + v) - r - a;
-      const K = opCostsExTax - drrCost;
+        const cogs = Math.max(0, num(els.cogs));
+        const fulfillment = Math.max(0, num(els.fulfillment));
+        const lastMile = Math.max(0, num(els.lastMile));
+        const returnsPct = clamp(num(els.returns), 0, 100);
+        const returnCost = Math.max(0, num(els.returnCost));
+        const inbound = Math.max(0, num(els.inbound));
+        const storage = Math.max(0, num(els.storage));
+        const packaging = Math.max(0, num(els.packaging));
+        const other = Math.max(0, num(els.other));
 
-      function breakevenPriceForRegime() {
-        if (C <= 0) return Infinity;
+        // Выручка без НДС
+        const netOfVAT = vatPct > 0 ? price / (1 + vatPct / 100) : price;
+
+        // Пропорциональные цене расходы
+        const referralFee = (price * refFeePct) / 100;
+        const drrCost = (price * drrPct) / 100;
+
+        // Ожидаемые возвраты
+        const expectedReturnCost = (returnsPct / 100) * returnCost;
+
+        // База нетто-выручки
+        const netRevenueBase = netOfVAT - referralFee;
+
+        // Операционные расходы без налога
+        const opCostsExTax =
+          cogs +
+          fulfillment +
+          lastMile +
+          expectedReturnCost +
+          inbound +
+          storage +
+          packaging +
+          other +
+          drrCost;
+
+        // Налог по режиму
+        let taxCost = 0;
         if (taxRegime === "USN6") {
-          const C2 = C - 0.06;
-          return C2 > 0 ? K / C2 : Infinity;
+          taxCost = price * 0.06;
         } else if (taxRegime === "USN15") {
-          const C2 = C * (1 - 0.15);
-          return C2 > 0 ? (K + 0.15 * K) / C2 : Infinity;
+          const pbt = netRevenueBase - opCostsExTax;
+          taxCost = Math.max(0, 0.15 * pbt);
         } else if (taxRegime === "OSNO") {
-          const C2 = C * (1 - 0.25);
-          return C2 > 0 ? (K + 0.25 * K) / C2 : Infinity;
+          const pbt = netRevenueBase - opCostsExTax;
+          taxCost = Math.max(0, 0.25 * pbt);
         }
-        return K / C;
-      }
 
-      const breakeven = breakevenPriceForRegime();
+        const totalCosts = opCostsExTax + taxCost;
+        const netRevenue = netRevenueBase;
+        const profit = netRevenue - totalCosts;
+        const margin =
+          netRevenue > 0 ? (profit / netRevenue) * 100 : profit < 0 ? -100 : 0;
 
-      // KPI
-      els.netRevVal.textContent = isFinite(netRevenue)
-        ? fmt(netRevenue) + " ₽"
-        : "—";
-      els.totalCostVal.textContent = isFinite(totalCosts)
-        ? fmt(totalCosts) + " ₽"
-        : "—";
-      els.profitVal.textContent = isFinite(profit) ? fmt(profit) + " ₽" : "—";
-      els.marginVal.textContent = isFinite(margin) ? fmt(margin) + " %" : "—";
-      $("#kpi-profit").classList.toggle("good", profit > 0);
-      $("#kpi-profit").classList.toggle("bad", profit < 0);
-      $("#kpi-margin").classList.toggle("good", margin >= 15);
-      $("#kpi-margin").classList.toggle("bad", margin < 0);
+        // Безубыточность
+        const v = vatPct / 100,
+          r = refFeePct / 100,
+          a = drrPct / 100;
+        const C = 1 / (1 + v) - r - a;
+        const K = opCostsExTax - drrCost;
 
-      els.breakevenPrice.textContent = isFinite(breakeven)
-        ? fmt(breakeven) + " ₽"
-        : "—";
+        function breakevenPriceForRegime() {
+          if (C <= 0) return Infinity;
+          if (taxRegime === "USN6") {
+            const C2 = C - 0.06;
+            return C2 > 0 ? K / C2 : Infinity;
+          } else if (taxRegime === "USN15") {
+            const C2 = C * (1 - 0.15);
+            return C2 > 0 ? (K + 0.15 * K) / C2 : Infinity;
+          } else if (taxRegime === "OSNO") {
+            const C2 = C * (1 - 0.25);
+            return C2 > 0 ? (K + 0.25 * K) / C2 : Infinity;
+          }
+          return K / C;
+        }
 
-      // Детализация
-      const rows = [
-        ["Цена реализации", fmt(price) + " ₽"],
-        [
-          "Налоговый режим",
-          taxRegime === "OSNO"
-            ? "ОСНО (25% от прибыли)"
-            : taxRegime === "USN6"
+        const breakeven = breakevenPriceForRegime();
+
+        // KPI
+        els.netRevVal.textContent = isFinite(netRevenue)
+          ? fmt(netRevenue) + " ₽"
+          : "—";
+        els.totalCostVal.textContent = isFinite(totalCosts)
+          ? fmt(totalCosts) + " ₽"
+          : "—";
+        els.profitVal.textContent = isFinite(profit) ? fmt(profit) + " ₽" : "—";
+        els.marginVal.textContent = isFinite(margin) ? fmt(margin) + " %" : "—";
+        $("#kpi-profit").classList.toggle("good", profit > 0);
+        $("#kpi-profit").classList.toggle("bad", profit < 0);
+        $("#kpi-margin").classList.toggle("good", margin >= 15);
+        $("#kpi-margin").classList.toggle("bad", margin < 0);
+
+        els.breakevenPrice.textContent = isFinite(breakeven)
+          ? fmt(breakeven) + " ₽"
+          : "—";
+
+        // Детализация
+        const rows = [
+          ["Цена реализации", fmt(price) + " ₽"],
+          [
+            "Налоговый режим",
+            taxRegime === "OSNO"
+              ? "ОСНО (25% от прибыли)"
+              : taxRegime === "USN6"
               ? "УСН 6%"
               : "УСН 15%",
-        ],
-        ["НДС, %", fmt(vatPct) + " %"],
-        ["Выручка без НДС", fmt(netOfVAT) + " ₽"],
-        [
-          "Комиссия площадки",
-          fmt(referralFee) + " ₽ (" + fmt(refFeePct) + " %)",
-        ],
-        ["ДРР (реклама)", fmt(drrCost) + " ₽ (" + fmt(drrPct) + " %)"],
-        ["Себестоимость (COGS)", fmt(cogs) + " ₽"],
-        ["Фулфилмент", fmt(fulfillment) + " ₽"],
-        ["Доставка покупателю", fmt(lastMile) + " ₽"],
-        [
-          "Возвраты (ожидаемо)",
-          fmt(expectedReturnCost) +
-          " ₽ (" +
-          fmt(returnsPct) +
-          " % × " +
-          fmt(returnCost) +
-          " ₽)",
-        ],
-        ["Входящая логистика", fmt(inbound) + " ₽"],
-        ["Хранение", fmt(storage) + " ₽"],
-        ["Упаковка", fmt(packaging) + " ₽"],
-        ["Прочие расходы", fmt(other) + " ₽"],
-        ["Налог по режиму", fmt(taxCost) + " ₽"],
-      ];
-      els.breakdown.innerHTML = rows
-        .map((r) => `<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`)
-        .join("");
+          ],
+          ["НДС, %", fmt(vatPct) + " %"],
+          ["Выручка без НДС", fmt(netOfVAT) + " ₽"],
+          [
+            "Комиссия площадки",
+            fmt(referralFee) + " ₽ (" + fmt(refFeePct) + " %)",
+          ],
+          ["ДРР (реклама)", fmt(drrCost) + " ₽ (" + fmt(drrPct) + " %)"],
+          ["Себестоимость (COGS)", fmt(cogs) + " ₽"],
+          ["Фулфилмент", fmt(fulfillment) + " ₽"],
+          ["Доставка покупателю", fmt(lastMile) + " ₽"],
+          [
+            "Возвраты (ожидаемо)",
+            fmt(expectedReturnCost) +
+              " ₽ (" +
+              fmt(returnsPct) +
+              " % × " +
+              fmt(returnCost) +
+              " ₽)",
+          ],
+          ["Входящая логистика", fmt(inbound) + " ₽"],
+          ["Хранение", fmt(storage) + " ₽"],
+          ["Упаковка", fmt(packaging) + " ₽"],
+          ["Прочие расходы", fmt(other) + " ₽"],
+          ["Налог по режиму", fmt(taxCost) + " ₽"],
+        ];
+        els.breakdown.innerHTML = rows
+          .map((r) => `<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`)
+          .join("");
 
-      // keep URL query in sync so copying from address bar works
-      try {
-        const qs = stateToQuery(getState());
-        history.replaceState(null, "", qs ? "?" + qs : location.pathname);
-      } catch { }
-    }
-
-    // Clear all numeric fields to blank
-    function clearAll() {
-      els.taxRegime.value = "OSNO";
-      els.vatRate.value = "22";
-      els.price.value = "";
-      els.refFee.value = "";
-      els.drr.value = "";
-      els.cogs.value = "";
-      els.fulfillment.value = "";
-      els.lastMile.value = "";
-      els.returns.value = "";
-      els.returnCost.value = "";
-      els.inbound.value = "";
-      els.storage.value = "";
-      els.packaging.value = "";
-      els.other.value = "";
-      els.comment.value = "";
-
-      els.netRevVal.textContent = "—";
-      els.totalCostVal.textContent = "—";
-      els.profitVal.textContent = "—";
-      els.marginVal.textContent = "—";
-      els.breakevenPrice.textContent = "—";
-      document.querySelector("#kpi-profit")?.classList.remove("good", "bad");
-      document.querySelector("#kpi-margin")?.classList.remove("good", "bad");
-      els.breakdown.innerHTML = "";
-      setPill("Очищено");
-
-      // Clear query string too
-      try {
-        history.replaceState(null, "", location.pathname);
-      } catch { }
-    }
-
-    // ---------- Query-state helpers ----------
-    function getState() {
-      return {
-        price: els.price.value,
-        tax: els.taxRegime.value,
-        vat: els.vatRate.value,
-        ref: els.refFee.value,
-        drr: els.drr.value,
-        cogs: els.cogs.value,
-        fulf: els.fulfillment.value,
-        last: els.lastMile.value,
-        ret: els.returns.value,
-        retc: els.returnCost.value,
-        inb: els.inbound.value,
-        stor: els.storage.value,
-        pack: els.packaging.value,
-        other: els.other.value,
-        cmt: els.comment.value,
-      };
-    }
-
-    function applyState(s) {
-      if (!s) return;
-      if (s.price != null) els.price.value = s.price;
-      if (s.tax != null) els.taxRegime.value = s.tax;
-      if (s.vat != null) els.vatRate.value = s.vat;
-      if (s.ref != null) els.refFee.value = s.ref;
-      if (s.drr != null) els.drr.value = s.drr;
-      if (s.cogs != null) els.cogs.value = s.cogs;
-      if (s.fulf != null) els.fulfillment.value = s.fulf;
-      if (s.last != null) els.lastMile.value = s.last;
-      if (s.ret != null) els.returns.value = s.ret;
-      if (s.retc != null) els.returnCost.value = s.retc;
-      if (s.inb != null) els.inbound.value = s.inb;
-      if (s.stor != null) els.storage.value = s.stor;
-      if (s.pack != null) els.packaging.value = s.pack;
-      if (s.other != null) els.other.value = s.other;
-      if (s.cmt != null) els.comment.value = s.cmt;
-    }
-
-    function stateToQuery(s) {
-      const usp = new URLSearchParams();
-      Object.entries(s).forEach(([k, v]) => {
-        if (v !== "" && v != null) usp.set(k, v);
-      });
-      return usp.toString();
-    }
-
-    function queryToState() {
-      const usp = new URLSearchParams(location.search);
-      const g = (k) => usp.get(k) ?? undefined;
-      return {
-        price: g("price"),
-        tax: g("tax"),
-        vat: g("vat"),
-        ref: g("ref"),
-        drr: g("drr"),
-        cogs: g("cogs"),
-        fulf: g("fulf"),
-        last: g("last"),
-        ret: g("ret"),
-        retc: g("retc"),
-        inb: g("inb"),
-        stor: g("stor"),
-        pack: g("pack"),
-        other: g("other"),
-        cmt: g("cmt"),
-      };
-    }
-
-    // ---------- TinyURL shortener ----------
-    async function shortenWithTinyURL(longUrl) {
-      try {
-        const res = await fetch(
-          "https://tinyurl.com/api-create.php?url=" +
-          encodeURIComponent(longUrl)
-        );
-        if (!res.ok) throw new Error("TinyURL error " + res.status);
-        const shortUrl = await res.text();
-        if (!/^https?:\/\/tinyurl\.com\//i.test(shortUrl))
-          throw new Error("Unexpected TinyURL response");
-        return shortUrl;
-      } catch (e) {
-        console.warn("TinyURL failed, using long URL:", e);
-        return longUrl;
-      }
-    }
-
-    async function shareLink() {
-      const longUrl =
-        location.origin +
-        location.pathname +
-        (function () {
+        // keep URL query in sync so copying from address bar works
+        try {
           const qs = stateToQuery(getState());
-          return qs ? "?" + qs : "";
-        })();
-
-      const url = await shortenWithTinyURL(longUrl);
-
-      try {
-        await navigator.clipboard.writeText(url);
-        setPill("Короткая ссылка скопирована");
-        els.shareStatus.textContent = "Ссылка скопирована в буфер обмена";
-      } catch {
-        els.shareStatus.textContent = "";
-        prompt("Скопируйте ссылку:", url);
+          history.replaceState(null, "", qs ? "?" + qs : location.pathname);
+        } catch {}
       }
-    }
 
-    // Events
-    function attachEvents() {
-      const inputs = [
-        "price",
-        "taxRegime",
-        "vatRate",
-        "refFee",
-        "drr",
-        "cogs",
-        "fulfillment",
-        "lastMile",
-        "returns",
-        "returnCost",
-        "inbound",
-        "storage",
-        "packaging",
-        "other",
-        "comment",
-      ].map((k) => els[k]);
+      // Clear all numeric fields to blank
+      function clearAll() {
+        els.taxRegime.value = "OSNO";
+        els.vatRate.value = "22";
+        els.price.value = "";
+        els.refFee.value = "";
+        els.drr.value = "";
+        els.cogs.value = "";
+        els.fulfillment.value = "";
+        els.lastMile.value = "";
+        els.returns.value = "";
+        els.returnCost.value = "";
+        els.inbound.value = "";
+        els.storage.value = "";
+        els.packaging.value = "";
+        els.other.value = "";
+        els.comment.value = "";
 
-      inputs.forEach((el) => {
-        el.addEventListener("input", debounce(calc, 80));
-        el.addEventListener("change", calc);
-        if (el.tagName === "INPUT")
-          el.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") calc();
-          });
-      });
+        els.netRevVal.textContent = "—";
+        els.totalCostVal.textContent = "—";
+        els.profitVal.textContent = "—";
+        els.marginVal.textContent = "—";
+        els.breakevenPrice.textContent = "—";
+        document.querySelector("#kpi-profit")?.classList.remove("good", "bad");
+        document.querySelector("#kpi-margin")?.classList.remove("good", "bad");
+        els.breakdown.innerHTML = "";
+        setPill("Очищено");
 
-      els.calcBtn.addEventListener("click", calc);
-      els.resetBtn.addEventListener("click", clearAll);
-      els.shareBtn.addEventListener("click", shareLink);
+        // Clear query string too
+        try {
+          history.replaceState(null, "", location.pathname);
+        } catch {}
+      }
 
-      // Load state from query (if any), then calculate
-      const initial = queryToState();
-      applyState(initial);
-      calc();
+      // ---------- Query-state helpers ----------
+      function getState() {
+        return {
+          price: els.price.value,
+          tax: els.taxRegime.value,
+          vat: els.vatRate.value,
+          ref: els.refFee.value,
+          drr: els.drr.value,
+          cogs: els.cogs.value,
+          fulf: els.fulfillment.value,
+          last: els.lastMile.value,
+          ret: els.returns.value,
+          retc: els.returnCost.value,
+          inb: els.inbound.value,
+          stor: els.storage.value,
+          pack: els.packaging.value,
+          other: els.other.value,
+          cmt: els.comment.value,
+        };
+      }
 
-      // If query changes (e.g., user pastes a link), update state
-      window.addEventListener("popstate", () => {
-        const st = queryToState();
-        applyState(st);
+      function applyState(s) {
+        if (!s) return;
+        if (s.price != null) els.price.value = s.price;
+        if (s.tax != null) els.taxRegime.value = s.tax;
+        if (s.vat != null) els.vatRate.value = s.vat;
+        if (s.ref != null) els.refFee.value = s.ref;
+        if (s.drr != null) els.drr.value = s.drr;
+        if (s.cogs != null) els.cogs.value = s.cogs;
+        if (s.fulf != null) els.fulfillment.value = s.fulf;
+        if (s.last != null) els.lastMile.value = s.last;
+        if (s.ret != null) els.returns.value = s.ret;
+        if (s.retc != null) els.returnCost.value = s.retc;
+        if (s.inb != null) els.inbound.value = s.inb;
+        if (s.stor != null) els.storage.value = s.stor;
+        if (s.pack != null) els.packaging.value = s.pack;
+        if (s.other != null) els.other.value = s.other;
+        if (s.cmt != null) els.comment.value = s.cmt;
+      }
+
+      function stateToQuery(s) {
+        const usp = new URLSearchParams();
+        Object.entries(s).forEach(([k, v]) => {
+          if (v !== "" && v != null) usp.set(k, v);
+        });
+        return usp.toString();
+      }
+
+      function queryToState() {
+        const usp = new URLSearchParams(location.search);
+        const g = (k) => usp.get(k) ?? undefined;
+        return {
+          price: g("price"),
+          tax: g("tax"),
+          vat: g("vat"),
+          ref: g("ref"),
+          drr: g("drr"),
+          cogs: g("cogs"),
+          fulf: g("fulf"),
+          last: g("last"),
+          ret: g("ret"),
+          retc: g("retc"),
+          inb: g("inb"),
+          stor: g("stor"),
+          pack: g("pack"),
+          other: g("other"),
+          cmt: g("cmt"),
+        };
+      }
+
+      // ---------- TinyURL shortener ----------
+      async function shortenWithTinyURL(longUrl) {
+        try {
+          const res = await fetch(
+            "https://tinyurl.com/api-create.php?url=" +
+              encodeURIComponent(longUrl)
+          );
+        if (!res.ok) throw new Error("TinyURL error " + res.status);
+          const shortUrl = await res.text();
+          if (!/^https?:\/\/tinyurl\.com\//i.test(shortUrl))
+            throw new Error("Unexpected TinyURL response");
+          return shortUrl;
+        } catch (e) {
+          console.warn("TinyURL failed, using long URL:", e);
+          return longUrl;
+        }
+      }
+
+      async function shareLink() {
+        const longUrl =
+          location.origin +
+          location.pathname +
+          (function () {
+            const qs = stateToQuery(getState());
+            return qs ? "?" + qs : "";
+          })();
+
+        const url = await shortenWithTinyURL(longUrl);
+
+        try {
+          await navigator.clipboard.writeText(url);
+          setPill("Короткая ссылка скопирована");
+          els.shareStatus.textContent = "Ссылка скопирована в буфер обмена";
+        } catch {
+          els.shareStatus.textContent = "";
+          prompt("Скопируйте ссылку:", url);
+        }
+      }
+
+      // Events
+      function attachEvents() {
+        const inputs = [
+          "price",
+          "taxRegime",
+          "vatRate",
+          "refFee",
+          "drr",
+          "cogs",
+          "fulfillment",
+          "lastMile",
+          "returns",
+          "returnCost",
+          "inbound",
+          "storage",
+          "packaging",
+          "other",
+          "comment",
+        ].map((k) => els[k]);
+
+        inputs.forEach((el) => {
+          el.addEventListener("input", debounce(calc, 80));
+          el.addEventListener("change", calc);
+          if (el.tagName === "INPUT")
+            el.addEventListener("keydown", (e) => {
+              if (e.key === "Enter") calc();
+            });
+        });
+
+        els.calcBtn.addEventListener("click", calc);
+        els.resetBtn.addEventListener("click", clearAll);
+        els.shareBtn.addEventListener("click", shareLink);
+
+        // Load state from query (if any), then calculate
+        const initial = queryToState();
+        applyState(initial);
         calc();
-      });
-    }
 
-    function debounce(fn, wait) {
-      let t = 0;
-      return (...args) => {
-        clearTimeout(t);
-        t = setTimeout(() => fn.apply(null, args), wait);
-      };
-    }
+        // If query changes (e.g., user pastes a link), update state
+        window.addEventListener("popstate", () => {
+          const st = queryToState();
+          applyState(st);
+          calc();
+        });
+      }
 
-    attachEvents();
-  </script>
-</body>
+      function debounce(fn, wait) {
+        let t = 0;
+        return (...args) => {
+          clearTimeout(t);
+          t = setTimeout(() => fn.apply(null, args), wait);
+        };
+      }
 
+      attachEvents();
+    </script>
+  </body>
 </html>
