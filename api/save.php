@@ -67,7 +67,7 @@ function sanitize_state($d, $MAX_COMMENT) {
 $state = sanitize_state($data, $MAX_COMMENT);
 
 // Load store
-$storeFile = __DIR__ . '/../data/store.json';
+$storeFile = __DIR__ . '/data/store.json';
 $storeDir = dirname($storeFile);
 if (!file_exists($storeDir)) {
   @mkdir($storeDir, 0775, true);

@@ -8,7 +8,7 @@ if ($slug === '') {
   echo json_encode(['ok' => false, 'error' => 'Missing slug']);
   exit;
 }
-$storeFile = __DIR__ . '/../data/store.json';
+$storeFile = __DIR__ . '/data/store.json';
 if (!file_exists($storeFile)) {
   http_response_code(404);
   echo json_encode(['ok' => false, 'error' => 'Not found']);
