@@ -48,13 +48,13 @@
 
             <div class="search-block">
     
-                <form role="search" method="get" class="search-form" action="#">
-                    <label>
-                        <span class="hide-content">Search for:</span>
-                        <input type="search" class="search-field" placeholder="Type Keywords" value="" name="s" title="Search for:" autocomplete="off">
-                    </label>
-                    <input type="submit" class="search-submit" value="Search">
-                </form>
+                <form role="search" method="get" class="search-form" action="/blog/search.php">
+  <label>
+    <span class="hide-content">Search for:</span>
+    <input type="search" class="search-field" placeholder="Type Keywords" value="" name="q" title="Search for:" autocomplete="off">
+  </label>
+  <input type="submit" class="search-submit" value="Search">
+</form>
     
                 <a href="#0" title="Close Search" class="search-close">Close</a>
     
