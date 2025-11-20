@@ -21,6 +21,7 @@ if (!$token) {
   exit;
 }
 
+
 // ВАЖНО: хост именно supplies-api
 $endpoint = 'https://supplies-api.wildberries.ru/api/v1/transit-tariffs';
 
