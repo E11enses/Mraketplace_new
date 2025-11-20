@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <title>WB — Транзитные направления (FBW)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        --bg: #0f172a;
+        --card: #111827;
+        --text: #e5e7eb;
+        --muted: #9ca3af;
+        --accent: #22c55e;
+        --accent-2: #6366f1;
+        --danger: #ef4444;
+        --border: #1f2937;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+          Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji;
+      }
+      .header {
+        padding: 16px;
+        border-bottom: 1px solid var(--border);
+        background: linear-gradient(180deg, #0b1225, #0f172a);
+      }
+      h1 {
+        margin: 0 0 12px;
+        font-size: 20px;
+      }
+      .filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 12px;
+        align-items: center;
+      }
+      label {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        font-size: 14px;
+      }
+      input[type='text'] {
+        background: #0b1020;
+        color: var(--text);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 8px 10px;
+        width: 180px;
+      }
+      button {
+        background: var(--accent);
+        color: #052e16;
+        border: none;
+        border-radius: 6px;
+        padding: 8px 12px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      button.secondary {
+        background: var(--accent-2);
+        color: white;
+      }
+      .status {
+        margin-top: 10px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .table-wrap {
+        padding: 16px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      th,
+      td {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+        font-size: 14px;
+      }
+      thead th {
+        background: #0b1020;
+        color: #d1d5db;
+        position: sticky;
+        top: 0;
+      }
+      tbody tr:hover {
+        background: rgba(99, 102, 241, 0.08);
+      }
+      .muted {
+        color: var(--muted);
+        text-align: center;
+      }
+      .footer {
+        padding: 16px;
+        border-top: 1px solid var(--border);
+        color: var(--muted);
+      }
+      .pill {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        background: rgba(34, 197, 94, 0.15);
+        color: #86efac;
+      }
+      .pill.red {
+        background: rgba(239, 68, 68, 0.15);
+        color: #fecaca;
+      }
+      .toolbar {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+      .toolbar .right {
+        margin-left: auto;
+        display: flex;
+        gap: 8px;
+      }
+      .hint {
+        font-size: 12px;
+        color: var(--muted);
+        margin-left: 8px;
+      }
+      .small {
+        font-size: 12px;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <h1>Доступные транзитные направления Wildberries (FBW)</h1>
+      <div class="filters">
+        <label>
+          Из склада (ID):
+          <input
+            type="text"
+            id="fromWarehouseId"
+            placeholder="например, 507"
+          />
+        </label>
+        <label>
+          В склад (ID):
+          <input type="text" id="toWarehouseId" placeholder="например, 125" />
+        </label>
+        <div class="toolbar">
+          <button id="btnLoad">Загрузить</button>
+          <button id="btnReset" class="secondary">Сбросить</button>
+          <span class="hint">Источник: /api/wb-transit.php</span>
+          <div class="right">
+            <label class="small"
+              ><input type="checkbox" id="onlyActive" /> Только активные</label
+            >
+          </div>
+        </div>
+      </div>
+      <div id="status" class="status">Готов</div>
+    </header>
+
+    <main>
+      <div class="table-wrap">
+        <table id="tariffsTable">
+          <thead>
+            <tr>
+              <th>Из склада (ID)</th>
+              <th>В склад (ID)</th>
+              <th>Тариф</th>
+              <th>Валюта</th>
+              <th>Срок, дней</th>
+              <th>Активно</th>
+              <th>Обновлено</th>
+              <th>Прочее</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr>
+              <td colspan="8" class="muted">Нет данных</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <span>Мини‑сервис для просмотра транзитных направлений WB</span>
+    </footer>
+
+    <script>
+      const els = {
+        from: document.getElementById('fromWarehouseId'),
+        to: document.getElementById('toWarehouseId'),
+        onlyActive: document.getElementById('onlyActive'),
+        btnLoad: document.getElementById('btnLoad'),
+        btnReset: document.getElementById('btnReset'),
+        status: document.getElementById('status'),
+        tbody: document.getElementById('tableBody'),
+      };
+
+      function setStatus(msg, type = 'info') {
+        els.status.textContent = msg;
+        els.status.style.color =
+          type === 'error' ? '#ef4444' : type === 'ok' ? '#22c55e' : '#9ca3af';
+      }
+
+      function buildQuery(params) {
+        const q = new URLSearchParams();
+        Object.entries(params).forEach(([k, v]) => {
+          if (v !== undefined && v !== null && String(v).trim() !== '') {
+            q.set(k, String(v).trim());
+          }
+        });
+        return q.toString() ? `?${q.toString()}` : '';
+      }
+
+      async function loadTariffs() {
+        setStatus('Загрузка…');
+        els.tbody.innerHTML =
+          '<tr><td colspan="8" class="muted">Загрузка…</td></tr>';
+
+        const query = buildQuery({
+          fromWarehouseId: els.from.value,
+          toWarehouseId: els.to.value,
+        });
+
+        try {
+          const res = await fetch(`/api/wb-transit.php${query}`, {
+            method: 'GET',
+            headers: { Accept: 'application/json' },
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            console.error('WB transit error', data);
+            els.tbody.innerHTML = `<tr><td colspan="8" class="muted">Ошибка: ${
+              data.error || data.message || res.status
+            }</td></tr>`;
+            setStatus('Ошибка загрузки', 'error');
+            return;
+          }
+
+          // wb-transit.php уже возвращает нормализованный массив
+          let list = Array.isArray(data) ? data : [];
+          if (els.onlyActive.checked) {
+            list = list.filter((x) => x.active === true);
+          }
+
+          renderList(list);
+        } catch (e) {
+          console.error(e);
+          els.tbody.innerHTML =
+            '<tr><td colspan="8" class="muted">Сетевая ошибка</td></tr>';
+          setStatus('Сетевая ошибка', 'error');
+        }
+      }
+
+      function renderList(list) {
+        if (!list || list.length === 0) {
+          els.tbody.innerHTML =
+            '<tr><td colspan="8" class="muted">Данные не найдены</td></tr>';
+          setStatus('Нет данных', 'ok');
+          return;
+        }
+
+        const rows = list.map((r) => {
+          const fromId = r.fromWarehouseId ?? '';
+          const toId = r.toWarehouseId ?? '';
+          const tariff =
+            r.tariff !== null && r.tariff !== undefined ? r.tariff : '—';
+          const currency = r.currency || 'RUB';
+          const lead =
+            r.leadTimeDays !== null && r.leadTimeDays !== undefined
+              ? r.leadTimeDays
+              : '—';
+          const active = r.active === true;
+          const upd = r.updatedAt ? fmtDatetime(r.updatedAt) : '—';
+
+          const extra = [];
+          if (r.serviceType) extra.push(`service: ${r.serviceType}`);
+          if (r.weightLimitKg !== null && r.weightLimitKg !== undefined)
+            extra.push(`limit: ${r.weightLimitKg}kg`);
+          if (r.comment) extra.push(`note: ${r.comment}`);
+
+          return {
+            fromId,
+            toId,
+            tariff,
+            currency,
+            lead,
+            active,
+            upd,
+            extra: extra.join(', '),
+          };
+        });
+
+        els.tbody.innerHTML = rows
+          .map(
+            (r) => `
+          <tr>
+            <td>${escapeHtml(r.fromId)}</td>
+            <td>${escapeHtml(r.toId)}</td>
+            <td>${escapeHtml(r.tariff)}</td>
+            <td>${escapeHtml(r.currency)}</td>
+            <td>${escapeHtml(r.lead)}</td>
+            <td>${
+              r.active
+                ? '<span class="pill">Да</span>'
+                : '<span class="pill red">Нет</span>'
+            }</td>
+            <td>${escapeHtml(r.upd)}</td>
+            <td>${escapeHtml(r.extra)}</td>
+          </tr>
+        `
+          )
+          .join('');
+
+        setStatus(`Готово: записей — ${rows.length}`, 'ok');
+      }
+
+      function escapeHtml(v) {
+        return String(v)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function fmtDatetime(s) {
+        // простое форматирование ISO в локальное
+        const d = new Date(s);
+        if (isNaN(d.getTime())) return s;
+        return (
+          d.getFullYear() +
+          '-' +
+          String(d.getMonth() + 1).padStart(2, '0') +
+          '-' +
+          String(d.getDate()).padStart(2, '0') +
+          ' ' +
+          String(d.getHours()).padStart(2, '0') +
+          ':' +
+          String(d.getMinutes()).padStart(2, '0')
+        );
+      }
+
+      document.getElementById('btnLoad').addEventListener('click', loadTariffs);
+      document.getElementById('btnReset').addEventListener('click', () => {
+        els.from.value = '';
+        els.to.value = '';
+        els.onlyActive.checked = false;
+        els.tbody.innerHTML =
+          '<tr><td colspan="8" class="muted">Нет данных</td></tr>';
+        setStatus('Готов');
+      });
+
+      document.addEventListener('DOMContentLoaded', () => {
+        loadTariffs();
+      });
+    </script>
+  </body>
+</html>
