@@ -16,145 +16,60 @@
         --border: #e5e7eb;
         --chip: #eef2ff;
       }
-      *,
-      *::before,
-      *::after {
-        box-sizing: border-box;
-      }
+      *, *::before, *::after { box-sizing: border-box; }
       body {
-        margin: 0;
-        background: var(--bg);
-        color: var(--text);
-        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
-          Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji;
+        margin: 0; background: --bg; background: #f7f7f9; color: var(--text);
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
       }
       .header {
-        padding: 16px;
-        border-bottom: 1px solid var(--border);
-        background: #ffffffcc;
-        backdrop-filter: saturate(150%) blur(8px);
-        position: sticky;
-        top: 0;
-        z-index: 10;
+        padding: 16px; border-bottom: 1px solid var(--border);
+        background: #ffffffcc; backdrop-filter: saturate(150%) blur(8px);
+        position: sticky; top: 0; z-index: 10;
       }
-      h1 {
-        margin: 0 0 10px;
-        font-size: 20px;
-      }
-      .row {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-        align-items: center;
-      }
-      label.inline {
-        display: flex;
-        gap: 6px;
-        align-items: center;
-        font-size: 14px;
-      }
+      h1 { margin: 0 0 10px; font-size: 20px; }
+      .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+      label.inline { display: flex; gap: 6px; align-items: center; font-size: 14px; }
       input[type='text'] {
-        background: #fff;
-        color: var(--text);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        padding: 8px 10px;
-        width: 260px;
+        background: #fff; color: var(--text); border: 1px solid var(--border);
+        border-radius: 8px; padding: 8px 10px; width: 260px;
       }
-      input[type='checkbox'] {
-        transform: translateY(1px);
-      }
+      input[type='checkbox'] { transform: translateY(1px); }
       button {
-        background: var(--accent);
-        color: #fff;
-        border: 1px solid var(--accent);
-        border-radius: 8px;
-        padding: 8px 12px;
-        font-weight: 600;
-        cursor: pointer;
+        background: var(--accent); color: #fff; border: 1px solid var(--accent);
+        border-radius: 8px; padding: 8px 12px; font-weight: 600; cursor: pointer;
       }
-      button.secondary {
-        background: #fff;
-        color: var(--accent);
-        border-color: var(--accent);
-      }
-      .status {
-        margin-top: 8px;
-        font-size: 13px;
-        color: var(--muted);
-      }
-      .container {
-        padding: 16px;
-      }
-      .graph-wrap {
-        display: grid;
-        grid-template-columns: 320px 1fr;
-        gap: 16px;
-      }
+      button.secondary { background: #fff; color: var(--accent); border-color: var(--accent); }
+      .status { margin-top: 8px; font-size: 13px; color: var(--muted); }
+      .container { padding: 16px; }
+      .graph-wrap { display: grid; grid-template-columns: 320px 1fr; gap: 16px; }
       .panel {
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 12px;
-        min-height: 440px;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+        padding: 12px; min-height: 440px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);
       }
       .panel h3 { margin: 0 0 10px; font-size: 16px; }
-      .list {
-        display: grid;
-        gap: 8px;
-        max-height: 392px;
-        overflow: auto;
-      }
+      .list { display: grid; gap: 8px; max-height: 392px; overflow: auto; }
       .item {
-        padding: 10px 12px;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        cursor: pointer;
-        background: #fff;
+        padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px;
+        cursor: pointer; background: #fff;
       }
       .item:hover { border-color: #c7d2fe; background: #fafaff; }
-      .item.active {
-        border-color: #93c5fd;
-        box-shadow: inset 0 0 0 2px #93c5fd55;
-        background: #f0f7ff;
-      }
+      .item.active { border-color: #93c5fd; box-shadow: inset 0 0 0 2px #93c5fd55; background: #f0f7ff; }
       .targets { min-height: 392px; }
       .edge {
-        background: #fff;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 10px 12px;
-        margin-bottom: 10px;
-        display: grid;
-        gap: 6px;
+        background: #fff; border: 1px solid var(--border); border-radius: 10px;
+        padding: 10px 12px; margin-bottom: 10px; display: grid; gap: 6px;
       }
       .edge .title { font-weight: 600; }
       .chips { display: inline-grid; grid-auto-flow: column; gap: 8px; }
       .chip {
-        background: var(--chip);
-        color: #3730a3;
-        border: 1px solid #e0e7ff;
-        border-radius: 999px;
-        padding: 2px 8px;
-        font-size: 12px;
-        font-weight: 600;
+        background: var(--chip); color: #3730a3; border: 1px solid #e0e7ff;
+        border-radius: 999px; padding: 2px 8px; font-size: 12px; font-weight: 600;
       }
       .pill {
-        display: inline-block;
-        padding: 2px 8px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 700;
-        background: #ecfdf5;
-        color: #065f46;
-        border: 1px solid #a7f3d0;
+        display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 700;
+        background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;
       }
-      .pill.red {
-        background: #fef2f2;
-        color: #991b1b;
-        border-color: #fecaca;
-      }
+      .pill.red { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
       .muted { color: var(--muted); }
       .hint { font-size: 12px; color: var(--muted); }
     </style>
@@ -163,13 +78,8 @@
     <header class="header">
       <h1>Транзитные направления Wildberries (FBW)</h1>
       <div class="row">
-        <label class="inline">
-          Поиск склада:
-          <input type="text" id="search" placeholder="имя или ID" />
-        </label>
-        <label class="inline">
-          <input type="checkbox" id="onlyActive" /> Только активные
-        </label>
+        <label class="inline">Поиск склада: <input type="text" id="search" placeholder="имя или ID" /></label>
+        <label class="inline"><input type="checkbox" id="onlyActive" /> Только активные</label>
         <button id="btnReload" class="secondary">Обновить</button>
       </div>
       <div id="status" class="status">Готов</div>
@@ -179,16 +89,12 @@
       <div class="graph-wrap">
         <div class="panel">
           <h3>Начальные склады (A)</h3>
-          <div class="hint" style="margin-bottom:8px">
-            Кликните на склад — справа появятся направления и цены
-          </div>
+          <div class="hint" style="margin-bottom:8px">Кликните на склад — справа появятся направления и цены</div>
           <div id="listA" class="list"></div>
         </div>
         <div class="panel">
           <h3>Связи A → B</h3>
-          <div id="edges" class="targets">
-            <div class="muted">Выберите склад слева</div>
-          </div>
+          <div id="edges" class="targets"><div class="muted">Выберите склад слева</div></div>
         </div>
       </div>
     </main>
@@ -209,69 +115,25 @@
 
       function setStatus(msg, type = 'info') {
         els.status.textContent = msg;
-        els.status.style.color =
-          type === 'error' ? '#dc2626' : type === 'ok' ? '#10b981' : '#6b7280';
+        els.status.style.color = type === 'error' ? '#dc2626' : type === 'ok' ? '#10b981' : '#6b7280';
       }
       function escapeHtml(v) {
-        return String(v)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;')
-          .replace(/'/g, '&#039;');
+        return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
       }
       function fmtDate(s) {
         if (!s) return '—';
-        const d = new Date(s);
-        if (isNaN(d.getTime())) return s;
-        return (
-          d.getFullYear() +
-          '-' +
-          String(d.getMonth() + 1).padStart(2, '0') +
-          '-' +
-          String(d.getDate()).padStart(2, '0') +
-          ' ' +
-          String(d.getHours()).padStart(2, '0') +
-          ':' +
-          String(d.getMinutes()).padStart(2, '0')
-        );
+        const d = new Date(s); if (isNaN(d.getTime())) return s;
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' +
+          String(d.getDate()).padStart(2, '0') + ' ' + String(d.getHours()).padStart(2, '0') +
+          ':' + String(d.getMinutes()).padStart(2, '0');
       }
-
-      // palletTariff: достаём из extra
-      function extractPalletFromExtra(extra) {
-        if (typeof extra !== 'string') return null;
-        const m = extra.match(/pallet:\s*([\d.,]+)/i);
-        return m ? m[1] : null;
-      }
-
-      // За литр: берём первое числовое значение после "box: ..."
-      function extractBoxFirstPrice(extra) {
-        if (typeof extra !== 'string') return null;
-
-        // Попробуем вытащить JSON-массив после "box:"
-        const jsonMatch = extra.match(/box:\s*(\[[\s\S]*\])/i);
-        if (jsonMatch) {
-          try {
-            const arr = JSON.parse(jsonMatch[1]);
-            if (Array.isArray(arr) && arr.length) {
-              const first = arr.find((t) => Number.isFinite(Number(t?.value)));
-              if (first) return `${Number(first.value)} ₽/л`;
-            }
-          } catch (_) {}
-        }
-
-        // Иначе берём первое число после "box:"
-        const simple = extra.match(/box:\s*([^\n;]+)/i);
-        if (simple) {
-          const num = simple[1].match(/[\d]+(?:[.,]\d+)?/);
-          if (num) return `${num[0].replace(',', '.')} ₽/л`;
-        }
-
-        // Если нет метки box:, возьмём первое число вообще
-        const any = extra.match(/[\d]+(?:[.,]\d+)?/);
-        if (any) return `${any[0].replace(',', '.')} ₽/л`;
-
-        return null;
+      function perLiterLabel(min, max) {
+        if (min == null && max == null) return '—';
+        if (min != null && max == null) return `${min} ₽/л`;
+        if (max != null && min == null) return `${max} ₽/л`;
+        if (min === max) return `${min} ₽/л`;
+        return `${min}–${max} ₽/л`;
       }
 
       function applyFilters() {
@@ -281,109 +143,67 @@
           const from = r.fromWarehouseName || r.fromWarehouseId || '';
           const to = r.toWarehouseName || r.toWarehouseId || '';
           if (!q) return true;
-          return (
-            String(from).toLowerCase().includes(q) ||
-            String(to).toLowerCase().includes(q)
-          );
+          return String(from).toLowerCase().includes(q) || String(to).toLowerCase().includes(q);
         });
       }
 
       async function loadData() {
         setStatus('Загрузка…');
         try {
-          const res = await fetch('/api/wb-transit.php', {
-            headers: { Accept: 'application/json' },
-          });
+          const res = await fetch('/api/wb-transit.php', { headers: { Accept: 'application/json' } });
           const data = await res.json();
           if (!res.ok) {
-            console.error(data);
-            setStatus('Ошибка загрузки', 'error');
-            fullData = [];
+            console.error(data); setStatus('Ошибка загрузки', 'error'); fullData = [];
           } else {
             fullData = Array.isArray(data) ? data : [];
             setStatus(`Готово: направлений — ${fullData.length}`, 'ok');
           }
-          currentAKey = null;
-          onStateChanged();
+          currentAKey = null; onStateChanged();
         } catch (e) {
-          console.error(e);
-          setStatus('Сетевая ошибка', 'error');
-          fullData = [];
-          onStateChanged();
+          console.error(e); setStatus('Сетевая ошибка', 'error'); fullData = []; onStateChanged();
         }
       }
 
       function groupBySource(list) {
         const map = new Map();
         for (const r of list) {
-          const key =
-            (r.fromWarehouseId || '') + '|' + (r.fromWarehouseName || '');
-          if (!map.has(key)) {
-            map.set(key, {
-              key,
-              id: r.fromWarehouseId || '',
-              name: r.fromWarehouseName || r.fromWarehouseId || '—',
-              items: [],
-            });
-          }
+          const key = (r.fromWarehouseId || '') + '|' + (r.fromWarehouseName || '');
+          if (!map.has(key)) map.set(key, {
+            key, id: r.fromWarehouseId || '', name: r.fromWarehouseName || r.fromWarehouseId || '—', items: [],
+          });
           map.get(key).items.push(r);
         }
-        return Array.from(map.values()).sort((a, b) =>
-          String(a.name).localeCompare(String(b.name), 'ru'),
-        );
+        return Array.from(map.values()).sort((a, b) => String(a.name).localeCompare(String(b.name), 'ru'));
       }
 
       function renderGraph() {
         const groups = groupBySource(filtered);
 
-        els.listA.innerHTML = groups
-          .map(
-            (g) => `
-            <div class="item ${g.key === currentAKey ? 'active' : ''}" data-key="${escapeHtml(
-              g.key,
-            )}">
-              ${escapeHtml(g.name)}
-              <div class="hint">направлений: ${g.items.length}</div>
-            </div>
-          `,
-          )
-          .join('');
+        els.listA.innerHTML = groups.map((g) => `
+          <div class="item ${g.key === currentAKey ? 'active' : ''}" data-key="${escapeHtml(g.key)}">
+            ${escapeHtml(g.name)}
+            <div class="hint">направлений: ${g.items.length}</div>
+          </div>
+        `).join('');
 
         for (const el of els.listA.querySelectorAll('.item')) {
-          el.addEventListener('click', () => {
-            currentAKey = el.getAttribute('data-key');
-            renderGraph();
-          });
+          el.addEventListener('click', () => { currentAKey = el.getAttribute('data-key'); renderGraph(); });
         }
 
-        const selected =
-          groups.find((g) => g.key === currentAKey) || groups[0] || null;
-        if (!selected) {
-          els.edges.innerHTML = `<div class="muted">Нет данных</div>`;
-          return;
-        }
+        const selected = groups.find((g) => g.key === currentAKey) || groups[0] || null;
+        if (!selected) { els.edges.innerHTML = `<div class="muted">Нет данных</div>`; return; }
         if (!currentAKey) currentAKey = selected.key;
 
         const edgesHtml = selected.items
-          .sort((a, b) =>
-            String(a.toWarehouseName || a.toWarehouseId || '').localeCompare(
-              String(b.toWarehouseName || b.toWarehouseId || ''),
-              'ru',
-            ),
-          )
+          .sort((a, b) => String(a.toWarehouseName || a.toWarehouseId || '').localeCompare(
+            String(b.toWarehouseName || b.toWarehouseId || ''), 'ru'))
           .map((r) => {
             const from = r.fromWarehouseName || r.fromWarehouseId || '';
             const to = r.toWarehouseName || r.toWarehouseId || '';
-            const perLiter = extractBoxFirstPrice(r.extra) ?? '—';
-            const palletVal = extractPalletFromExtra(r.extra);
-            const pallet = palletVal ? `${palletVal} ₽/паллета` : '—';
-            const active =
-              r.active === true
-                ? '<span class="pill">Да</span>'
-                : r.active === false
-                ? '<span class="pill red">Нет</span>'
-                : '—';
-
+            const perLiter = perLiterLabel(r.boxMinPerLiter, r.boxMaxPerLiter);
+            const pallet = r.palletTariff != null && r.palletTariff !== '' ? `${r.palletTariff} ₽/паллета` : '—';
+            const active = r.active === true ? '<span class="pill">Да</span>' :
+                           r.active === false ? '<span class="pill red">Нет</span>' : '—';
             return `
               <div class="edge">
                 <div class="title">${escapeHtml(from)} → ${escapeHtml(to)}</div>
@@ -395,17 +215,12 @@
                 </div>
               </div>
             `;
-          })
-          .join('');
+          }).join('');
 
         els.edges.innerHTML = edgesHtml || `<div class="muted">Нет связей</div>`;
       }
 
-      function onStateChanged() {
-        applyFilters();
-        renderGraph();
-      }
-
+      function onStateChanged() { applyFilters(); renderGraph(); }
       els.onlyActive.addEventListener('change', onStateChanged);
       els.search.addEventListener('input', onStateChanged);
       els.btnReload.addEventListener('click', loadData);

@@ -1,6 +1,7 @@
 <?php
 // api/wb-transit.php — SUPPLIES API
-// Возвращает нормализованный список транзитных направлений FBW.
+// Возвращает нормализованный список транзитных направлений FBW,
+// включая паллетный тариф и тарифы за литр (диапазоны + min/max).
 
 $token = getenv('WB_SUPPLIES_TOKEN');
 if (!$token) {
@@ -25,12 +26,12 @@ $endpoint = 'https://supplies-api.wildberries.ru/api/v1/transit-tariffs';
 
 $ch = curl_init($endpoint);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
-  // Если вернёт 401 — замените на 'X-Api-Key: ' . $token
+  // Если вернёт 401 — поменяйте на 'X-Api-Key: ' . $token
   'Authorization: ' . $token,
   'Accept: application/json',
 ]);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+curl_setopt($ch, CURLOPT_TIMEOUT, 25);
 
 $resp = curl_exec($ch);
 $http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -50,21 +51,26 @@ if ($http < 200 || $http >= 300) {
 
 $raw = json_decode($resp, true);
 if (!is_array($raw)) $raw = [];
-// Некоторые ответы могут быть завернуты
 if (isset($raw['data']) && is_array($raw['data'])) $raw = $raw['data'];
 elseif (isset($raw['result']) && is_array($raw['result'])) $raw = $raw['result'];
 elseif (isset($raw['rows']) && is_array($raw['rows'])) $raw = $raw['rows'];
 
-// Нормализация под поля из документации:
-// transitWarehouseName, destinationWarehouseName, activeFrom, boxTariff, palletTariff
+function numOrNull($v) {
+  if ($v === null || $v === '') return null;
+  if (is_numeric($v)) return 0 + $v;
+  if (is_string($v)) {
+    $x = str_replace(' ', '', $v);
+    $x = str_replace(',', '.', $x);
+    if (is_numeric($x)) return 0 + $x;
+  }
+  return null;
+}
+
 $items = [];
 foreach ($raw as $r) {
-  // Идентификаторы складов в этой ручке могут отсутствовать — есть имена.
-  // Сохраним имена, а ID оставим пустыми, если их нет.
   $fromName = isset($r['transitWarehouseName']) ? (string)$r['transitWarehouseName'] : null;
   $toName   = isset($r['destinationWarehouseName']) ? (string)$r['destinationWarehouseName'] : null;
 
-  // Иногда API может возвращать ID — поддержим возможные варианты:
   $fromId = null;
   if (isset($r['fromWarehouseId'])) $fromId = (string)$r['fromWarehouseId'];
   elseif (isset($r['fromWarehouseID'])) $fromId = (string)$r['fromWarehouseID'];
@@ -73,45 +79,47 @@ foreach ($raw as $r) {
   if (isset($r['toWarehouseId'])) $toId = (string)$r['toWarehouseId'];
   elseif (isset($r['toWarehouseID'])) $toId = (string)$r['toWarehouseID'];
 
-  // Тарифы: короб и паллета
-  $boxTariff = array_key_exists('boxTariff', $r) ? $r['boxTariff'] : null;
-  $palletTariff = array_key_exists('palletTariff', $r) ? $r['palletTariff'] : null;
-
-  // Дата начала действия
   $activeFrom = isset($r['activeFrom']) ? (string)$r['activeFrom'] : null;
-
-  // Стандартные поля нашего фронта: tariff/currency/leadTimeDays/active — здесь не применимо.
-  // Заполним:
-  // - tariff оставим null, покажем box/pallet в "Прочее"
-  // - currency: RUB
-  // - leadTimeDays: null
-  // - active: true, если activeFrom в прошлом или сегодня (если поле есть), иначе null
   $active = null;
   if ($activeFrom) {
     $ts = strtotime($activeFrom);
-    if ($ts !== false) {
-      $active = (time() >= $ts);
-    }
+    if ($ts !== false) $active = (time() >= $ts);
   }
 
-  $extra = [];
-  if ($boxTariff !== null) $extra[] = 'box: ' . $boxTariff;
-  if ($palletTariff !== null) $extra[] = 'pallet: ' . $palletTariff;
+  // Паллетный тариф
+  $palletTariff = array_key_exists('palletTariff', $r) ? numOrNull($r['palletTariff']) : null;
+
+  // Диапазоны boxTariff (за литр)
+  $boxRanges = [];
+  $boxMin = null;
+  $boxMax = null;
+  if (isset($r['boxTariff']) && is_array($r['boxTariff'])) {
+    foreach ($r['boxTariff'] as $t) {
+      $from = isset($t['from']) ? intval($t['from']) : null;
+      $to   = isset($t['to']) ? intval($t['to']) : null; // 0 = без верхней границы
+      $val  = numOrNull($t['value']); // ₽/л
+      if ($from !== null && $val !== null) {
+        $boxRanges[] = ['from' => $from, 'to' => $to, 'value' => $val];
+        if ($boxMin === null || $val < $boxMin) $boxMin = $val;
+        if ($boxMax === null || $val > $boxMax) $boxMax = $val;
+      }
+    }
+    usort($boxRanges, fn($a, $b) => $a['from'] <=> $b['from']);
+  }
 
   $items[] = [
-    'fromWarehouseId' => $fromId,          // может быть null
-    'toWarehouseId'   => $toId,            // может быть null
+    'fromWarehouseId'   => $fromId,
+    'toWarehouseId'     => $toId,
     'fromWarehouseName' => $fromName,
     'toWarehouseName'   => $toName,
-    'tariff' => null,
-    'currency' => 'RUB',
-    'leadTimeDays' => null,
-    'active' => $active,
-    'updatedAt' => $activeFrom,            // используем как "с" дата
-    'serviceType' => null,
-    'weightLimitKg' => null,
-    'comment' => null,
-    'extra' => implode(', ', $extra),
+    'active'            => $active,
+    'updatedAt'         => $activeFrom,
+
+    // Явные ценовые поля:
+    'palletTariff'      => $palletTariff,     // число или null
+    'boxTariffRanges'   => $boxRanges,        // массив [{from,to,value}]
+    'boxMinPerLiter'    => $boxMin,           // число или null
+    'boxMaxPerLiter'    => $boxMax,           // число или null
   ];
 }
 
