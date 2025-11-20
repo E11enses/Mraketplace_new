@@ -23,7 +23,7 @@
     <div class="header__top">
       <div class="header__logo">
         <a class="site-logo" href="index.php">
-          <img src="blog/images/logo.svg" alt="Homepage">
+          <img src="/blog/images/logo.svg" alt="Homepage">
         </a>
       </div>
     </div>
