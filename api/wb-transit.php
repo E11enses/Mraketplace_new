@@ -24,7 +24,7 @@ if (!$token) {
 }
 
 // 2) Upstream endpoint
-$endpoint = 'https://suppliers-api.wildberries.ru/api/v1/transit-tariffs';
+$endpoint = 'https://supplies-api.wildberries.ru/api/v1/transit-tariffs';
 
 // 3) Call WB
 $ch = curl_init($endpoint);
