@@ -14,6 +14,7 @@
         --accent-2: #6366f1;
         --danger: #ef4444;
         --border: #1f2937;
+        --link: #93c5fd;
       }
       *,
       *::before,
@@ -36,13 +37,13 @@
         margin: 0 0 12px;
         font-size: 20px;
       }
-      .filters {
+      .row {
         display: flex;
+        gap: 12px;
         flex-wrap: wrap;
-        gap: 8px 12px;
         align-items: center;
       }
-      label {
+      label.inline {
         display: flex;
         gap: 6px;
         align-items: center;
@@ -54,7 +55,7 @@
         border: 1px solid var(--border);
         border-radius: 6px;
         padding: 8px 10px;
-        width: 180px;
+        width: 200px;
       }
       button {
         background: var(--accent);
@@ -69,14 +70,31 @@
         background: var(--accent-2);
         color: white;
       }
+      .tabs {
+        display: inline-flex;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+        margin-left: 8px;
+      }
+      .tabs button {
+        background: transparent;
+        color: var(--text);
+        padding: 8px 12px;
+        border-right: 1px solid var(--border);
+      }
+      .tabs button.active {
+        background: #1b2238;
+      }
       .status {
         margin-top: 10px;
         font-size: 13px;
         color: var(--muted);
       }
-      .table-wrap {
+      .container {
         padding: 16px;
       }
+      /* table */
       table {
         width: 100%;
         border-collapse: collapse;
@@ -91,6 +109,7 @@
         border-bottom: 1px solid var(--border);
         text-align: left;
         font-size: 14px;
+        vertical-align: top;
       }
       thead th {
         background: #0b1020;
@@ -105,11 +124,6 @@
         color: var(--muted);
         text-align: center;
       }
-      .footer {
-        padding: 16px;
-        border-top: 1px solid var(--border);
-        color: var(--muted);
-      }
       .pill {
         display: inline-block;
         padding: 2px 8px;
@@ -123,23 +137,56 @@
         background: rgba(239, 68, 68, 0.15);
         color: #fecaca;
       }
-      .toolbar {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin-top: 10px;
+
+      /* graph */
+      .graph-wrap {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 16px;
       }
-      .toolbar .right {
-        margin-left: auto;
-        display: flex;
-        gap: 8px;
+      .panel {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px;
+        min-height: 420px;
+      }
+      .panel h3 {
+        margin: 0 0 10px;
+        font-size: 16px;
+      }
+      .list {
+        display: grid;
+        gap: 6px;
+        max-height: 380px;
+        overflow: auto;
+      }
+      .item {
+        padding: 8px 10px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      .item.active {
+        border-color: #3b82f6;
+        box-shadow: inset 0 0 0 1px #3b82f6;
+      }
+      .targets {
+        position: relative;
+        min-height: 380px;
+      }
+      .edge {
+        background: #0b1020;
+        border: 1px dashed #334155;
+        border-radius: 8px;
+        padding: 8px 10px;
+        margin-bottom: 8px;
+      }
+      .edge a {
+        color: var(--link);
+        text-decoration: none;
       }
       .hint {
-        font-size: 12px;
-        color: var(--muted);
-        margin-left: 8px;
-      }
-      .small {
         font-size: 12px;
         color: var(--muted);
       }
@@ -147,192 +194,99 @@
   </head>
   <body>
     <header class="header">
-      <h1>Доступные транзитные направления Wildberries (FBW)</h1>
-      <div class="filters">
-        <label>
-          Из склада (ID):
-          <input
-            type="text"
-            id="fromWarehouseId"
-            placeholder="например, 507"
-          />
+      <h1>Транзитные направления Wildberries (FBW)</h1>
+      <div class="row">
+        <label class="inline">
+          Поиск склада:
+          <input type="text" id="search" placeholder="имя или ID" />
         </label>
-        <label>
-          В склад (ID):
-          <input type="text" id="toWarehouseId" placeholder="например, 125" />
-        </label>
-        <div class="toolbar">
-          <button id="btnLoad">Загрузить</button>
-          <button id="btnReset" class="secondary">Сбросить</button>
-          <span class="hint">Источник: /api/wb-transit.php</span>
-          <div class="right">
-            <label class="small"
-              ><input type="checkbox" id="onlyActive" /> Только активные</label
-            >
-          </div>
+        <label class="inline"
+          ><input type="checkbox" id="onlyActive" /> Только активные</label
+        >
+        <div class="tabs" role="tablist" aria-label="Вид">
+          <button id="tabTable" class="active" role="tab">Таблица</button>
+          <button id="tabGraph" role="tab">Схема</button>
         </div>
+        <button id="btnReload" class="secondary">Обновить</button>
       </div>
       <div id="status" class="status">Готов</div>
     </header>
 
-    <main>
-      <div class="table-wrap">
-        <table id="tariffsTable">
+    <main class="container">
+      <!-- TABLE VIEW -->
+      <div id="viewTable">
+        <table>
           <thead>
             <tr>
-              <th>Из склада (ID)</th>
-              <th>В склад (ID)</th>
-              <th>Тариф</th>
-              <th>Валюта</th>
-              <th>Срок, дней</th>
+              <th>Откуда</th>
+              <th>Куда</th>
+              <th>Box</th>
+              <th>Pallet</th>
               <th>Активно</th>
-              <th>Обновлено</th>
-              <th>Прочее</th>
+              <th>С даты</th>
             </tr>
           </thead>
-          <tbody id="tableBody">
+          <tbody id="tbodyTable">
             <tr>
-              <td colspan="8" class="muted">Нет данных</td>
+              <td colspan="6" class="muted">Нет данных</td>
             </tr>
           </tbody>
         </table>
       </div>
+
+      <!-- GRAPH VIEW -->
+      <div id="viewGraph" style="display: none">
+        <div class="graph-wrap">
+          <div class="panel">
+            <h3>Начальные склады (A)</h3>
+            <div class="row" style="margin-bottom:8px">
+              <span class="hint"
+                >Кликните на склад — увидите связи и цены справа</span
+              >
+            </div>
+            <div id="listA" class="list"></div>
+          </div>
+          <div class="panel">
+            <h3>Связи A → B (назначения)</h3>
+            <div id="edges" class="targets">
+              <div class="muted">Выберите склад слева</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
 
-    <footer class="footer">
-      <span>Мини‑сервис для просмотра транзитных направлений WB</span>
-    </footer>
-
     <script>
+      // Ожидаем формат элементов, который возвращает ваш /api/wb-transit.php:
+      // {
+      //   fromWarehouseId, toWarehouseId,
+      //   fromWarehouseName, toWarehouseName,
+      //   extra: 'box: 750, pallet: 12000',
+      //   active: true|false|null,
+      //   updatedAt: '2025-01-01T00:00:00Z' | null
+      // }
       const els = {
-        from: document.getElementById('fromWarehouseId'),
-        to: document.getElementById('toWarehouseId'),
-        onlyActive: document.getElementById('onlyActive'),
-        btnLoad: document.getElementById('btnLoad'),
-        btnReset: document.getElementById('btnReset'),
         status: document.getElementById('status'),
-        tbody: document.getElementById('tableBody'),
+        tbody: document.getElementById('tbodyTable'),
+        viewTable: document.getElementById('viewTable'),
+        viewGraph: document.getElementById('viewGraph'),
+        tabTable: document.getElementById('tabTable'),
+        tabGraph: document.getElementById('tabGraph'),
+        btnReload: document.getElementById('btnReload'),
+        onlyActive: document.getElementById('onlyActive'),
+        search: document.getElementById('search'),
+        listA: document.getElementById('listA'),
+        edges: document.getElementById('edges'),
       };
+
+      let fullData = [];
+      let filtered = [];
+      let currentAKey = null;
 
       function setStatus(msg, type = 'info') {
         els.status.textContent = msg;
         els.status.style.color =
           type === 'error' ? '#ef4444' : type === 'ok' ? '#22c55e' : '#9ca3af';
-      }
-
-      function buildQuery(params) {
-        const q = new URLSearchParams();
-        Object.entries(params).forEach(([k, v]) => {
-          if (v !== undefined && v !== null && String(v).trim() !== '') {
-            q.set(k, String(v).trim());
-          }
-        });
-        return q.toString() ? `?${q.toString()}` : '';
-      }
-
-      async function loadTariffs() {
-        setStatus('Загрузка…');
-        els.tbody.innerHTML =
-          '<tr><td colspan="8" class="muted">Загрузка…</td></tr>';
-
-        const query = buildQuery({
-          fromWarehouseId: els.from.value,
-          toWarehouseId: els.to.value,
-        });
-
-        try {
-          const res = await fetch(`/api/wb-transit.php${query}`, {
-            method: 'GET',
-            headers: { Accept: 'application/json' },
-          });
-
-          const data = await res.json();
-
-          if (!res.ok) {
-            console.error('WB transit error', data);
-            els.tbody.innerHTML = `<tr><td colspan="8" class="muted">Ошибка: ${
-              data.error || data.message || res.status
-            }</td></tr>`;
-            setStatus('Ошибка загрузки', 'error');
-            return;
-          }
-
-          // wb-transit.php уже возвращает нормализованный массив
-          let list = Array.isArray(data) ? data : [];
-          if (els.onlyActive.checked) {
-            list = list.filter((x) => x.active === true);
-          }
-
-          renderList(list);
-        } catch (e) {
-          console.error(e);
-          els.tbody.innerHTML =
-            '<tr><td colspan="8" class="muted">Сетевая ошибка</td></tr>';
-          setStatus('Сетевая ошибка', 'error');
-        }
-      }
-
-      function renderList(list) {
-        if (!list || list.length === 0) {
-          els.tbody.innerHTML =
-            '<tr><td colspan="8" class="muted">Данные не найдены</td></tr>';
-          setStatus('Нет данных', 'ok');
-          return;
-        }
-
-        const rows = list.map((r) => {
-          const fromId = r.fromWarehouseId ?? '';
-          const toId = r.toWarehouseId ?? '';
-          const tariff =
-            r.tariff !== null && r.tariff !== undefined ? r.tariff : '—';
-          const currency = r.currency || 'RUB';
-          const lead =
-            r.leadTimeDays !== null && r.leadTimeDays !== undefined
-              ? r.leadTimeDays
-              : '—';
-          const active = r.active === true;
-          const upd = r.updatedAt ? fmtDatetime(r.updatedAt) : '—';
-
-          const extra = [];
-          if (r.serviceType) extra.push(`service: ${r.serviceType}`);
-          if (r.weightLimitKg !== null && r.weightLimitKg !== undefined)
-            extra.push(`limit: ${r.weightLimitKg}kg`);
-          if (r.comment) extra.push(`note: ${r.comment}`);
-
-          return {
-            fromId,
-            toId,
-            tariff,
-            currency,
-            lead,
-            active,
-            upd,
-            extra: extra.join(', '),
-          };
-        });
-
-        els.tbody.innerHTML = rows
-          .map(
-            (r) => `
-          <tr>
-            <td>${escapeHtml(r.fromId)}</td>
-            <td>${escapeHtml(r.toId)}</td>
-            <td>${escapeHtml(r.tariff)}</td>
-            <td>${escapeHtml(r.currency)}</td>
-            <td>${escapeHtml(r.lead)}</td>
-            <td>${
-              r.active
-                ? '<span class="pill">Да</span>'
-                : '<span class="pill red">Нет</span>'
-            }</td>
-            <td>${escapeHtml(r.upd)}</td>
-            <td>${escapeHtml(r.extra)}</td>
-          </tr>
-        `
-          )
-          .join('');
-
-        setStatus(`Готово: записей — ${rows.length}`, 'ok');
       }
 
       function escapeHtml(v) {
@@ -344,8 +298,8 @@
           .replace(/'/g, '&#039;');
       }
 
-      function fmtDatetime(s) {
-        // простое форматирование ISO в локальное
+      function fmtDate(s) {
+        if (!s) return '—';
         const d = new Date(s);
         if (isNaN(d.getTime())) return s;
         return (
@@ -361,19 +315,217 @@
         );
       }
 
-      document.getElementById('btnLoad').addEventListener('click', loadTariffs);
-      document.getElementById('btnReset').addEventListener('click', () => {
-        els.from.value = '';
-        els.to.value = '';
-        els.onlyActive.checked = false;
-        els.tbody.innerHTML =
-          '<tr><td colspan="8" class="muted">Нет данных</td></tr>';
-        setStatus('Готов');
-      });
+      function parseExtraForPrices(extra) {
+        // ожидаем строку вида "box: 7500, pallet: 12000"
+        const out = { box: null, pallet: null };
+        if (!extra || typeof extra !== 'string') return out;
+        const mBox = extra.match(/box:\s*([\d.,]+)/i);
+        const mPal = extra.match(/pallet:\s*([\d.,]+)/i);
+        out.box = mBox ? mBox[1] : null;
+        out.pallet = mPal ? mPal[1] : null;
+        return out;
+      }
 
-      document.addEventListener('DOMContentLoaded', () => {
-        loadTariffs();
+      function applyFilters() {
+        const q = els.search.value.trim().toLowerCase();
+        filtered = fullData.filter((r) => {
+          if (els.onlyActive.checked && r.active !== true) return false;
+
+          const from =
+            r.fromWarehouseName ||
+            r.fromWarehouseId ||
+            '';
+          const to =
+            r.toWarehouseName ||
+            r.toWarehouseId ||
+            '';
+
+          if (!q) return true;
+          return (
+            String(from).toLowerCase().includes(q) ||
+            String(to).toLowerCase().includes(q)
+          );
+        });
+      }
+
+      async function loadData() {
+        setStatus('Загрузка…');
+        try {
+          const res = await fetch('/api/wb-transit.php', {
+            headers: { Accept: 'application/json' },
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            console.error(data);
+            setStatus('Ошибка загрузки', 'error');
+            fullData = [];
+          } else {
+            fullData = Array.isArray(data) ? data : [];
+            setStatus(`Готово: направлений — ${fullData.length}`, 'ok');
+          }
+          currentAKey = null;
+          onStateChanged();
+        } catch (e) {
+          console.error(e);
+          setStatus('Сетевая ошибка', 'error');
+          fullData = [];
+          onStateChanged();
+        }
+      }
+
+      function renderTable() {
+        if (!filtered.length) {
+          els.tbody.innerHTML =
+            '<tr><td colspan="6" class="muted">Нет данных</td></tr>';
+          return;
+        }
+        els.tbody.innerHTML = filtered
+          .map((r) => {
+            const from =
+              r.fromWarehouseName || r.fromWarehouseId || '';
+            const to =
+              r.toWarehouseName || r.toWarehouseId || '';
+            const { box, pallet } = parseExtraForPrices(r.extra);
+            const active =
+              r.active === true
+                ? '<span class="pill">Да</span>'
+                : r.active === false
+                ? '<span class="pill red">Нет</span>'
+                : '—';
+            return `
+              <tr>
+                <td>${escapeHtml(from)}</td>
+                <td>${escapeHtml(to)}</td>
+                <td>${box ? escapeHtml(box) : '—'}</td>
+                <td>${pallet ? escapeHtml(pallet) : '—'}</td>
+                <td>${active}</td>
+                <td>${escapeHtml(fmtDate(r.updatedAt))}</td>
+              </tr>
+            `;
+          })
+          .join('');
+      }
+
+      function groupBySource(list) {
+        const map = new Map(); // key -> { key, name, items[] }
+        for (const r of list) {
+          const key =
+            (r.fromWarehouseId || '') + '|' + (r.fromWarehouseName || '');
+          if (!map.has(key)) {
+            map.set(key, {
+              key,
+              id: r.fromWarehouseId || '',
+              name: r.fromWarehouseName || r.fromWarehouseId || '—',
+              items: [],
+            });
+          }
+          map.get(key).items.push(r);
+        }
+        // сортировка по имени
+        return Array.from(map.values()).sort((a, b) =>
+          String(a.name).localeCompare(String(b.name), 'ru'),
+        );
+      }
+
+      function renderGraph() {
+        const groups = groupBySource(filtered);
+        // левая колонка A
+        els.listA.innerHTML = groups
+          .map(
+            (g) => `
+            <div class="item ${g.key === currentAKey ? 'active' : ''}" data-key="${escapeHtml(
+              g.key,
+            )}">
+              ${escapeHtml(g.name)}
+              <div class="hint">направлений: ${g.items.length}</div>
+            </div>
+          `,
+          )
+          .join('');
+
+        // обработчики
+        for (const el of els.listA.querySelectorAll('.item')) {
+          el.addEventListener('click', () => {
+            currentAKey = el.getAttribute('data-key');
+            renderGraph(); // перерисовать правую часть
+          });
+        }
+
+        // правая колонка связи
+        const selected =
+          groups.find((g) => g.key === currentAKey) || groups[0] || null;
+        if (!selected) {
+          els.edges.innerHTML = `<div class="muted">Нет данных</div>`;
+          return;
+        }
+        if (!currentAKey) currentAKey = selected.key;
+
+        const edgesHtml = selected.items
+          .sort((a, b) =>
+            String(a.toWarehouseName || a.toWarehouseId || '').localeCompare(
+              String(b.toWarehouseName || b.toWarehouseId || ''),
+              'ru',
+            ),
+          )
+          .map((r) => {
+            const from =
+              r.fromWarehouseName || r.fromWarehouseId || '';
+            const to =
+              r.toWarehouseName || r.toWarehouseId || '';
+            const { box, pallet } = parseExtraForPrices(r.extra);
+            const active =
+              r.active === true
+                ? '<span class="pill">Да</span>'
+                : r.active === false
+                ? '<span class="pill red">Нет</span>'
+                : '—';
+            return `
+              <div class="edge">
+                <div><strong>${escapeHtml(from)}</strong> → <strong>${escapeHtml(
+              to,
+            )}</strong></div>
+                <div class="hint">
+                  box: ${box ? escapeHtml(box) : '—'}; pallet: ${
+              pallet ? escapeHtml(pallet) : '—'
+            }; активен: ${active}; с: ${escapeHtml(fmtDate(r.updatedAt))}
+                </div>
+              </div>
+            `;
+          })
+          .join('');
+
+        els.edges.innerHTML = edgesHtml || `<div class="muted">Нет связей</div>`;
+      }
+
+      function onStateChanged() {
+        applyFilters();
+        if (els.viewTable.style.display !== 'none') {
+          renderTable();
+        } else {
+          renderGraph();
+        }
+      }
+
+      // UI events
+      els.tabTable.addEventListener('click', () => {
+        els.tabTable.classList.add('active');
+        els.tabGraph.classList.remove('active');
+        els.viewTable.style.display = '';
+        els.viewGraph.style.display = 'none';
+        onStateChanged();
       });
+      els.tabGraph.addEventListener('click', () => {
+        els.tabGraph.classList.add('active');
+        els.tabTable.classList.remove('active');
+        els.viewTable.style.display = 'none';
+        els.viewGraph.style.display = '';
+        onStateChanged();
+      });
+      els.onlyActive.addEventListener('change', onStateChanged);
+      els.search.addEventListener('input', onStateChanged);
+      els.btnReload.addEventListener('click', loadData);
+
+      document.addEventListener('DOMContentLoaded', loadData);
     </script>
   </body>
 </html>
