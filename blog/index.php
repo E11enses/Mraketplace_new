@@ -1,5 +1,12 @@
 <?php
-$config = require __DIR__.'/config.php';
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+$config = require_once __DIR__ . '/config.php';
+if (!is_array($config)) {
+    throw new RuntimeException('Config file must return an array.');
+}
 require __DIR__.'/inc/functions.php';
 $all = load_posts($config['posts_dir']);
 
@@ -14,6 +21,7 @@ $pager = paginate($all, $page, $config['per_page']);
 $config['site_name'] = 'Typerite';
 include __DIR__.'/inc/header.php';
 ?>
+
 <div class="s-content">
   <div class="masonry-wrap">
     <div class="masonry">
@@ -47,6 +55,6 @@ include __DIR__.'/inc/header.php';
       <?php endforeach; ?>
     </div>
   </div>
-  <?php $pager && include __DIR__.'/inc/pagination.php'; ?>
+  <?php if ($pager) { include __DIR__ . '/inc/pagination.php'; } ?>
 </div>
-<?php include __DIR__.'/inc/footer.php';
+<?php include_once __DIR__ . '/inc/footer.php'; ?>
