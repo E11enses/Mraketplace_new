@@ -16,7 +16,6 @@
             --border-soft: #eef2f7;
             --row-alt: #fbfdff;
             --num: #0f172a;
-            --resize: #cbd5e1;
         }
 
         *,
@@ -72,6 +71,32 @@
             cursor: pointer;
         }
 
+        .filters {
+            display: grid;
+            gap: 8px;
+            grid-template-columns: minmax(220px, 320px) auto;
+            align-items: end;
+            margin-top: 10px;
+        }
+
+        .filters .field {
+            display: grid;
+            gap: 4px;
+        }
+
+        .filters label {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .filters select {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 10px;
+            width: 100%;
+        }
+
         .status-row {
             margin-top: 8px;
             font-size: 14px;
@@ -87,44 +112,6 @@
 
         .ok {
             color: #059669;
-        }
-
-        .filters {
-            display: grid;
-            gap: 8px;
-            grid-template-columns: repeat(6, minmax(120px, 1fr));
-            margin-top: 10px;
-        }
-
-        .filters .field {
-            display: grid;
-            gap: 4px;
-        }
-
-        .filters label {
-            font-size: 12px;
-            color: var(--muted);
-        }
-
-        .filters input,
-        .filters select {
-            background: #fff;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 8px 10px;
-            width: 100%;
-        }
-
-        .filters .row-actions {
-            display: flex;
-            gap: 8px;
-            align-items: end;
-        }
-
-        .filters .row-actions .ghost {
-            background: #fff;
-            color: var(--accent);
-            border: 1px solid var(--accent);
         }
 
         .container {
@@ -148,15 +135,15 @@
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
-            min-width: 1100px;
-            table-layout: fixed;
+            table-layout: auto;
+            min-width: 860px;
         }
 
         thead th {
             position: sticky;
             top: 0;
             background: #f9fafb;
-            z-index: 2;
+            z-index: 1;
             user-select: none;
         }
 
@@ -167,8 +154,6 @@
             text-align: left;
             font-size: 14px;
             white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
         tbody tr:nth-child(2n) td {
@@ -209,40 +194,7 @@
             content: "▼";
         }
 
-        /* ресайз-ручка */
-        .resizer {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 6px;
-            cursor: col-resize;
-            user-select: none;
-            height: 100%;
-            transform: translateX(3px);
-        }
-
-        .resizer::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 2px;
-            width: 2px;
-            background: transparent;
-        }
-
-        th:hover .resizer::after {
-            background: var(--resize);
-        }
-
-        th {
-            position: relative;
-        }
-
         @media (max-width: 899px) {
-            table {
-                min-width: 980px;
-            }
 
             th,
             td {
@@ -250,7 +202,7 @@
             }
 
             .filters {
-                grid-template-columns: repeat(2, minmax(140px, 1fr));
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -262,70 +214,17 @@
 
         <div class="topbar">
             <div class="search-wrap">
-                <input id="q" type="text" placeholder="поиск: товар или категория" />
+                <input id="q" type="text" placeholder="поиск: товар" />
             </div>
             <button id="btnReload">Обновить</button>
         </div>
 
-        <div class="filters" id="filters">
+        <div class="filters">
             <div class="field">
                 <label>Категория</label>
                 <select id="fCategory">
                     <option value="">Все</option>
                 </select>
-            </div>
-
-            <div class="field">
-                <label>FBW (%, от–до)</label>
-                <div style="display:flex;gap:6px">
-                    <input id="fFbwMin" type="number" step="0.1" placeholder="min" />
-                    <input id="fFbwMax" type="number" step="0.1" placeholder="max" />
-                </div>
-            </div>
-
-            <div class="field">
-                <label>FBS (%, от–до)</label>
-                <div style="display:flex;gap:6px">
-                    <input id="fFbsMin" type="number" step="0.1" placeholder="min" />
-                    <input id="fFbsMax" type="number" step="0.1" placeholder="max" />
-                </div>
-            </div>
-
-            <div class="field">
-                <label>DBS/DBW (%, от–до)</label>
-                <div style="display:flex;gap:6px">
-                    <input id="fDbsMin" type="number" step="0.1" placeholder="min" />
-                    <input id="fDbsMax" type="number" step="0.1" placeholder="max" />
-                </div>
-            </div>
-
-            <div class="field">
-                <label>EDBS (%, от–до)</label>
-                <div style="display:flex;gap:6px">
-                    <input id="fEdbsMin" type="number" step="0.1" placeholder="min" />
-                    <input id="fEdbsMax" type="number" step="0.1" placeholder="max" />
-                </div>
-            </div>
-
-            <div class="field">
-                <label>C&amp;C (%, от–до)</label>
-                <div style="display:flex;gap:6px">
-                    <input id="fCcMin" type="number" step="0.1" placeholder="min" />
-                    <input id="fCcMax" type="number" step="0.1" placeholder="max" />
-                </div>
-            </div>
-
-            <div class="field">
-                <label>Бронирование (%, от–до)</label>
-                <div style="display:flex;gap:6px">
-                    <input id="fBookMin" type="number" step="0.1" placeholder="min" />
-                    <input id="fBookMax" type="number" step="0.1" placeholder="max" />
-                </div>
-            </div>
-
-            <div class="row-actions">
-                <button id="btnApply" class="ghost">Применить</button>
-                <button id="btnReset" class="ghost">Сбросить</button>
             </div>
         </div>
 
@@ -337,41 +236,33 @@
 
     <main class="container">
         <div class="panel">
-            <div class="table-wrap" id="tableWrap">
+            <div class="table-wrap">
                 <table id="grid">
                     <thead>
                         <tr>
                             <th data-key="subjectName" data-sort="text">
                                 <div class="th-sort">Товар <span class="arrow"></span></div>
-                                <div class="resizer"></div>
                             </th>
                             <th data-key="parentName" data-sort="text">
                                 <div class="th-sort">Категория <span class="arrow"></span></div>
-                                <div class="resizer"></div>
                             </th>
                             <th data-key="paidStorageKgvp" data-sort="num" title="Склад WB (FBW), %">
                                 <div class="th-sort">Склад WB (FBW) <span class="arrow"></span></div>
-                                <div class="resizer"></div>
                             </th>
                             <th data-key="kgvpMarketplace" data-sort="num" title="Маркетплейс (FBS), %">
                                 <div class="th-sort">Маркетплейс (FBS) <span class="arrow"></span></div>
-                                <div class="resizer"></div>
                             </th>
                             <th data-key="kgvpSupplier" data-sort="num" title="Витрина/Курьер WB (DBS/DBW), %">
                                 <div class="th-sort">Витрина/Курьер WB (DBS/DBW) <span class="arrow"></span></div>
-                                <div class="resizer"></div>
                             </th>
                             <th data-key="kgvpSupplierExpress" data-sort="num" title="Витрина экспресс (EDBS), %">
                                 <div class="th-sort">Витрина экспресс (EDBS) <span class="arrow"></span></div>
-                                <div class="resizer"></div>
                             </th>
                             <th data-key="kgvpPickup" data-sort="num" title="Самовывоз (C&amp;C), %">
                                 <div class="th-sort">Самовывоз (C&amp;C) <span class="arrow"></span></div>
-                                <div class="resizer"></div>
                             </th>
                             <th data-key="kgvpBooking" data-sort="num" title="Бронирование, %">
                                 <div class="th-sort">Бронирование <span class="arrow"></span></div>
-                                <div class="resizer"></div>
                             </th>
                         </tr>
                     </thead>
@@ -393,28 +284,12 @@
             updated: document.getElementById('updated'),
             tbody: document.getElementById('tbody'),
             fCategory: document.getElementById('fCategory'),
-            fFbwMin: document.getElementById('fFbwMin'),
-            fFbwMax: document.getElementById('fFbwMax'),
-            fFbsMin: document.getElementById('fFbsMin'),
-            fFbsMax: document.getElementById('fFbsMax'),
-            fDbsMin: document.getElementById('fDbsMin'),
-            fDbsMax: document.getElementById('fDbsMax'),
-            fEdbsMin: document.getElementById('fEdbsMin'),
-            fEdbsMax: document.getElementById('fEdbsMax'),
-            fCcMin: document.getElementById('fCcMin'),
-            fCcMax: document.getElementById('fCcMax'),
-            fBookMin: document.getElementById('fBookMin'),
-            fBookMax: document.getElementById('fBookMax'),
-            btnApply: document.getElementById('btnApply'),
-            btnReset: document.getElementById('btnReset'),
             table: document.getElementById('grid'),
-            tableWrap: document.getElementById('tableWrap'),
         };
 
         let raw = [];
         let filtered = [];
         let sortState = JSON.parse(localStorage.getItem('wb_comm_sort') || 'null') || { key: 'subjectName', dir: 'asc' };
-        const WIDTHS_KEY = 'wb_comm_widths';
 
         function fmtTimeNow() {
             const d = new Date();
@@ -424,29 +299,9 @@
             return `${hh}:${mm}:${ss}`;
         }
 
-        function numInRange(val, min, max) {
-            if (val == null || val === '') return false;
-            const v = Number(val);
-            if (Number.isNaN(v)) return false;
-            if (min !== '' && min != null && v < Number(min)) return false;
-            if (max !== '' && max != null && v > Number(max)) return false;
-            return true;
-        }
-        function numPass(val, min, max) {
-            if ((min === '' || min == null) && (max === '' || max == null)) return true;
-            if (val == null || val === '') return false;
-            const v = Number(val);
-            if (Number.isNaN(v)) return false;
-            if (min !== '' && min != null && v < Number(min)) return false;
-            if (max !== '' && max != null && v > Number(max)) return false;
-            return true;
-        }
-
         function buildCategories(list) {
             const set = new Set();
-            for (const r of list) {
-                if (r.parentName) set.add(r.parentName);
-            }
+            for (const r of list) if (r.parentName) set.add(r.parentName);
             const arr = Array.from(set).sort((a, b) => a.localeCompare(b, 'ru'));
             els.fCategory.innerHTML = '<option value="">Все</option>' + arr.map(v => `<option>${escapeHtml(v)}</option>`).join('');
         }
@@ -456,22 +311,11 @@
             const cat = els.fCategory.value || '';
 
             filtered = raw.filter((r) => {
-                // Поиск
                 if (q) {
-                    const hay = (r.subjectName || '') + ' ' + (r.parentName || '');
+                    const hay = (r.subjectName || '');
                     if (!hay.toLowerCase().includes(q)) return false;
                 }
-                // Категория
                 if (cat && r.parentName !== cat) return false;
-
-                // Диапазоны
-                if (!numPass(r.paidStorageKgvp, els.fFbwMin.value, els.fFbwMax.value)) return false;
-                if (!numPass(r.kgvpMarketplace, els.fFbsMin.value, els.fFbsMax.value)) return false;
-                if (!numPass(r.kgvpSupplier, els.fDbsMin.value, els.fDbsMax.value)) return false;
-                if (!numPass(r.kgvpSupplierExpress, els.fEdbsMin.value, els.fEdbsMax.value)) return false;
-                if (!numPass(r.kgvpPickup, els.fCcMin.value, els.fCcMax.value)) return false;
-                if (!numPass(r.kgvpBooking, els.fBookMin.value, els.fBookMax.value)) return false;
-
                 return true;
             });
 
@@ -550,10 +394,7 @@
                     return dir === 'asc' ? c : -c;
                 }
             });
-            // Обновить визуальную индикацию
-            document.querySelectorAll('thead th[data-sort]').forEach(th => {
-                th.classList.remove('sorted');
-            });
+            document.querySelectorAll('thead th[data-sort]').forEach(th => th.classList.remove('sorted'));
             const th = document.querySelector(`thead th[data-key="${key}"]`);
             if (th) {
                 th.classList.add('sorted');
@@ -563,105 +404,19 @@
         }
 
         document.querySelectorAll('thead th[data-sort]').forEach(th => {
-            th.addEventListener('click', (e) => {
-                // игнор, если клик по ресайзеру
-                if (e.target.classList.contains('resizer')) return;
-
+            th.addEventListener('click', () => {
                 const key = th.getAttribute('data-key');
-                const sortable = th.getAttribute('data-sort');
-                if (!sortable) return;
-
-                if (sortState.key === key) {
-                    sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
-                } else {
-                    sortState.key = key;
-                    sortState.dir = 'asc';
-                }
+                if (sortState.key === key) sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
+                else { sortState.key = key; sortState.dir = 'asc'; }
                 applyFilters();
             });
         });
 
-        // Ресайз колонок
-        function loadWidths() {
-            const saved = JSON.parse(localStorage.getItem(WIDTHS_KEY) || 'null');
-            if (!saved) return;
-            const ths = els.table.querySelectorAll('thead th');
-            ths.forEach((th, i) => {
-                const w = saved[i];
-                if (w) th.style.width = w + 'px';
-            });
-        }
-        function saveWidths() {
-            const ths = els.table.querySelectorAll('thead th');
-            const arr = Array.from(ths).map(th => Math.round(th.getBoundingClientRect().width));
-            localStorage.setItem(WIDTHS_KEY, JSON.stringify(arr));
-        }
-        function setupResizers() {
-            const ths = els.table.querySelectorAll('thead th');
-            ths.forEach((th) => {
-                const handle = th.querySelector('.resizer');
-                if (!handle) return;
+        els.q.addEventListener('input', applyFilters);
+        els.fCategory.addEventListener('change', applyFilters);
+        els.btnReload.addEventListener('click', loadData);
 
-                let startX = 0, startW = 0;
-
-                const doDrag = (clientX) => {
-                    const dx = clientX - startX;
-                    const newW = Math.max(80, startW + dx);
-                    th.style.width = newW + 'px';
-                };
-                const stopDrag = () => {
-                    window.removeEventListener('mousemove', onMove);
-                    window.removeEventListener('mouseup', onUp);
-                    window.removeEventListener('touchmove', onTouchMove);
-                    window.removeEventListener('touchend', onTouchEnd);
-                    saveWidths();
-                };
-                const onMove = (e) => { doDrag(e.clientX); };
-                const onUp = stopDrag;
-                const onTouchMove = (e) => {
-                    if (!e.touches || !e.touches[0]) return;
-                    doDrag(e.touches[0].clientX);
-                };
-                const onTouchEnd = stopDrag;
-
-                handle.addEventListener('mousedown', (e) => {
-                    e.preventDefault();
-                    startX = e.clientX;
-                    startW = th.getBoundingClientRect().width;
-                    window.addEventListener('mousemove', onMove);
-                    window.addEventListener('mouseup', onUp);
-                });
-                handle.addEventListener('touchstart', (e) => {
-                    if (!e.touches || !e.touches[0]) return;
-                    startX = e.touches[0].clientX;
-                    startW = th.getBoundingClientRect().width;
-                    window.addEventListener('touchmove', onTouchMove, { passive: false });
-                    window.addEventListener('touchend', onTouchEnd);
-                }, { passive: false });
-            });
-        }
-
-        // Применить / Сбросить
-        els.btnApply.addEventListener('click', applyFilters);
-        els.btnReset.addEventListener('click', () => {
-            els.q.value = '';
-            els.fCategory.value = '';
-            [els.fFbwMin, els.fFbwMax, els.fFbsMin, els.fFbsMax, els.fDbsMin, els.fDbsMax, els.fEdbsMin, els.fEdbsMax, els.fCcMin, els.fCcMax, els.fBookMin, els.fBookMax].forEach(i => i.value = '');
-            applyFilters();
-        });
-
-        // live-поиск
-        els.q.addEventListener('input', () => {
-            applyFilters();
-        });
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            await loadData();
-            loadWidths();
-            setupResizers();
-            // применим сохранённую сортировку визуально
-            sortData(); renderTable();
-        });
+        document.addEventListener('DOMContentLoaded', loadData);
     </script>
 </body>
 
