@@ -303,35 +303,77 @@
                     '<tr><td colspan="9" class="muted">Данные не найдены</td></tr>';
                 return;
             }
-            els.tbody.innerHTML = filtered
-                .map((r) => {
-                    const subject = r.subject || '—';
-                    const category = r.category || '—';
-                    const tnved = r.tnved ? `, ТН ВЭД: ${r.tnved}` : '';
-                    const percent =
-                        r.commissionPercent != null ? String(r.commissionPercent) : '—';
-                    const minc =
-                        r.minCommission != null ? String(r.minCommission) : '—';
-                    const calc = r.calcType || '—';
-                    const region = r.region || '—';
-                    const brandNm =
-                        r.brand || r.nmId ? `${r.brand || ''}${r.brand && r.nmId ? ' / ' : ''}${r.nmId || ''}` : '—';
-                    const upd = fmtDateRU(r.updatedAt);
-                    const note = r.note || '—';
 
-                    return `
-              <tr>
-                <td>${escapeHtml(subject)}</td>
-                <td>${escapeHtml(category)}${tnved ? escapeHtml(tnved) : ''}</td>
-                <td>${escapeHtml(percent)}</td>
-                <td>${escapeHtml(minc)}</td>
-                <td>${escapeHtml(calc)}</td>
-                <td>${escapeHtml(region)}</td>
-                <td>${escapeHtml(brandNm)}</td>
-                <td>${escapeHtml(upd)}</td>
-                <td>${escapeHtml(note)}</td>
-              </tr>
-            `;
+            // Попытка рендера по нашим ожидаемым полям
+            const hasExpected =
+                filtered.some(
+                    (r) =>
+                        r.subject != null ||
+                        r.subjectName != null ||
+                        r.category != null ||
+                        r.categoryName != null ||
+                        r.commission != null ||
+                        r.commissionPercent != null
+                );
+
+            if (hasExpected) {
+                els.tbody.innerHTML = filtered
+                    .map((r) => {
+                        const subject = r.subject ?? r.subjectName ?? r.groupName ?? '—';
+                        const category =
+                            r.category ?? r.categoryName ?? r.tnvedName ?? r.groupName ?? '—';
+                        const tnvedCode = r.tnved ?? r.tnvedCode ?? '';
+                        const tnved = tnvedCode ? `, ТН ВЭД: ${tnvedCode}` : '';
+
+                        const percent =
+                            r.commissionPercent ?? r.commission ?? r.percent ?? null;
+                        const minc = r.minCommission ?? r.min ?? null;
+                        const calc = r.calcType ?? r.type ?? '—';
+                        const region = r.region ?? r.country ?? '—';
+                        const brandNm =
+                            r.brand || r.nmId
+                                ? `${r.brand || ''}${r.brand && r.nmId ? ' / ' : ''}${r.nmId || ''
+                                }`
+                                : '—';
+                        const upd = fmtDateRU(r.updatedAt ?? r.date ?? null);
+                        const note = r.note ?? r.comment ?? '—';
+
+                        return `
+          <tr>
+            <td>${escapeHtml(String(subject))}</td>
+            <td>${escapeHtml(String(category))}${tnved ? escapeHtml(tnved) : ''
+                            }</td>
+            <td>${percent != null ? escapeHtml(String(percent)) : '—'}</td>
+            <td>${minc != null ? escapeHtml(String(minc)) : '—'}</td>
+            <td>${escapeHtml(String(calc))}</td>
+            <td>${escapeHtml(String(region))}</td>
+            <td>${escapeHtml(String(brandNm))}</td>
+            <td>${escapeHtml(String(upd))}</td>
+            <td>${escapeHtml(String(note))}</td>
+          </tr>
+        `;
+                    })
+                    .join('');
+                return;
+            }
+
+            // Fallback: авто‑таблица по всем ключам первой записи
+            const keys = Object.keys(filtered[0] || {});
+            if (!keys.length) {
+                els.tbody.innerHTML =
+                    '<tr><td colspan="9" class="muted">Формат ответа пуст</td></tr>';
+                return;
+            }
+
+            // Перестроим заголовок под реальные ключи (один раз)
+            const thead = document.querySelector('thead tr');
+            thead.innerHTML = keys.map((k) => `<th>${escapeHtml(k)}</th>`).join('');
+
+            els.tbody.innerHTML = filtered
+                .map((row) => {
+                    return `<tr>${keys
+                        .map((k) => `<td>${escapeHtml(row[k])}</td>`)
+                        .join('')}</tr>`;
                 })
                 .join('');
         }
