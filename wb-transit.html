@@ -187,11 +187,6 @@
       font-weight: 700;
     }
 
-    .ids {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
     .status-badge {
       padding: 4px 10px;
       border-radius: 999px;
@@ -267,7 +262,7 @@
   <header class="header">
     <h1>Транзитные направления Wildberries (FBW)</h1>
     <div class="topbar">
-      <label class="inline">Поиск склада: <input type="text" id="search" placeholder="имя или ID" /></label>
+      <label class="inline">Поиск склада: <input type="text" id="search" placeholder="имя склада" /></label>
       <label class="inline"><input type="checkbox" id="onlyActive" /> Только активные</label>
       <button id="btnReload" class="secondary">Обновить</button>
       <div id="pageUpdated" class="updated-at">Последнее обновление: —</div>
@@ -307,7 +302,6 @@
     let fullData = [];
     let filtered = [];
     let currentAKey = null;
-    let lastPageUpdateTs = null;
 
     function setStatus(msg, type = 'info') {
       els.status.textContent = msg;
@@ -358,8 +352,8 @@
       const q = (els.search.value || '').trim().toLowerCase();
       filtered = fullData.filter((r) => {
         if (els.onlyActive.checked && r.active !== true) return false;
-        const from = r.fromWarehouseName || r.fromWarehouseId || '';
-        const to = r.toWarehouseName || r.toWarehouseId || '';
+        const from = r.fromWarehouseName || '';
+        const to = r.toWarehouseName || '';
         if (!q) return true;
         return (
           String(from).toLowerCase().includes(q) ||
@@ -388,7 +382,6 @@
         } else {
           fullData = Array.isArray(data) ? data : [];
           setStatus(`Готово: направлений — ${fullData.length}`, 'ok');
-          lastPageUpdateTs = new Date();
           els.pageUpdated.textContent =
             'Последнее обновление: ' + fmtNow();
         }
@@ -414,13 +407,11 @@
     function groupBySource(list) {
       const map = new Map();
       for (const r of list) {
-        const key =
-          (r.fromWarehouseId || '') + '|' + (r.fromWarehouseName || '');
+        const key = (r.fromWarehouseName || '').toLowerCase();
         if (!map.has(key)) {
           map.set(key, {
             key,
-            id: r.fromWarehouseId || '',
-            name: r.fromWarehouseName || r.fromWarehouseId || '—',
+            name: r.fromWarehouseName || '—',
             items: [],
           });
         }
@@ -441,8 +432,7 @@
             g.key,
           )}">
               ${escapeHtml(g.name)}
-              <div class="sub">ID: ${g.id ? escapeHtml(g.id) : '—'
-            } · направлений: ${g.items.length}</div>
+              <div class="sub">направлений: ${g.items.length}</div>
             </div>
           `,
         )
@@ -465,16 +455,14 @@
 
       const edgesHtml = selected.items
         .sort((a, b) =>
-          String(a.toWarehouseName || a.toWarehouseId || '').localeCompare(
-            String(b.toWarehouseName || b.toWarehouseId || ''),
+          String(a.toWarehouseName || '').localeCompare(
+            String(b.toWarehouseName || ''),
             'ru',
           ),
         )
         .map((r) => {
-          const fromName = r.fromWarehouseName || r.fromWarehouseId || '';
-          const toName = r.toWarehouseName || r.toWarehouseId || '';
-          const fromId = r.fromWarehouseId || '—';
-          const toId = r.toWarehouseId || '—';
+          const fromName = r.fromWarehouseName || '';
+          const toName = r.toWarehouseName || '';
 
           const perLiter = perLiterLabel(
             r.boxMinPerLiter,
@@ -502,9 +490,6 @@
                   <span class="title">${escapeHtml(fromName)} → ${escapeHtml(
             toName,
           )}</span>
-                  <span class="ids">(ID источника: ${escapeHtml(
-            fromId,
-          )}, ID назначения: ${escapeHtml(toId)})</span>
                 </div>
                 <div class="badges">
                   <span class="badge"><span class="k">За литр:</span><span class="v">${escapeHtml(
