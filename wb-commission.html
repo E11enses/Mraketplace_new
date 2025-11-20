@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>WB — Комиссии (Tariffs Commission)</title>
+    <title>WB — Комиссии (KГВП по предметам)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
         :root {
@@ -13,7 +13,6 @@
             --muted: #6b7280;
             --accent: #2563eb;
             --border: #e5e7eb;
-            --success: #16a34a;
         }
 
         *,
@@ -46,7 +45,7 @@
 
         .topbar {
             display: grid;
-            grid-template-columns: 1fr auto auto;
+            grid-template-columns: 1fr auto;
             gap: 8px;
             align-items: center;
         }
@@ -63,20 +62,6 @@
             border-radius: 8px;
             padding: 8px 10px;
             width: 100%;
-        }
-
-        .controls {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .checkbox {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 14px;
-            white-space: nowrap;
         }
 
         button {
@@ -126,7 +111,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 860px;
+            min-width: 980px;
         }
 
         th,
@@ -147,24 +132,9 @@
             color: var(--muted);
         }
 
-        .pill {
-            display: inline-block;
-            padding: 2px 6px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 700;
-            background: #eef2ff;
-            color: #1d4ed8;
-            border: 1px solid #e0e7ff;
-        }
-
         @media (max-width: 899px) {
-            .table-wrap {
-                border: none;
-            }
-
             table {
-                min-width: 720px;
+                min-width: 860px;
             }
         }
     </style>
@@ -172,15 +142,12 @@
 
 <body>
     <header class="header">
-        <h1>Комиссии Wildberries</h1>
+        <h1>Комиссии (KГВП) Wildberries</h1>
         <div class="topbar">
             <div class="search-wrap">
-                <input id="q" type="text" placeholder="поиск: предмет, категория, ТН ВЭД, бренд, nmId" />
+                <input id="q" type="text" placeholder="поиск: предмет или родительская категория" />
             </div>
-            <div class="controls">
-                <button id="btnReload">Обновить</button>
-            </div>
-            <label class="checkbox"><input type="checkbox" id="onlyWithMin" /> Только с минималкой</label>
+            <button id="btnReload">Обновить</button>
         </div>
         <div class="status-row">
             <div id="status" class="ok">Найдено позиций — 0</div>
@@ -195,19 +162,18 @@
                     <thead>
                         <tr>
                             <th>Предмет</th>
-                            <th>Категория / ТН ВЭД</th>
-                            <th>Ставка, %</th>
-                            <th>Мин. комиссия, ₽</th>
-                            <th>Тип расчета</th>
-                            <th>Регион</th>
-                            <th>Бренд / nmId</th>
-                            <th>Обновлено</th>
-                            <th>Примечание</th>
+                            <th>Родит. категория</th>
+                            <th>KGVP Supplier, %</th>
+                            <th>KGVP Marketplace, %</th>
+                            <th>KGVP Pickup, %</th>
+                            <th>KGVP Booking, %</th>
+                            <th>KGVP Supplier Express, %</th>
+                            <th>Платное хранение, %</th>
                         </tr>
                     </thead>
                     <tbody id="tbody">
                         <tr>
-                            <td colspan="9" class="muted">Нет данных</td>
+                            <td colspan="8" class="muted">Нет данных</td>
                         </tr>
                     </tbody>
                 </table>
@@ -218,7 +184,6 @@
     <script>
         const els = {
             q: document.getElementById('q'),
-            onlyMin: document.getElementById('onlyWithMin'),
             btnReload: document.getElementById('btnReload'),
             status: document.getElementById('status'),
             updated: document.getElementById('updated'),
@@ -235,34 +200,13 @@
             const ss = String(d.getSeconds()).padStart(2, '0');
             return `${hh}:${mm}:${ss}`;
         }
-        function fmtDateRU(s) {
-            if (!s) return '—';
-            const d = new Date(s);
-            if (isNaN(d.getTime())) return s;
-            const dd = String(d.getDate()).padStart(2, '0');
-            const mm = String(d.getMonth() + 1).padStart(2, '0');
-            const yyyy = d.getFullYear();
-            const hh = String(d.getHours()).padStart(2, '0');
-            const mi = String(d.getMinutes()).padStart(2, '0');
-            return `${dd}.${mm}.${yyyy} ${hh}:${mi}`;
-        }
 
         function applyFilters() {
             const q = (els.q.value || '').trim().toLowerCase();
             filtered = raw.filter((r) => {
-                if (els.onlyMin.checked && !(Number(r.minCommission) > 0)) return false;
-
                 if (!q) return true;
-                const hay = [
-                    r.subject, r.category, r.tnved, r.brand,
-                    r.nmId && String(r.nmId),
-                    r.region, r.calcType, r.note,
-                ]
-                    .filter(Boolean)
-                    .join(' ')
-                    .toLowerCase();
-
-                return hay.includes(q);
+                const from = (r.subjectName || '') + ' ' + (r.parentName || '');
+                return from.toLowerCase().includes(q);
             });
             renderTable();
         }
@@ -275,23 +219,17 @@
 
         async function loadData() {
             els.status.textContent = 'Загрузка…';
-            els.tbody.innerHTML =
-                '<tr><td colspan="9" class="muted">Загрузка…</td></tr>';
+            els.tbody.innerHTML = '<tr><td colspan="8" class="muted">Загрузка…</td></tr>';
             try {
-                // Можно пробрасывать query в API, если понадобится (напр., ?subjectName=...)
-                const res = await fetch('/api/wb-commission.php', {
-                    headers: { Accept: 'application/json' },
-                });
+                const res = await fetch('/api/wb-commission.php', { headers: { Accept: 'application/json' } });
                 const data = await safeJson(res);
                 raw = res.ok && Array.isArray(data) ? data : [];
-                console.log('WB commission sample:', raw[0]);
                 els.updated.textContent = 'Обновлено: ' + fmtTimeNow();
                 applyFilters();
                 els.status.textContent = `Найдено позиций — ${filtered.length}`;
             } catch (e) {
                 console.error(e);
-                els.tbody.innerHTML =
-                    '<tr><td colspan="9" class="muted">Ошибка загрузки</td></tr>';
+                els.tbody.innerHTML = '<tr><td colspan="8" class="muted">Ошибка загрузки</td></tr>';
                 els.status.textContent = 'Ошибка загрузки';
                 els.updated.textContent = 'Обновлено: ошибка';
             }
@@ -300,64 +238,27 @@
         function renderTable() {
             if (!filtered.length) {
                 els.tbody.innerHTML =
-                    '<tr><td colspan="9" class="muted">Данные не найдены</td></tr>';
+                    '<tr><td colspan="8" class="muted">Данные не найдены</td></tr>';
                 return;
             }
             els.tbody.innerHTML = filtered
                 .map((r) => {
-                    const subject = r.subject || '—';
-                    const category = r.category || '—';
-                    const tnved = r.tnved ? `, ТН ВЭД: ${r.tnved}` : '';
-                    const percent =
-                        r.commissionPercent != null ? String(r.commissionPercent) : '—';
-                    const minc =
-                        r.minCommission != null ? String(r.minCommission) : '—';
-                    const calc = r.calcType || '—';
-                    const region = r.region || '—';
-                    const brandNm =
-                        r.brand || r.nmId
-                            ? `${r.brand || ''}${r.brand && r.nmId ? ' / ' : ''}${r.nmId || ''}`
-                            : '—';
-                    const upd = fmtDateRU(r.updatedAt);
-                    const note = r.note || '—';
-
+                    const s = (v) => (v == null ? '—' : String(v));
                     return `
-        <tr>
-          <td>${escapeHtml(subject)}</td>
-          <td>${escapeHtml(category)}${tnved ? escapeHtml(tnved) : ''}</td>
-          <td>${escapeHtml(percent)}</td>
-          <td>${escapeHtml(minc)}</td>
-          <td>${escapeHtml(calc)}</td>
-          <td>${escapeHtml(region)}</td>
-          <td>${escapeHtml(brandNm)}</td>
-          <td>${escapeHtml(upd)}</td>
-          <td>${escapeHtml(note)}</td>
-        </tr>
-      `;
+              <tr>
+                <td>${escapeHtml(r.subjectName || '—')}</td>
+                <td>${escapeHtml(r.parentName || '—')}</td>
+                <td>${escapeHtml(s(r.kgvpSupplier))}</td>
+                <td>${escapeHtml(s(r.kgvpMarketplace))}</td>
+                <td>${escapeHtml(s(r.kgvpPickup))}</td>
+                <td>${escapeHtml(s(r.kgvpBooking))}</td>
+                <td>${escapeHtml(s(r.kgvpSupplierExpress))}</td>
+                <td>${escapeHtml(s(r.paidStorageKgvp))}</td>
+              </tr>
+            `;
                 })
                 .join('');
         }
-
-        // Fallback: авто‑таблица по всем ключам первой записи
-        const keys = Object.keys(filtered[0] || {});
-        if (!keys.length) {
-            els.tbody.innerHTML =
-                '<tr><td colspan="9" class="muted">Формат ответа пуст</td></tr>';
-            return;
-        }
-
-        // Перестроим заголовок под реальные ключи (один раз)
-        const thead = document.querySelector('thead tr');
-        thead.innerHTML = keys.map((k) => `<th>${escapeHtml(k)}</th>`).join('');
-
-        els.tbody.innerHTML = filtered
-            .map((row) => {
-                return `<tr>${keys
-                    .map((k) => `<td>${escapeHtml(row[k])}</td>`)
-                    .join('')}</tr>`;
-            })
-            .join('');
-
 
         function escapeHtml(v) {
             return String(v)
@@ -370,10 +271,6 @@
 
         els.btnReload.addEventListener('click', loadData);
         els.q.addEventListener('input', () => {
-            applyFilters();
-            els.status.textContent = `Найдено позиций — ${filtered.length}`;
-        });
-        els.onlyMin.addEventListener('change', () => {
             applyFilters();
             els.status.textContent = `Найдено позиций — ${filtered.length}`;
         });
