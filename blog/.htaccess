@@ -1,0 +1,9 @@
+RewriteEngine On
+RewriteBase /blog/
+
+# Pretty post URLs: /blog/post/filename-without-ext
+RewriteRule ^post/([A-Za-z0-9\-_.]+)$ view.php?slug=$1 [L,QSA]
+
+# Optional: remove trailing slash
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.+)/$ /blog/$1 [R=301,L]

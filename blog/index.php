@@ -50,7 +50,7 @@ include __DIR__ . '/inc/header.php';
     if (preg_match('/^(\d{4}-\d{2}-\d{2})-/', $name, $m)) {
         $dateText = date('M d, Y', strtotime($m[1]));
     }
-    $viewUrl = 'view.php?f=' . rawurlencode(basename($file));
+    $viewUrl = 'post/' . rawurlencode(preg_replace('/^\d{4}-\d{2}-\d{2}-/', '', $name));
     // thumb from HTML comment <!-- thumb: path -->
     $thumb = '';
     if (preg_match('/<!--\s*thumb:\s*(.*?)\s*-->/', $html, $m)) {
