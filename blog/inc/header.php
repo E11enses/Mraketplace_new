@@ -4,14 +4,14 @@
   <meta charset="utf-8">
   <title>Typerite</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/vendor.css">
-  <link rel="stylesheet" href="css/main.css">
-  <script src="js/modernizr.js"></script>
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-  <link rel="manifest" href="site.webmanifest">
+  <link rel="stylesheet" href="blog/css/base.css">
+  <link rel="stylesheet" href="blog/css/vendor.css">
+  <link rel="stylesheet" href="blog/css/main.css">
+  <script src="blog/js/modernizr.js"></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="blog/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="blog/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="blog/favicon-16x16.png">
+  <link rel="manifest" href="blog/site.webmanifest">
 </head>
 <body>
 <div id="preloader"><div id="loader" class="dots-fade"><div></div><div></div><div></div></div></div>
@@ -23,7 +23,7 @@
     <div class="header__top">
       <div class="header__logo">
         <a class="site-logo" href="index.php">
-          <img src="images/logo.svg" alt="Homepage">
+          <img src="blog/images/logo.svg" alt="Homepage">
         </a>
       </div>
     </div>
