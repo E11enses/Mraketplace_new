@@ -284,6 +284,7 @@
                 });
                 const data = await safeJson(res);
                 raw = res.ok && Array.isArray(data) ? data : [];
+                console.log('WB commission sample:', raw[0]);
                 els.updated.textContent = 'Обновлено: ' + fmtTimeNow();
                 applyFilters();
                 els.status.textContent = `Найдено позиций — ${filtered.length}`;
