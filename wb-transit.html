@@ -6,15 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
       :root {
-        --bg: #0f172a;
-        --card: #111827;
-        --text: #e5e7eb;
-        --muted: #9ca3af;
-        --accent: #22c55e;
-        --accent-2: #6366f1;
-        --danger: #ef4444;
-        --border: #1f2937;
-        --link: #93c5fd;
+        --bg: #f7f7f9;
+        --card: #ffffff;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --accent: #2563eb;
+        --accent-2: #10b981;
+        --danger: #dc2626;
+        --border: #e5e7eb;
+        --link: #2563eb;
+        --chip: #eef2ff;
       }
       *,
       *::before,
@@ -31,10 +32,14 @@
       .header {
         padding: 16px;
         border-bottom: 1px solid var(--border);
-        background: linear-gradient(180deg, #0b1225, #0f172a);
+        background: #ffffffcc;
+        backdrop-filter: saturate(150%) blur(8px);
+        position: sticky;
+        top: 0;
+        z-index: 10;
       }
       h1 {
-        margin: 0 0 12px;
+        margin: 0 0 10px;
         font-size: 20px;
       }
       .row {
@@ -50,106 +55,50 @@
         font-size: 14px;
       }
       input[type='text'] {
-        background: #0b1020;
+        background: #fff;
         color: var(--text);
         border: 1px solid var(--border);
-        border-radius: 6px;
+        border-radius: 8px;
         padding: 8px 10px;
-        width: 200px;
+        width: 260px;
+      }
+      input[type='checkbox'] {
+        transform: translateY(1px);
       }
       button {
         background: var(--accent);
-        color: #052e16;
-        border: none;
-        border-radius: 6px;
+        color: #fff;
+        border: 1px solid var(--accent);
+        border-radius: 8px;
         padding: 8px 12px;
         font-weight: 600;
         cursor: pointer;
       }
       button.secondary {
-        background: var(--accent-2);
-        color: white;
-      }
-      .tabs {
-        display: inline-flex;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        overflow: hidden;
-        margin-left: 8px;
-      }
-      .tabs button {
-        background: transparent;
-        color: var(--text);
-        padding: 8px 12px;
-        border-right: 1px solid var(--border);
-      }
-      .tabs button.active {
-        background: #1b2238;
+        background: #fff;
+        color: var(--accent);
+        border-color: var(--accent);
       }
       .status {
-        margin-top: 10px;
+        margin-top: 8px;
         font-size: 13px;
         color: var(--muted);
       }
       .container {
         padding: 16px;
       }
-      /* table */
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        overflow: hidden;
-      }
-      th,
-      td {
-        padding: 10px 12px;
-        border-bottom: 1px solid var(--border);
-        text-align: left;
-        font-size: 14px;
-        vertical-align: top;
-      }
-      thead th {
-        background: #0b1020;
-        color: #d1d5db;
-        position: sticky;
-        top: 0;
-      }
-      tbody tr:hover {
-        background: rgba(99, 102, 241, 0.08);
-      }
-      .muted {
-        color: var(--muted);
-        text-align: center;
-      }
-      .pill {
-        display: inline-block;
-        padding: 2px 8px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 600;
-        background: rgba(34, 197, 94, 0.15);
-        color: #86efac;
-      }
-      .pill.red {
-        background: rgba(239, 68, 68, 0.15);
-        color: #fecaca;
-      }
-
-      /* graph */
       .graph-wrap {
         display: grid;
-        grid-template-columns: 280px 1fr;
+        grid-template-columns: 320px 1fr;
         gap: 16px;
       }
       .panel {
         background: var(--card);
         border: 1px solid var(--border);
-        border-radius: 8px;
+        border-radius: 12px;
         padding: 12px;
-        min-height: 420px;
+        min-height: 440px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
       }
       .panel h3 {
         margin: 0 0 10px;
@@ -157,39 +106,73 @@
       }
       .list {
         display: grid;
-        gap: 6px;
-        max-height: 380px;
+        gap: 8px;
+        max-height: 392px;
         overflow: auto;
       }
       .item {
-        padding: 8px 10px;
+        padding: 10px 12px;
         border: 1px solid var(--border);
-        border-radius: 6px;
+        border-radius: 10px;
         cursor: pointer;
+        background: #fff;
+      }
+      .item:hover {
+        border-color: #c7d2fe;
+        background: #fafaff;
       }
       .item.active {
-        border-color: #3b82f6;
-        box-shadow: inset 0 0 0 1px #3b82f6;
+        border-color: #93c5fd;
+        box-shadow: inset 0 0 0 2px #93c5fd55;
+        background: #f0f7ff;
       }
       .targets {
         position: relative;
-        min-height: 380px;
+        min-height: 392px;
       }
       .edge {
-        background: #0b1020;
-        border: 1px dashed #334155;
-        border-radius: 8px;
-        padding: 8px 10px;
-        margin-bottom: 8px;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px 12px;
+        margin-bottom: 10px;
+        display: grid;
+        gap: 6px;
       }
-      .edge a {
-        color: var(--link);
-        text-decoration: none;
+      .edge .title {
+        font-weight: 600;
       }
-      .hint {
+      .chips {
+        display: inline-grid;
+        grid-auto-flow: column;
+        gap: 8px;
+      }
+      .chip {
+        background: var(--chip);
+        color: #3730a3;
+        border: 1px solid #e0e7ff;
+        border-radius: 999px;
+        padding: 2px 8px;
         font-size: 12px;
-        color: var(--muted);
+        font-weight: 600;
       }
+      .pill {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        background: #ecfdf5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+      }
+      .pill.red {
+        background: #fef2f2;
+        color: #991b1b;
+        border-color: #fecaca;
+      }
+      .muted { color: var(--muted); }
+      .hint { font-size: 12px; color: var(--muted); }
     </style>
   </head>
   <body>
@@ -203,80 +186,37 @@
         <label class="inline"
           ><input type="checkbox" id="onlyActive" /> Только активные</label
         >
-        <div class="tabs" role="tablist" aria-label="Вид">
-          <button id="tabTable" class="active" role="tab">Таблица</button>
-          <button id="tabGraph" role="tab">Схема</button>
-        </div>
         <button id="btnReload" class="secondary">Обновить</button>
       </div>
       <div id="status" class="status">Готов</div>
     </header>
 
     <main class="container">
-      <!-- TABLE VIEW -->
-      <div id="viewTable">
-        <table>
-          <thead>
-            <tr>
-              <th>Откуда</th>
-              <th>Куда</th>
-              <th>Box</th>
-              <th>Pallet</th>
-              <th>Активно</th>
-              <th>С даты</th>
-            </tr>
-          </thead>
-          <tbody id="tbodyTable">
-            <tr>
-              <td colspan="6" class="muted">Нет данных</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- GRAPH VIEW -->
-      <div id="viewGraph" style="display: none">
-        <div class="graph-wrap">
-          <div class="panel">
-            <h3>Начальные склады (A)</h3>
-            <div class="row" style="margin-bottom:8px">
-              <span class="hint"
-                >Кликните на склад — увидите связи и цены справа</span
-              >
-            </div>
-            <div id="listA" class="list"></div>
+      <div class="graph-wrap">
+        <div class="panel">
+          <h3>Начальные склады (A)</h3>
+          <div class="hint" style="margin-bottom:8px">
+            Кликните на склад — справа появятся направления и цены
           </div>
-          <div class="panel">
-            <h3>Связи A → B (назначения)</h3>
-            <div id="edges" class="targets">
-              <div class="muted">Выберите склад слева</div>
-            </div>
+          <div id="listA" class="list"></div>
+        </div>
+        <div class="panel">
+          <h3>Связи A → B</h3>
+          <div id="edges" class="targets">
+            <div class="muted">Выберите склад слева</div>
           </div>
         </div>
       </div>
     </main>
 
     <script>
-      // Ожидаем формат элементов, который возвращает ваш /api/wb-transit.php:
-      // {
-      //   fromWarehouseId, toWarehouseId,
-      //   fromWarehouseName, toWarehouseName,
-      //   extra: 'box: 750, pallet: 12000',
-      //   active: true|false|null,
-      //   updatedAt: '2025-01-01T00:00:00Z' | null
-      // }
       const els = {
         status: document.getElementById('status'),
-        tbody: document.getElementById('tbodyTable'),
-        viewTable: document.getElementById('viewTable'),
-        viewGraph: document.getElementById('viewGraph'),
-        tabTable: document.getElementById('tabTable'),
-        tabGraph: document.getElementById('tabGraph'),
-        btnReload: document.getElementById('btnReload'),
-        onlyActive: document.getElementById('onlyActive'),
-        search: document.getElementById('search'),
         listA: document.getElementById('listA'),
         edges: document.getElementById('edges'),
+        onlyActive: document.getElementById('onlyActive'),
+        search: document.getElementById('search'),
+        btnReload: document.getElementById('btnReload'),
       };
 
       let fullData = [];
@@ -286,9 +226,8 @@
       function setStatus(msg, type = 'info') {
         els.status.textContent = msg;
         els.status.style.color =
-          type === 'error' ? '#ef4444' : type === 'ok' ? '#22c55e' : '#9ca3af';
+          type === 'error' ? '#dc2626' : type === 'ok' ? '#10b981' : '#6b7280';
       }
-
       function escapeHtml(v) {
         return String(v)
           .replace(/&/g, '&amp;')
@@ -297,7 +236,6 @@
           .replace(/"/g, '&quot;')
           .replace(/'/g, '&#039;');
       }
-
       function fmtDate(s) {
         if (!s) return '—';
         const d = new Date(s);
@@ -315,31 +253,29 @@
         );
       }
 
-      function parseExtraForPrices(extra) {
-        // ожидаем строку вида "box: 7500, pallet: 12000"
-        const out = { box: null, pallet: null };
-        if (!extra || typeof extra !== 'string') return out;
-        const mBox = extra.match(/box:\s*([\d.,]+)/i);
-        const mPal = extra.match(/pallet:\s*([\d.,]+)/i);
-        out.box = mBox ? mBox[1] : null;
-        out.pallet = mPal ? mPal[1] : null;
-        return out;
+      function priceRangeFromBoxRanges(ranges) {
+        if (!Array.isArray(ranges) || !ranges.length) return null;
+        let min = Number.POSITIVE_INFINITY;
+        let max = Number.NEGATIVE_INFINITY;
+        for (const x of ranges) {
+          const v = Number(x?.value);
+          if (Number.isFinite(v)) {
+            if (v < min) min = v;
+            if (v > max) max = v;
+          }
+        }
+        if (!Number.isFinite(min)) return null;
+        if (!Number.isFinite(max)) max = min;
+        // формат: 3.9–5.3 ₽/л (или 4.2 ₽/л, если одно значение)
+        return min === max ? `${min} ₽/л` : `${min}–${max} ₽/л`;
       }
 
       function applyFilters() {
         const q = els.search.value.trim().toLowerCase();
         filtered = fullData.filter((r) => {
           if (els.onlyActive.checked && r.active !== true) return false;
-
-          const from =
-            r.fromWarehouseName ||
-            r.fromWarehouseId ||
-            '';
-          const to =
-            r.toWarehouseName ||
-            r.toWarehouseId ||
-            '';
-
+          const from = r.fromWarehouseName || r.fromWarehouseId || '';
+          const to = r.toWarehouseName || r.toWarehouseId || '';
           if (!q) return true;
           return (
             String(from).toLowerCase().includes(q) ||
@@ -373,41 +309,8 @@
         }
       }
 
-      function renderTable() {
-        if (!filtered.length) {
-          els.tbody.innerHTML =
-            '<tr><td colspan="6" class="muted">Нет данных</td></tr>';
-          return;
-        }
-        els.tbody.innerHTML = filtered
-          .map((r) => {
-            const from =
-              r.fromWarehouseName || r.fromWarehouseId || '';
-            const to =
-              r.toWarehouseName || r.toWarehouseId || '';
-            const { box, pallet } = parseExtraForPrices(r.extra);
-            const active =
-              r.active === true
-                ? '<span class="pill">Да</span>'
-                : r.active === false
-                ? '<span class="pill red">Нет</span>'
-                : '—';
-            return `
-              <tr>
-                <td>${escapeHtml(from)}</td>
-                <td>${escapeHtml(to)}</td>
-                <td>${box ? escapeHtml(box) : '—'}</td>
-                <td>${pallet ? escapeHtml(pallet) : '—'}</td>
-                <td>${active}</td>
-                <td>${escapeHtml(fmtDate(r.updatedAt))}</td>
-              </tr>
-            `;
-          })
-          .join('');
-      }
-
       function groupBySource(list) {
-        const map = new Map(); // key -> { key, name, items[] }
+        const map = new Map();
         for (const r of list) {
           const key =
             (r.fromWarehouseId || '') + '|' + (r.fromWarehouseName || '');
@@ -421,7 +324,6 @@
           }
           map.get(key).items.push(r);
         }
-        // сортировка по имени
         return Array.from(map.values()).sort((a, b) =>
           String(a.name).localeCompare(String(b.name), 'ru'),
         );
@@ -429,7 +331,7 @@
 
       function renderGraph() {
         const groups = groupBySource(filtered);
-        // левая колонка A
+
         els.listA.innerHTML = groups
           .map(
             (g) => `
@@ -443,15 +345,13 @@
           )
           .join('');
 
-        // обработчики
         for (const el of els.listA.querySelectorAll('.item')) {
           el.addEventListener('click', () => {
             currentAKey = el.getAttribute('data-key');
-            renderGraph(); // перерисовать правую часть
+            renderGraph();
           });
         }
 
-        // правая колонка связи
         const selected =
           groups.find((g) => g.key === currentAKey) || groups[0] || null;
         if (!selected) {
@@ -468,26 +368,28 @@
             ),
           )
           .map((r) => {
-            const from =
-              r.fromWarehouseName || r.fromWarehouseId || '';
-            const to =
-              r.toWarehouseName || r.toWarehouseId || '';
-            const { box, pallet } = parseExtraForPrices(r.extra);
+            const from = r.fromWarehouseName || r.fromWarehouseId || '';
+            const to = r.toWarehouseName || r.toWarehouseId || '';
+            const perLiter = priceRangeFromBoxRanges(r.boxTariffRanges) ?? '—';
+            const pallet =
+              r.palletTariff != null && r.palletTariff !== ''
+                ? `${r.palletTariff} ₽/паллета`
+                : '—';
             const active =
               r.active === true
                 ? '<span class="pill">Да</span>'
                 : r.active === false
                 ? '<span class="pill red">Нет</span>'
                 : '—';
+
             return `
               <div class="edge">
-                <div><strong>${escapeHtml(from)}</strong> → <strong>${escapeHtml(
-              to,
-            )}</strong></div>
-                <div class="hint">
-                  box: ${box ? escapeHtml(box) : '—'}; pallet: ${
-              pallet ? escapeHtml(pallet) : '—'
-            }; активен: ${active}; с: ${escapeHtml(fmtDate(r.updatedAt))}
+                <div class="title">${escapeHtml(from)} → ${escapeHtml(to)}</div>
+                <div class="chips">
+                  <span class="chip">За литр: ${escapeHtml(perLiter)}</span>
+                  <span class="chip">Паллета: ${escapeHtml(pallet)}</span>
+                  <span class="chip">С: ${escapeHtml(fmtDate(r.updatedAt))}</span>
+                  <span class="chip">Активно: ${active}</span>
                 </div>
               </div>
             `;
@@ -499,32 +401,12 @@
 
       function onStateChanged() {
         applyFilters();
-        if (els.viewTable.style.display !== 'none') {
-          renderTable();
-        } else {
-          renderGraph();
-        }
+        renderGraph();
       }
 
-      // UI events
-      els.tabTable.addEventListener('click', () => {
-        els.tabTable.classList.add('active');
-        els.tabGraph.classList.remove('active');
-        els.viewTable.style.display = '';
-        els.viewGraph.style.display = 'none';
-        onStateChanged();
-      });
-      els.tabGraph.addEventListener('click', () => {
-        els.tabGraph.classList.add('active');
-        els.tabTable.classList.remove('active');
-        els.viewTable.style.display = 'none';
-        els.viewGraph.style.display = '';
-        onStateChanged();
-      });
       els.onlyActive.addEventListener('change', onStateChanged);
       els.search.addEventListener('input', onStateChanged);
       els.btnReload.addEventListener('click', loadData);
-
       document.addEventListener('DOMContentLoaded', loadData);
     </script>
   </body>
