@@ -87,7 +87,7 @@
                 <form role="search" method="get" class="search-form" action="/blog/search.php">
   <label>
     <span class="hide-content">Искать:</span>
-    <input type="search" class="search-field" placeholder="Начните вводить запрос" value="" name="q" title="Ищем:" autocomplete="off">
+    <input type="search" class="search-field" placeholder="Начните вводить запрос" value="Начните вводить запрос" name="q" title="Ищем:" autocomplete="off">
   </label>
   <input type="submit" class="search-submit" value="Найти">
 </form>
