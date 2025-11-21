@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Калькулятор скидок и цена на Wildberries | МРАКЕТПЛЕЙСЫ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        :root {
+            --bg: #f7f8fa;
+            --panel: #ffffff;
+            --panel-2: #f2f3f5;
+            --text: #111827;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --radius: 14px;
+
+            /* WB-like palette */
+            --violet: #6e2cff;
+            --violet-10: #f3f0ff;
+            --violet-20: #e8e1ff;
+            --pink: #ff3b7f;
+            --pink-10: #ffeaf1;
+            --pink-20: #ffd0df;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+                Helvetica, Arial;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .wrap {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 16px;
+            display: grid;
+            gap: 16px;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        h1 {
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 960px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 12px;
+        }
+
+        .panel h2 {
+            font-size: 14px;
+            margin: 0 0 10px;
+            color: var(--muted);
+            letter-spacing: 0.2px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 10px;
+            align-items: center;
+            padding: 6px 0;
+        }
+
+        @media (max-width: 640px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        label {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--panel-2);
+            font-size: 15px;
+        }
+
+        /* Distinguish prices vs discounts */
+        .price input {
+            background: #fff;
+        }
+
+        .disc input {
+            background: var(--violet-10);
+            border-color: var(--violet-20);
+        }
+
+        .btns {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            border: 1px solid var(--border);
+            background: linear-gradient(180deg, #ffffff, #f3f4f6);
+            color: #111827;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        button.primary {
+            background: linear-gradient(180deg, #7a57ff, #6e2cff);
+            color: #ffffff;
+            border-color: #6e2cff;
+        }
+
+        .pill {
+            font-size: 12px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: #f8f9ff;
+            color: #374151;
+        }
+
+        /* Timeline cards */
+        .timeline {
+            display: grid;
+            gap: 10px;
+        }
+
+        .stage {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border);
+            background: #fff;
+            border-radius: 16px;
+            padding: 12px 14px;
+            box-shadow: 0 1px 0 rgba(17, 24, 39, 0.03);
+        }
+
+        .stage .title {
+            font-size: 12px;
+            color: var(--muted);
+            letter-spacing: 0.2px;
+        }
+
+        .stage .hint {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .stage .val {
+            font-weight: 900;
+            font-size: 20px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Special styling for final with wallet */
+        .stage.wallet {
+            background: var(--pink-10);
+            border-color: var(--pink-20);
+        }
+
+        .stage.wallet .val {
+            color: var(--pink);
+        }
+
+        /* Discount KPI chips */
+        .kpis {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        @media (max-width: 640px) {
+            .kpis {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .kpi {
+            background: var(--violet-10);
+            border: 1px solid var(--violet-20);
+            border-radius: 12px;
+            padding: 10px;
+        }
+
+        .kpi .name {
+            font-size: 12px;
+            color: #6a5bd1;
+        }
+
+        .kpi .num {
+            font-weight: 900;
+            color: var(--violet);
+            font-size: 18px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .hint-global {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <header>
+            <h1>Калькулятор скидок и цен на Wildberries (СПП, ЦР, Цена до скидок)</h1>
+            <div class="pill" id="status">Готово</div>
+        </header>
+
+        <div class="grid">
+            <!-- Inputs -->
+            <section class="panel">
+                <h2>Входные данные (заполняются любые поля)</h2>
+
+                <!-- Prices -->
+                <div class="form-row price">
+                    <label>Цена с WB Кошельком (P1)</label>
+                    <input id="P1" type="number" inputmode="decimal" placeholder="3411" />
+                </div>
+
+                <div class="form-row price">
+                    <label>Цена с СПП (без WB Кошелька) (P2)</label>
+                    <input id="P3" type="number" inputmode="decimal" placeholder="3790" />
+                </div>
+
+                <div class="form-row price">
+                    <label>Цена реализации (без СПП со скидкой продавца) (P3)</label>
+                    <input id="P4" type="number" inputmode="decimal" placeholder="" />
+                </div>
+
+                <div class="form-row price">
+                    <label>Оригинальная цена ("зачеркнутая", до скидки продавца) (P4)</label>
+                    <input id="P5" type="number" inputmode="decimal" placeholder="" />
+                </div>
+
+                <!-- Discounts -->
+                <div class="form-row disc">
+                    <label>WB Кошелёк, % (w)</label>
+                    <input id="w" type="number" inputmode="decimal" min="0" max="100" placeholder="" />
+                </div>
+                <div class="form-row disc">
+                    <label>СПП, % (p)</label>
+                    <input id="p" type="number" inputmode="decimal" min="0" max="100" placeholder="" />
+                </div>
+                <div class="form-row disc">
+                    <label>Скидка продавца, % (s)</label>
+                    <input id="s" type="number" inputmode="decimal" min="0" max="100" placeholder="" />
+                </div>
+
+                <div class="btns">
+                    <button class="primary" id="solveBtn">Пересчитать</button>
+                    <button id="clearBtn">Сбросить</button>
+                </div>
+                <div class="hint-global" id="hint"></div>
+            </section>
+
+            <!-- Timeline + KPIs -->
+            <section class="panel">
+                <h2>Вывод цены</h2>
+                <div class="timeline">
+                    <div class="stage wallet">
+                        <div>
+                            <div class="title">1) Цена с WB Кошельком</div>
+                            <div class="hint">P1 = P2 × (1 − w)</div>
+                        </div>
+                        <div class="val" id="vP1">—</div>
+                    </div>
+                    <div class="stage">
+                        <div>
+                            <div class="title">2) Цена с СПП (без WB Кошелька)</div>
+                            <div class="hint">P2 = P3 × (1 − p)</div>
+                        </div>
+                        <div class="val" id="vP3">—</div>
+                    </div>
+                    <div class="stage">
+                        <div>
+                            <div class="title">3) Цена Реализации (без СПП, после скидки продавца)</div>
+                            <div class="hint">P3 = P4 × (1 − s)</div>
+                        </div>
+                        <div class="val" id="vP4">—</div>
+                    </div>
+                    <div class="stage">
+                        <div>
+                            <div class="title">4) Оригинальная цена ("зачеркнутая")</div>
+                            <div class="hint">P4</div>
+                        </div>
+                        <div class="val" id="vP5">—</div>
+                    </div>
+                </div>
+
+                <h2 style="margin-top:12px">Рассчитанные скидки</h2>
+                <div class="kpis">
+                    <div class="kpi">
+                        <div class="name">Текущая СПП, %</div>
+                        <div class="num" id="vp">—</div>
+                    </div>
+                    <div class="kpi">
+                        <div class="name">WB Кошелёк, %</div>
+                        <div class="num" id="vw">—</div>
+                    </div>
+                    <div class="kpi">
+                        <div class="name">Скидка продавца, %</div>
+                        <div class="num" id="vs">—</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        const $ = (s) => document.querySelector(s);
+        const fmt = (n) =>
+            Number.isFinite(n) ? new Intl.NumberFormat("ru-RU").format(n) + " ₽" : "—";
+
+        const els = {
+            P1: $("#P1"),
+            P3: $("#P3"),
+            P4: $("#P4"),
+            P5: $("#P5"),
+            w: $("#w"),
+            p: $("#p"),
+            s: $("#s"),
+            vP1: $("#vP1"),
+            vP3: $("#vP3"),
+            vP4: $("#vP4"),
+            vP5: $("#vP5"),
+            vp: $("#vp"),
+            vw: $("#vw"),
+            vs: $("#vs"),
+            hint: $("#hint"),
+            status: $("#status"),
+            solveBtn: $("#solveBtn"),
+            clearBtn: $("#clearBtn"),
+        };
+
+        const val = (el) => {
+            const v = parseFloat(String(el.value).replace(",", "."));
+            return Number.isFinite(v) ? v : null;
+        };
+
+        const roundWB = (x) => (x == null ? null : Math.round(x)); // WB shows whole ₽
+
+        function solve() {
+            let P1 = val(els.P1);
+            let P3 = val(els.P3);
+            let P4 = val(els.P4);
+            let P5 = val(els.P5);
+            let w = val(els.w);
+            let p = val(els.p);
+            let s = val(els.s);
+
+            const wf = w != null ? w / 100 : null;
+            const pf = p != null ? p / 100 : null;
+            const sf = s != null ? s / 100 : null;
+
+            const notes = [];
+
+            // From P1 & w ⇒ P3
+            if (P1 != null && w != null && P3 == null) {
+                if (wf >= 1) notes.push("w ≥ 100% невозможно");
+                else P3 = P1 / (1 - wf);
+            }
+
+            // From P3 & p ⇒ P4
+            if (P3 != null && p != null && P4 == null) {
+                if (pf >= 1) notes.push("p ≥ 100% невозможно");
+                else P4 = P3 / (1 - pf);
+            }
+
+            // From P4 & s ⇒ P5
+            if (P4 != null && s != null && P5 == null) {
+                if (sf >= 1) notes.push("s ≥ 100% невозможно");
+                else P5 = P4 / (1 - sf);
+            }
+
+            // Infer discounts if prices known
+            if (w == null && P1 != null && P3 != null && P3 > 0) w = (1 - P1 / P3) * 100;
+            if (p == null && P3 != null && P4 != null && P4 > 0) p = (1 - P3 / P4) * 100;
+            if (s == null && P4 != null && P5 != null && P5 > 0) s = (1 - P4 / P5) * 100;
+
+            // Forward fill when upper levels are known
+            if (P5 != null && s != null && P4 == null) P4 = P5 * (1 - (s / 100));
+            if (P4 != null && p != null && P3 == null) P3 = P4 * (1 - (p / 100));
+            if (P3 != null && w != null && P1 == null) P1 = P3 * (1 - (w / 100));
+
+            // Round for display
+            const rP1 = roundWB(P1);
+            const rP3 = roundWB(P3);
+            const rP4 = roundWB(P4);
+            const rP5 = roundWB(P5);
+
+            els.vP1.textContent = fmt(rP1);
+            els.vP3.textContent = fmt(rP3);
+            els.vP4.textContent = fmt(rP4);
+            els.vP5.textContent = fmt(rP5);
+
+            const f2 = (x) =>
+                x == null || !Number.isFinite(x)
+                    ? "—"
+                    : new Intl.NumberFormat("ru-RU", {
+                        maximumFractionDigits: 2,
+                        minimumFractionDigits: 0,
+                    }).format(x) + " %";
+
+            els.vw.textContent = f2(w);
+            els.vp.textContent = f2(p);
+            els.vs.textContent = f2(s);
+
+            els.hint.textContent = notes.length ? "Проверка: " + notes.join("; ") : "";
+            els.status.textContent = "Готово";
+        }
+
+        function clearAll() {
+            ["P1", "P3", "P4", "P5", "w", "p", "s"].forEach((k) => (els[k].value = ""));
+            ["vP1", "vP3", "vP4", "vP5", "vp", "vw", "vs"].forEach(
+                (k) => (els[k].textContent = "—")
+            );
+            els.hint.textContent = "";
+            els.status.textContent = "Очищено";
+        }
+
+        ["P1", "P3", "P4", "P5", "w", "p", "s"].forEach((id) => {
+            els[id].addEventListener("input", solve);
+            els[id].addEventListener("change", solve);
+            els[id].addEventListener("keydown", (e) => {
+                if (e.key === "Enter") solve();
+            });
+        });
+        els.solveBtn.addEventListener("click", solve);
+        els.clearBtn.addEventListener("click", clearAll);
+
+        solve();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Калькулятор цен и скидок OZON | МРАКЕТПЛЕЙСЫ </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        :root {
+            --bg: #f7f8fa;
+            --panel: #ffffff;
+            --panel-2: #f2f3f5;
+            --text: #111827;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --radius: 14px;
+
+            /* Ozon-like palette */
+            --blue: #005bff;
+            --blue-10: #eef4ff;
+            --blue-20: #dbe7ff;
+            --red: rgba(16, 196, 76, 1);
+            --red-10: rgba(16, 196, 76, 0.10);
+            --red-20: rgba(16, 196, 76, 0.25);
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .wrap {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 16px;
+            display: grid;
+            gap: 16px
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between
+        }
+
+        h1 {
+            font-size: 18px;
+            margin: 0
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px
+        }
+
+        @media (max-width:960px) {
+            .grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 12px
+        }
+
+        .panel h2 {
+            font-size: 14px;
+            margin: 0 0 10px;
+            color: var(--muted);
+            letter-spacing: .2px
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 10px;
+            align-items: center;
+            padding: 6px 0
+        }
+
+        @media (max-width:640px) {
+            .form-row {
+                grid-template-columns: 1fr
+            }
+        }
+
+        label {
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        input[type="number"] {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--panel-2);
+            font-size: 15px
+        }
+
+        /* Distinguish prices vs discounts */
+        .price input {
+            background: #fff
+        }
+
+        .disc input {
+            background: var(--blue-10);
+            border-color: var(--blue-20)
+        }
+
+        .btns {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap
+        }
+
+        button {
+            border: 1px solid var(--border);
+            background: linear-gradient(180deg, #ffffff, #f3f4f6);
+            color: #111827;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer
+        }
+
+        button.primary {
+            background: linear-gradient(180deg, #3680ff, #005bff);
+            color: #fff;
+            border-color: #005bff
+        }
+
+        .pill {
+            font-size: 12px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: #f4f7ff;
+            color: #1f2a44
+        }
+
+        /* Timeline cards */
+        .timeline {
+            display: grid;
+            gap: 10px
+        }
+
+        .stage {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border);
+            background: #fff;
+            border-radius: 16px;
+            padding: 12px 14px;
+            box-shadow: 0 1px 0 rgba(17, 24, 39, .03)
+        }
+
+        .stage .title {
+            font-size: 12px;
+            color: var(--muted);
+            letter-spacing: .2px
+        }
+
+        .stage .hint {
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .stage .val {
+            font-weight: 900;
+            font-size: 20px;
+            font-variant-numeric: tabular-nums
+        }
+
+        /* Final with Ozon Card (use red accent like promo) */
+        .stage.card {
+            background: var(--red-10);
+            border-color: var(--red-20)
+        }
+
+        .stage.card .val {
+            color: var(--red)
+        }
+
+        /* Discount KPI chips (blue) */
+        .kpis {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px
+        }
+
+        @media (max-width:640px) {
+            .kpis {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .kpi {
+            background: var(--blue-10);
+            border: 1px solid var(--blue-20);
+            border-radius: 12px;
+            padding: 10px
+        }
+
+        .kpi .name {
+            font-size: 12px;
+            color: #2b5bd7
+        }
+
+        .kpi .num {
+            font-weight: 900;
+            color: var(--blue);
+            font-size: 18px;
+            font-variant-numeric: tabular-nums
+        }
+
+        .hint-global {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 6px
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <header>
+            <h1>Калькулятор скидок и цен на Ozon (СПП, ЦР, Цена до скидок)</h1>
+            <div class="pill" id="status">Готово</div>
+        </header>
+
+        <div class="grid">
+            <!-- Inputs -->
+            <section class="panel">
+                <h2>Входные данные (можно заполнять любые поля)</h2>
+
+                <!-- Prices -->
+                <div class="form-row price">
+                    <label>Цена с Ozon Картой (P1)</label>
+                    <input id="P1" type="number" inputmode="decimal" placeholder="Напр., 3411" />
+                </div>
+
+                <div class="form-row price">
+                    <label>Цена с СПП (без Ozon Карты) (P2)</label>
+                    <input id="P2" type="number" inputmode="decimal" placeholder="Напр., 3790" />
+                </div>
+
+                <div class="form-row price">
+                    <label>Цена реализации (без СПП, со скидкой продавца) (P3)</label>
+                    <input id="P3" type="number" inputmode="decimal" placeholder="" />
+                </div>
+
+                <div class="form-row price">
+                    <label>Оригинальная цена (до скидки продавца) (P4)</label>
+                    <input id="P4" type="number" inputmode="decimal" placeholder="" />
+                </div>
+
+                <!-- Discounts -->
+                <div class="form-row disc">
+                    <label>Ozon Карта, % (w)</label>
+                    <input id="w" type="number" inputmode="decimal" min="0" max="100" placeholder="" />
+                </div>
+                <div class="form-row disc">
+                    <label>СПП, % (p)</label>
+                    <input id="p" type="number" inputmode="decimal" min="0" max="100" placeholder="" />
+                </div>
+                <div class="form-row disc">
+                    <label>Скидка продавца, % (s)</label>
+                    <input id="s" type="number" inputmode="decimal" min="0" max="100" placeholder="" />
+                </div>
+
+                <div class="btns">
+                    <button class="primary" id="solveBtn">Пересчитать</button>
+                    <button id="clearBtn">Сбросить</button>
+                </div>
+                <div class="hint-global" id="hint"></div>
+            </section>
+
+            <!-- Timeline + KPIs -->
+            <section class="panel">
+                <h2>Итоговые цены и скидки</h2>
+                <div class="timeline">
+                    <div class="stage card">
+                        <div>
+                            <div class="title">1) Цена с Ozon Картой</div>
+                            <div class="hint">P1 = P2 × (1 − w)</div>
+                        </div>
+                        <div class="val" id="vP1">—</div>
+                    </div>
+                    <div class="stage">
+                        <div>
+                            <div class="title">2) Цена с СПП (без Ozon Карты)</div>
+                            <div class="hint">P2 = P3 × (1 − p)</div>
+                        </div>
+                        <div class="val" id="vP2">—</div>
+                    </div>
+                    <div class="stage">
+                        <div>
+                            <div class="title">3) Цена реализации (без СПП, после скидки продавца)</div>
+                            <div class="hint">P3 = P4 × (1 − s)</div>
+                        </div>
+                        <div class="val" id="vP3">—</div>
+                    </div>
+                    <div class="stage">
+                        <div>
+                            <div class="title">4) Оригинальная цена ("зачеркнутая")</div>
+                            <div class="hint">P4 — до скидки продавца</div>
+                        </div>
+                        <div class="val" id="vP4">—</div>
+                    </div>
+                </div>
+
+                <h2 style="margin-top:12px">Рассчитанные скидки</h2>
+                <div class="kpis">
+                    <div class="kpi">
+                        <div class="name">СПП, %</div>
+                        <div class="num" id="vp">—</div>
+                    </div>
+                    <div class="kpi">
+                        <div class="name">Ozon Карта, %</div>
+                        <div class="num" id="vw">—</div>
+                    </div>
+                    <div class="kpi">
+                        <div class="name">Скидка продавца, %</div>
+                        <div class="num" id="vs">—</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        const $ = (s) => document.querySelector(s);
+        const fmt = (n) =>
+            Number.isFinite(n) ? new Intl.NumberFormat("ru-RU").format(n) + " ₽" : "—";
+
+        const els = {
+            P1: $("#P1"),
+            P2: $("#P2"),
+            P3: $("#P3"),
+            P4: $("#P4"),
+            w: $("#w"),
+            p: $("#p"),
+            s: $("#s"),
+            vP1: $("#vP1"),
+            vP2: $("#vP2"),
+            vP3: $("#vP3"),
+            vP4: $("#vP4"),
+            vp: $("#vp"),
+            vw: $("#vw"),
+            vs: $("#vs"),
+            hint: $("#hint"),
+            status: $("#status"),
+            solveBtn: $("#solveBtn"),
+            clearBtn: $("#clearBtn"),
+        };
+
+        const val = (el) => {
+            const v = parseFloat(String(el.value).replace(",", "."));
+            return Number.isFinite(v) ? v : null;
+        };
+
+        const roundRUB = (x) => (x == null ? null : Math.round(x));
+
+        function solve() {
+            let P1 = val(els.P1);
+            let P2 = val(els.P2);
+            let P3 = val(els.P3);
+            let P4 = val(els.P4);
+            let w = val(els.w);
+            let p = val(els.p);
+            let s = val(els.s);
+
+            const wf = w != null ? w / 100 : null;
+            const pf = p != null ? p / 100 : null;
+            const sf = s != null ? s / 100 : null;
+
+            const notes = [];
+
+            // From P1 & w ⇒ P2
+            if (P1 != null && w != null && P2 == null) {
+                if (wf >= 1) notes.push("w ≥ 100% невозможно");
+                else P2 = P1 / (1 - wf);
+            }
+
+            // From P2 & p ⇒ P3
+            if (P2 != null && p != null && P3 == null) {
+                if (pf >= 1) notes.push("p ≥ 100% невозможно");
+                else P3 = P2 / (1 - pf);
+            }
+
+            // From P3 & s ⇒ P4
+            if (P3 != null && s != null && P4 == null) {
+                if (sf >= 1) notes.push("s ≥ 100% невозможно");
+                else P4 = P3 / (1 - sf);
+            }
+
+            // Infer discounts if prices known
+            if (w == null && P1 != null && P2 != null && P2 > 0) w = (1 - P1 / P2) * 100;
+            if (p == null && P2 != null && P3 != null && P3 > 0) p = (1 - P2 / P3) * 100;
+            if (s == null && P3 != null && P4 != null && P4 > 0) s = (1 - P3 / P4) * 100;
+
+            // Forward fill when upper levels known
+            if (P4 != null && s != null && P3 == null) P3 = P4 * (1 - (s / 100));
+            if (P3 != null && p != null && P2 == null) P2 = P3 * (1 - (p / 100));
+            if (P2 != null && w != null && P1 == null) P1 = P2 * (1 - (w / 100));
+
+            // Round for display
+            const rP1 = roundRUB(P1);
+            const rP2 = roundRUB(P2);
+            const rP3 = roundRUB(P3);
+            const rP4 = roundRUB(P4);
+
+            els.vP1.textContent = fmt(rP1);
+            els.vP2.textContent = fmt(rP2);
+            els.vP3.textContent = fmt(rP3);
+            els.vP4.textContent = fmt(rP4);
+
+            const f2 = (x) =>
+                x == null || !Number.isFinite(x)
+                    ? "—"
+                    : new Intl.NumberFormat("ru-RU", {
+                        maximumFractionDigits: 2,
+                        minimumFractionDigits: 0,
+                    }).format(x) + " %";
+
+            els.vw.textContent = f2(w);
+            els.vp.textContent = f2(p);
+            els.vs.textContent = f2(s);
+
+            els.hint.textContent = notes.length ? "Проверка: " + notes.join("; ") : "";
+            els.status.textContent = "Готово";
+        }
+
+        function clearAll() {
+            ["P1", "P2", "P3", "P4", "w", "p", "s"].forEach((k) => (els[k].value = ""));
+            ["vP1", "vP2", "vP3", "vP4", "vp", "vw", "vs"].forEach((k) => (els[k].textContent = "—"));
+            els.hint.textContent = "";
+            els.status.textContent = "Очищено";
+        }
+
+        ["P1", "P2", "P3", "P4", "w", "p", "s"].forEach((id) => {
+            els[id].addEventListener("input", solve);
+            els[id].addEventListener("change", solve);
+            els[id].addEventListener("keydown", (e) => { if (e.key === "Enter") solve(); });
+        });
+        els.solveBtn.addEventListener("click", solve);
+        els.clearBtn.addEventListener("click", clearAll);
+
+        solve();
+    </script>
+</body>
+
+</html>
