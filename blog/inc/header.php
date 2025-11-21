@@ -1,3 +1,19 @@
+<?php
+require_once __DIR__ . '/functions.php';
+$postsDir = dirname(__DIR__) . '/posts';
+$catSet = [];
+
+foreach (glob($postsDir.'/*.html') as $f) {
+    $h = file_get_contents($f);
+    $m = parse_meta_from_html($h);
+    foreach ($m['categories'] as $c) {
+        if ($c !== '') $catSet[$c] = true;
+    }
+}
+$categoriesForNav = array_keys($catSet);
+natsort($categoriesForNav); // simple sort
+?>
+
 <!DOCTYPE html>
 <html class="no-js" lang="ru_RU">
 <head>
@@ -66,7 +82,18 @@
     <nav class="header__nav-wrap">
       <ul class="header__nav">
         <li class="current"><a href="index.php" title="">Главная</a></li>
-        <li><a href="#" title="">Категории</a></li>
+        <li class="has-children">
+  <a href="#0" title="">Категории</a>
+  <ul class="sub-menu">
+    <?php if (!empty($categoriesForNav)): ?>
+      <?php foreach ($categoriesForNav as $cat): ?>
+        <li><a href="/blog/category/<?= urlencode($cat) ?>"><?= e($cat) ?></a></li>
+      <?php endforeach; ?>
+    <?php else: ?>
+      <li><a href="#0">Нет категорий</a></li>
+    <?php endif; ?>
+  </ul>
+</li>
         <li><a href="#" title="">Блог</a></li>
         <li><a href="#" title="">О нас</a></li>
         <li><a href="#" title="">Контакты</a></li>
