@@ -41,7 +41,7 @@ $html = file_get_contents($path);
 // Optional: set page title from first H1
 $pageTitle = 'Post';
 if (preg_match('/<h1[^>]*>(.*?)<\/h1>/is', $html, $m)) {
-    $pageTitle = trim(strip_tags($m[1])) . ' - Typerite';
+    $pageTitle = trim(strip_tags($m[1])) . ' - Блог Мракетплейсы';
 }
 
 include __DIR__ . '/inc/header.php';

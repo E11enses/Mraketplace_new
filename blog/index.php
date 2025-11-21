@@ -109,7 +109,7 @@ if (preg_match('/^(\d{4}-\d{2}-\d{2})-/', $name, $m)) {
     <div class="column large-full">
       <nav class="pgn"><ul>
         <?php if ($page > 1): ?>
-          <li><a class="pgn__prev" href="?page=<?= $page - 1 ?>">Prev</a></li>
+          <li><a class="pgn__prev" href="?page=<?= $page - 1 ?>">Предыдущая</a></li>
         <?php endif; ?>
         <?php for ($i = 1; $i <= $pages; $i++): ?>
           <?php if ($i === $page): ?>
@@ -119,7 +119,7 @@ if (preg_match('/^(\d{4}-\d{2}-\d{2})-/', $name, $m)) {
           <?php endif; ?>
         <?php endfor; ?>
         <?php if ($page < $pages): ?>
-          <li><a class="pgn__next" href="?page=<?= $page + 1 ?>">Next</a></li>
+          <li><a class="pgn__next" href="?page=<?= $page + 1 ?>">Следующая</a></li>
         <?php endif; ?>
       </ul></nav>
     </div>

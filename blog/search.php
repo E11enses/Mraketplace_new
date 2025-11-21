@@ -77,9 +77,9 @@ include __DIR__ . '/inc/header.php';
 ?>
 <div class="s-content">
   <header class="listing-header">
-    <h1 class="h2">Search: <?= htmlspecialchars($q ?: 'All', ENT_QUOTES, 'UTF-8') ?></h1>
+    <h1 class="h2">Поиск: <?= htmlspecialchars($q ?: 'All', ENT_QUOTES, 'UTF-8') ?></h1>
     <?php if ($q !== ''): ?>
-      <p><?= $total ?> result<?= $total == 1 ? '' : 's' ?> found</p>
+      <p><?= $total ?> результатов<?= $total == 1 ? '' : 's' ?> найдено</p>
     <?php endif; ?>
   </header>
 
@@ -88,11 +88,11 @@ include __DIR__ . '/inc/header.php';
       <div class="grid-sizer"></div>
       <?php if ($q === ''): ?>
         <div class="column large-full">
-          <p>Please enter keywords in the search box.</p>
+          <p>Введите поисковый запрос.</p>
         </div>
       <?php elseif ($total === 0): ?>
         <div class="column large-full">
-          <p>No results for "<?= htmlspecialchars($q, ENT_QUOTES, 'UTF-8') ?>".</p>
+          <p>Не нашли результатов для "<?= htmlspecialchars($q, ENT_QUOTES, 'UTF-8') ?>".</p>
         </div>
       <?php else: ?>
         <?php foreach ($slice as $r): ?>
@@ -129,7 +129,7 @@ include __DIR__ . '/inc/header.php';
   <div class="row"><div class="column large-full">
     <nav class="pgn"><ul>
       <?php if ($page > 1): ?>
-        <li><a class="pgn__prev" href="?q=<?= urlencode($q) ?>&page=<?= $page - 1 ?>">Prev</a></li>
+        <li><a class="pgn__prev" href="?q=<?= urlencode($q) ?>&page=<?= $page - 1 ?>">Предыдущая</a></li>
       <?php endif; ?>
       <?php for ($i = 1; $i <= $pages; $i++): ?>
         <?php if ($i === $page): ?>
@@ -139,7 +139,7 @@ include __DIR__ . '/inc/header.php';
         <?php endif; ?>
       <?php endfor; ?>
       <?php if ($page < $pages): ?>
-        <li><a class="pgn__next" href="?q=<?= urlencode($q) ?>&page=<?= $page + 1 ?>">Next</a></li>
+        <li><a class="pgn__next" href="?q=<?= urlencode($q) ?>&page=<?= $page + 1 ?>">Следующая</a></li>
       <?php endif; ?>
     </ul></nav>
   </div></div>

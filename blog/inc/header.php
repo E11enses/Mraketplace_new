@@ -75,7 +75,7 @@
         <li class="ss-vk"><a href="https://vk.com"><span class="screen-reader-text">VK</span></a></li>
       </ul>
     </nav>
-    <a href="#0" class="header__menu-toggle"><span>Menu</span></a>
+    <a href="#0" class="header__menu-toggle"><span>Меню</span></a>
   </header>
   <!-- End header -->
 <!-- search
@@ -86,7 +86,7 @@
     
                 <form role="search" method="get" class="search-form" action="/blog/search.php">
   <label>
-    <span class="hide-content">Search for:</span>
+    <span class="hide-content">Искать:</span>
     <input type="search" class="search-field" placeholder="Type Keywords" value="" name="q" title="Search for:" autocomplete="off">
   </label>
   <input type="submit" class="search-submit" value="Search">
