@@ -2887,7 +2887,7 @@ body.search-is-visible {
 }
 
 .search-trigger span {
-    content: "Search";
+    content: "Искать";
     width: auto;
     -webkit-transform: rotate(-90deg);
     transform: rotate(-90deg);
