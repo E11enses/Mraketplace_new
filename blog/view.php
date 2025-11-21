@@ -3,6 +3,8 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 date_default_timezone_set('Europe/Moscow');
 
+require __DIR__ . '/inc/functions.php';
+
 $postsDir = __DIR__ . '/posts';
 
 // Accept either pretty slug (?slug=...) or fallback (?f=filename.html)
@@ -37,6 +39,7 @@ if (!$path) {
 }
 
 $html = file_get_contents($path);
+$meta = parse_meta_from_html($html);
 
 // Optional: set page title from first H1
 $pageTitle = 'Post';
@@ -49,7 +52,20 @@ include __DIR__ . '/inc/header.php';
 <div class="s-content content">
   <main class="row content__page">
     <article class="column large-full entry format-standard">
-      <?= $html ?>
+      <div class="entry__content">
+        <?= $html ?>
+
+        <?php if (!empty($meta['tags'])): ?>
+        <p class="entry__tags">
+          <span>Теги</span>
+          <span class="entry__tag-list">
+            <?php foreach ($meta['tags'] as $t): ?>
+              <a href="/blog/tag/<?= urlencode($t) ?>"><?= e($t) ?></a>
+            <?php endforeach; ?>
+          </span>
+        </p>
+        <?php endif; ?>
+      </div>
     </article>
   </main>
 </div>
