@@ -42,6 +42,12 @@
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
     <link rel="manifest" href="/favicon/site.webmanifest" />
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/blog/css/base.css">
+    <link rel="stylesheet" href="/blog/css/vendor.css">
+    <link rel="stylesheet" href="/blog/css/main.css">
+    
 </head>
 <body>
 <div id="preloader"><div id="loader" class="dots-fade"><div></div><div></div><div></div></div></div>
