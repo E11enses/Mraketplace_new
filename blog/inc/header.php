@@ -87,12 +87,12 @@
                 <form role="search" method="get" class="search-form" action="/blog/search.php">
   <label>
     <span class="hide-content">Искать:</span>
-    <input type="search" class="search-field" placeholder="Type Keywords" value="" name="q" title="Search for:" autocomplete="off">
+    <input type="search" class="search-field" placeholder="Вводите запрос" value="" name="q" title="Search for:" autocomplete="off">
   </label>
   <input type="submit" class="search-submit" value="Search">
 </form>
     
-                <a href="#0" title="Close Search" class="search-close">Close</a>
+                <a href="#0" title="Close Search" class="search-close">Закрыть поиск</a>
     
             </div>  <!-- end search-block -->
 
