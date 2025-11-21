@@ -61,6 +61,21 @@ function load_posts(string $dir): array {
   return $posts;
 }
 
+function format_date_ru(string $ymd): string {
+    // Expecting YYYY-MM-DD (from filename or front matter)
+    $ts = strtotime($ymd);
+    if (!$ts) return $ymd;
+    $fmt = new IntlDateFormatter(
+        'ru_RU',
+        IntlDateFormatter::MEDIUM,
+        IntlDateFormatter::NONE,
+        date_default_timezone_get(),
+        IntlDateFormatter::GREGORIAN,
+        'd MMM yyyy' // e.g. 05 янв. 2025
+    );
+    return $fmt->format($ts);
+}
+
 function paginate(array $items, int $page, int $per_page): array {
   $total = count($items);
   $pages = max(1, (int)ceil($total / $per_page));

@@ -45,11 +45,11 @@ include __DIR__ . '/inc/header.php';
         $summary = trim(preg_replace('/\s+/', ' ', strip_tags($m[1])));
     }
     // date from filename
-    $name = basename($file, '.html');
-    $dateText = '';
-    if (preg_match('/^(\d{4}-\d{2}-\d{2})-/', $name, $m)) {
-        $dateText = date('M d, Y', strtotime($m[1]));
-    }
+$name = basename($file, '.html');
+$dateText = '';
+if (preg_match('/^(\d{4}-\d{2}-\d{2})-/', $name, $m)) {
+    $dateText = format_date_ru($m[1]); // 5 января 2025
+}
     $viewUrl = 'post/' . rawurlencode(preg_replace('/^\d{4}-\d{2}-\d{2}-/', '', $name));
     // thumb from HTML comment <!-- thumb: path -->
     $thumb = '';

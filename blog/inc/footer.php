@@ -2,8 +2,7 @@
   <div class="row">
     <div class="column large-full footer__content">
       <div class="footer__copyright">
-        <span>© Copyright Typerite <?= date('Y') ?></span>
-        <span>Design by <a href="https://www.styleshout.com/">StyleShout</a></span>
+        <span>© МРАКЕТПЛЕЙСЫ 2021-2025</span>
       </div>
     </div>
   </div>

@@ -3,7 +3,7 @@
   <div class="column large-full">
     <nav class="pgn"><ul>
       <?php if ($pager['page'] > 1): ?>
-        <li><a class="pgn__prev" href="?<?= http_build_query(array_merge($_GET, ['page'=>$pager['page']-1])) ?>">Prev</a></li>
+        <li><a class="pgn__prev" href="?<?= http_build_query(array_merge($_GET, ['page'=>$pager['page']-1])) ?>">Предыдущие</a></li>
       <?php endif; ?>
       <?php for ($i=1;$i<=$pager['pages'];$i++): ?>
         <?php if ($i == $pager['page']): ?>
@@ -13,7 +13,7 @@
         <?php endif; ?>
       <?php endfor; ?>
       <?php if ($pager['page'] < $pager['pages']): ?>
-        <li><a class="pgn__next" href="?<?= http_build_query(array_merge($_GET, ['page'=>$pager['page']+1])) ?>">Next</a></li>
+        <li><a class="pgn__next" href="?<?= http_build_query(array_merge($_GET, ['page'=>$pager['page']+1])) ?>">Следующие</a></li>
       <?php endif; ?>
     </ul></nav>
   </div>
