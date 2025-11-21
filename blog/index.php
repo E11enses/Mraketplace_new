@@ -44,6 +44,26 @@ include __DIR__ . '/inc/header.php';
     if (preg_match('/<p[^>]*>(.*?)<\/p>/is', $html, $m)) {
         $summary = trim(preg_replace('/\s+/', ' ', strip_tags($m[1])));
     }
+
+
+// make sure timezone is set earlier
+// date_default_timezone_set('Europe/Moscow');
+
+if (!function_exists('format_date_ru')) {
+    function format_date_ru(string $ymd): string {
+        $ts = strtotime($ymd);
+        if (!$ts) return $ymd;
+        $fmt = new IntlDateFormatter(
+            'ru_RU',
+            IntlDateFormatter::MEDIUM,
+            IntlDateFormatter::NONE,
+            date_default_timezone_get(),
+            IntlDateFormatter::GREGORIAN,
+            'd MMMM yyyy' // e.g., 5 января 2025
+        );
+        return $fmt->format($ts);
+    }
+}
     // date from filename
 $name = basename($file, '.html');
 $dateText = '';
