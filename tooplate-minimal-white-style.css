@@ -833,6 +833,48 @@ nav.scrolled {
     margin-right: 6px;
 }
 
+/* Filter bar */
+.tools-filter-bar {
+    max-width: 1040px;
+    margin: 0 auto 12px;
+    padding: 0 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.filter-chip {
+    appearance: none;
+    border: 1px solid #111;
+    background: #fff;
+    color: #111;
+    border-radius: 5px;
+    padding: 8px 10px;
+    font: 700 12px/1 Inter, system-ui;
+    cursor: pointer;
+    user-select: none;
+}
+
+.filter-chip[aria-pressed="true"] {
+    background: #000;
+    color: #fff;
+}
+
+.filter-chip:hover {
+    background: #000;
+    color: #fff;
+    transition: all 0.3s ease;
+}
+
+.filter-chip--all {
+    margin-right: 12px;
+}
+
+/* Hide helper */
+.is-hidden {
+    display: none !important;
+}
+
 /* Values Grid */
 .values-section {
     text-align: center;
