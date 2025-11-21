@@ -89,11 +89,15 @@ if (preg_match('/^(\d{4}-\d{2}-\d{2})-/', $name, $m)) {
           <div class="entry__header">
             <h2 class="entry__title"><a href="<?= htmlspecialchars($viewUrl) ?>"><?= htmlspecialchars($title) ?></a></h2>
             <div class="entry__meta">
-              <span class="entry__meta-cat"></span>
-              <span class="entry__meta-date">
-                <a href="<?= htmlspecialchars($viewUrl) ?>"><?= htmlspecialchars($dateText) ?></a>
-              </span>
-            </div>
+  <span class="entry__meta-cat">
+    <?php foreach ($meta['categories'] as $c): ?>
+      <a href="/blog/category/<?= urlencode($c) ?>"><?= htmlspecialchars($c) ?></a>
+    <?php endforeach; ?>
+  </span>
+  <span class="entry__meta-date">
+    <a href="<?= htmlspecialchars($viewUrl) ?>"><?= htmlspecialchars($dateText) ?></a>
+  </span>
+</div>
           </div>
           <div class="entry__excerpt">
             <p><?= htmlspecialchars(mb_strimwidth($summary, 0, 200, '…', 'UTF-8')) ?></p>
