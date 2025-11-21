@@ -47,7 +47,7 @@
     <link rel="stylesheet" href="/blog/css/base.css">
     <link rel="stylesheet" href="/blog/css/vendor.css">
     <link rel="stylesheet" href="/blog/css/main.css">
-    
+
 </head>
 <body>
 <div id="preloader"><div id="loader" class="dots-fade"><div></div><div></div><div></div></div></div>
@@ -59,7 +59,7 @@
     <div class="header__top">
       <div class="header__logo">
         <a class="site-logo" href="index.php">
-          МРАКЕТПЛЕЙСЫ
+          <img src="/blog/images/logo.svg" alt="">
         </a>
       </div>
     </div>
