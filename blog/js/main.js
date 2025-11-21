@@ -95,7 +95,7 @@
             e.stopPropagation();
         });
 
-        searchField.attr({ placeholder: 'Начните вводить запрос', autocomplete: 'off' });
+        searchField.attr({ placeholder: 'Введите запрос', autocomplete: 'off' });
 
     };
 
