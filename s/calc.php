@@ -25,7 +25,7 @@ if (!$state) {
 
 unset($state['_ts']);
 
-$calcPath = '/utilities/calc.html'; // your main calculator page
+$calcPath = 'utilities/calc.html'; // your main calculator page
 ?>
 <!doctype html>
 <html lang="ru">
