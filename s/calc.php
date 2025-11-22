@@ -25,7 +25,8 @@ if (!$state) {
 
 unset($state['_ts']);
 
-$calcPath = 'utilities/calc.html'; // your main calculator page
+// IMPORTANT: absolute path
+$calcPath = '/utilities/calc.html';
 ?>
 <!doctype html>
 <html lang="ru">
@@ -37,7 +38,6 @@ $calcPath = 'utilities/calc.html'; // your main calculator page
   <body>
     <script>
       try {
-        // Store a JSON STRING so your app can JSON.parse it
         sessionStorage.setItem(
           "calcState",
           JSON.stringify(<?php echo json_encode($state, JSON_UNESCAPED_UNICODE); ?>)
