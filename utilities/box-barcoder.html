@@ -1,0 +1,1226 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <title>
+      Генератор штрихкодов — мобильный, колонки, жирные 4 цифры, авто‑имя PDF
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- SheetJS (Excel) -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <!-- JsBarcode -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <!-- jsPDF UMD -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <!-- html2canvas -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+
+    <style>
+      :root {
+        --bg: #0f1220;
+        --card: #171a2b;
+        --text: #e7e9f3;
+        --muted: #a6accd;
+        --accent: #7aa2f7;
+        --border: #2a2f4a;
+
+        /* LANDSCAPE page (mm) — default 75×120 */
+        --page-mm-w: 120;
+        --page-mm-h: 75;
+
+        --preview-scale: 1;
+
+        /* Typography */
+        --title-font: 14px; /* for 75x120 by default */
+        --extra-font: 11px;
+
+        /* Spacing (mm) */
+        --page-pad-mm: 3;
+        --gap-title-bar-mm: 4;
+        --gap-bar-contents-mm: 4;
+        --cols-gap-mm: 8; /* wider gap for readability */
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        overflow-x: hidden; /* prevent tiny horizontal jitter */
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+          Helvetica, Arial;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      .header {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        background: #0f1220e6;
+        backdrop-filter: saturate(150%) blur(6px);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+      h1 {
+        margin: 0 0 10px;
+        font-size: 20px;
+        line-height: 1.2;
+      }
+
+      .topbar {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        align-items: center;
+      }
+      .controls {
+        display: flex;
+        gap: 10px;
+        align-items: stretch;
+        flex-wrap: wrap;
+      }
+
+      select,
+      button,
+      input[type="file"],
+      input[type="text"] {
+        height: 40px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        font-size: 14px;
+      }
+      select,
+      input[type="file"] {
+        background: var(--card);
+        color: var(--text);
+        padding: 0 12px;
+      }
+      input[type="file"] {
+        padding: 8px 12px;
+      }
+      input[type="text"] {
+        background: #1e2235;
+        color: var(--text);
+        padding: 0 12px;
+      }
+
+      button {
+        background: linear-gradient(180deg, #3853a1, #2d3a8c);
+        color: #fff;
+        border-color: #2f448f;
+        padding: 0 14px;
+        font-weight: 700;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      button.secondary {
+        background: linear-gradient(180deg, #202542, #171a2b);
+        color: var(--text);
+        border: 1px solid var(--border);
+        font-weight: 600;
+      }
+      button.danger {
+        background: #b91c1c;
+        border-color: #991b1b;
+        color: #fff;
+      }
+      button.ghost {
+        background: #1e2235;
+        color: var(--muted);
+        border: 1px solid var(--border);
+      }
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .status-row {
+        margin-top: 8px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+        font-size: 14px;
+      }
+
+      .container {
+        padding: 12px 16px 16px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: minmax(360px, 560px) 1fr;
+        gap: 16px;
+      }
+
+      .panel {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+      }
+      .panel h3 {
+        margin: 0 0 8px;
+        font-size: 16px;
+        color: var(--muted);
+      }
+      .hint {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+
+      .form {
+        display: grid;
+        gap: 10px;
+      }
+      .form-row {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        gap: 8px;
+        align-items: center;
+      }
+      .form-row label {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .form-row input,
+      .form-row select,
+      .form-row textarea {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px;
+        font-size: 14px;
+        background: #1e2235;
+        color: var(--text);
+      }
+      .form-row textarea {
+        min-height: 72px;
+        resize: vertical;
+      }
+      .row-inline {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .list-pages {
+        display: grid;
+        gap: 8px;
+        margin-top: 8px;
+        max-height: 40vh;
+        overflow: auto;
+      }
+      .page-item {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 8px;
+        background: #1e2235;
+        display: grid;
+        gap: 6px;
+        cursor: pointer;
+      }
+      .page-item.active {
+        border-color: #7aa2f7;
+        box-shadow: inset 0 0 0 2px #7aa2f744;
+        background: #202542;
+      }
+      .item-title {
+        font-weight: 700;
+        font-size: 14px;
+      }
+      .item-sub {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      /* PREVIEW */
+      .preview-viewport {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: #0f1220;
+        padding: 12px;
+        height: calc(100vh - 260px);
+        overflow-y: auto;
+        overflow-x: hidden; /* avoid horizontal wiggle */
+      }
+      .pages {
+        display: grid;
+        gap: 16px;
+        overflow-x: hidden;
+      }
+      .page-stage {
+        background: #0f1220;
+        overflow: hidden; /* clip sub-pixel bleed */
+        border-radius: 8px;
+        border: 1px solid #22263a;
+        padding: 8px;
+        box-sizing: content-box;
+      }
+      .page-inner {
+        width: calc(var(--page-mm-w) * 1mm);
+        min-height: calc(var(--page-mm-h) * 1mm);
+        background: #ffffff;
+        color: #111827;
+        transform-origin: top left;
+        transform: scale(var(--preview-scale));
+        display: flex;
+        flex-direction: column;
+        padding: calc(var(--page-pad-mm) * 1mm);
+      }
+      .page-title {
+        font-size: var(--title-font);
+        font-weight: 700;
+        text-align: center;
+        color: #111827;
+        margin-bottom: calc(var(--gap-title-bar-mm) * 1mm);
+      }
+      .label-figure {
+        margin: 0 0 calc(var(--gap-bar-contents-mm) * 1mm) 0;
+        overflow: hidden; /* clip fractional paint */
+      }
+      .label-figure svg {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .box-contents {
+        white-space: normal;
+        word-wrap: break-word;
+        font-size: var(--extra-font);
+        line-height: 1.35;
+        color: #111827;
+        text-align: left;
+      }
+      .box-contents.centered {
+        text-align: center;
+      }
+      .box-contents.multicol {
+        column-gap: calc(var(--cols-gap-mm) * 1mm);
+        column-fill: balance;
+      }
+
+      /* Export surface (off-screen) */
+      #exportSurface {
+        position: absolute;
+        left: -99999px;
+        top: -99999px;
+        background: #fff;
+        padding: 0;
+        margin: 0;
+      }
+      .xpage {
+        width: calc(var(--page-mm-w) * 3.7795275591px);
+        min-height: calc(var(--page-mm-h) * 3.7795275591px);
+        background: #fff;
+        color: #111827;
+        display: flex;
+        flex-direction: column;
+        padding: calc(var(--page-pad-mm) * 3.7795275591px);
+      }
+      .xtitle {
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: calc(var(--gap-title-bar-mm) * 3.7795275591px);
+      }
+      .xfigure {
+        margin: 0 0 calc(var(--gap-bar-contents-mm) * 3.7795275591px) 0;
+        overflow: hidden;
+      }
+      .xfigure svg {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      .xcontents {
+        text-align: left;
+      }
+      .xcols {
+        margin: 0 auto;
+        max-width: 170mm;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: calc(var(--cols-gap-mm) * 1mm);
+      }
+
+      .bold-last4 {
+        font-weight: 800;
+      }
+
+      /* ---------- Mobile enhancements ---------- */
+
+      @media (max-width: 960px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        .panel {
+          padding: 10px;
+        }
+      }
+
+      @media (max-width: 640px) {
+        :root {
+          --title-font: 13px;
+          --extra-font: 12px;
+          --cols-gap-mm: 8;
+        }
+
+        .header {
+          padding: 10px 12px;
+        }
+        h1 {
+          font-size: 18px;
+          margin-bottom: 6px;
+        }
+
+        .topbar {
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+
+        .controls {
+          width: 100%;
+          gap: 8px;
+        }
+        .controls > * {
+          flex: 1 1 auto;
+        }
+
+        select,
+        button,
+        input[type="file"],
+        input[type="text"] {
+          height: 44px;
+          font-size: 15px;
+        }
+
+        .form-row {
+          grid-template-columns: 1fr;
+          gap: 6px;
+        }
+        .form-row input,
+        .form-row textarea {
+          height: 44px;
+          font-size: 15px;
+        }
+        .form-row textarea {
+          min-height: 84px;
+        }
+
+        .list-pages {
+          max-height: 30vh;
+        }
+
+        .preview-viewport {
+          padding: 8px;
+          height: auto;
+          max-height: none;
+        }
+
+        .page-stage {
+          padding: 6px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="header">
+      <h1>Генератор штрихкодов</h1>
+      <div class="topbar">
+        <div class="controls">
+          <!-- Order: 75×120 (default), 58×40, A5, A4 -->
+          <select id="pageFormat" aria-label="Размер страницы (альбомная ориентация)">
+            <option value="75x120" selected>75 × 120 мм</option>
+            <option value="58x40">58 × 40 мм</option>
+            <option value="A5">A5 (210 × 148 мм)</option>
+            <option value="A4">A4 (297 × 210 мм)</option>
+          </select>
+
+          <input
+            id="globalWarehouse"
+            type="text"
+            inputmode="text"
+            autocapitalize="sentences"
+            autocomplete="off"
+            autocorrect="off"
+            placeholder="Склад + дата (прим.: Коледино 22.11)"
+          />
+          <input
+            id="entranceCode"
+            type="text"
+            inputmode="text"
+            autocapitalize="characters"
+            autocomplete="off"
+            autocorrect="off"
+            placeholder="Код пропуска авто (прим.: WB-GI-1234567890)"
+          />
+          <button id="btnGenEntrancePages" class="secondary" type="button">
+            Добавить страницы с пропуском
+          </button>
+          <button
+            id="btnClearEntrancePages"
+            class="ghost"
+            type="button"
+            title="Удалить только страницы пропусков"
+          >
+            Очистить пропуски
+          </button>
+        </div>
+        <div class="status-row">
+          <div id="status" class="ok">Готово</div>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="grid">
+        <section class="panel">
+          <h3>Импорт из Excel (Wildberries)</h3>
+          <div class="hint">
+            A: «Баркод товара», B: «Кол-во», C: «ШК короба». Если строк ≤5 —
+            одна колонка (центр). Если ≥6 — две колонки, максимально ровные.
+            Последние 4 цифры кода товара выделяются жирным.
+          </div>
+          <div class="row-inline">
+            <input
+              id="wbFile"
+              type="file"
+              accept=".xlsx,.xls,.csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv"
+            />
+            <button id="btnImportWB" class="secondary" type="button">
+              Импорт из WB
+            </button>
+          </div>
+
+          <div style="height:1px;background:var(--border);margin:10px 0;"></div>
+
+          <h3>Список этикеток</h3>
+          <div class="hint">Нажмите по этикетке для редактирования</div>
+          <div id="labelsList" class="list-pages"></div>
+
+          <div style="height:1px;background:var(--border);margin:10px 0;"></div>
+
+          <h3>Редактор этикетки</h3>
+          <form id="editor" class="form" autocomplete="off">
+            <div class="form-row">
+              <label>Номер ШК (Code128)</label>
+              <input
+                id="i_text"
+                type="text"
+                inputmode="text"
+                autocapitalize="off"
+                autocomplete="off"
+                autocorrect="off"
+                spellcheck="false"
+                placeholder="например, WB_1478418584 или 5901234123457"
+              />
+            </div>
+
+            <div class="form-row">
+              <label>Содержимое коробки (из Excel)</label>
+              <textarea
+                id="i_extra"
+                placeholder="например: 2041903715071 × 10&#10;2045515308010 × 2"
+              ></textarea>
+            </div>
+
+            <div class="form-row">
+              <label>Размер штрихкода</label>
+              <div class="row-inline">
+                <input
+                  id="i_width"
+                  type="number"
+                  inputmode="numeric"
+                  min="1"
+                  max="10"
+                  value="2"
+                />
+                <input
+                  id="i_height"
+                  type="number"
+                  inputmode="numeric"
+                  min="20"
+                  max="300"
+                  value="100"
+                />
+                <span class="hint">ширина модуля и высота</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label>Размер шрифта содержимого</label>
+              <input
+                id="i_fontSize"
+                type="number"
+                inputmode="numeric"
+                min="8"
+                max="48"
+                value="11"
+              />
+            </div>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;">
+              <button id="btnApply" type="button" class="secondary">
+                Сохранить изменения
+              </button>
+              <button id="btnAddEmpty" type="button" class="secondary">
+                Добавить пустую этикетку
+              </button>
+              <button id="btnDelete" type="button" class="danger">
+                Удалить этикетку
+              </button>
+            </div>
+          </form>
+
+          <div style="height:1px;background:var(--border);margin:10px 0;"></div>
+
+          <div class="row-inline">
+            <button id="btnExport" type="button">Скачать PDF</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h3>Предпросмотр</h3>
+          <div id="previewViewport" class="preview-viewport">
+            <div id="pagesPreview" class="pages"></div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Export surface (off-screen) -->
+    <div id="exportSurface"></div>
+
+    <script>
+      function getJsPDF() {
+        if (window.jspdf && window.jspdf.jsPDF) return window.jspdf.jsPDF;
+        if (window.jsPDF) return window.jsPDF;
+        throw new Error("jsPDF library is not available");
+      }
+      function safeFilePart(s) {
+        return (s || "")
+          .trim()
+          .replace(/[\\/:*?"<>|\u0000-\u001f]/g, "_")
+          .replace(/\s+/g, " ")
+          .slice(0, 120);
+      }
+
+      const els = {
+        labelsList: document.getElementById("labelsList"),
+        pagesPreview: document.getElementById("pagesPreview"),
+        previewViewport: document.getElementById("previewViewport"),
+        pageFormat: document.getElementById("pageFormat"),
+        wbFile: document.getElementById("wbFile"),
+        btnImportWB: document.getElementById("btnImportWB"),
+        btnAddEmpty: document.getElementById("btnAddEmpty"),
+        btnExport: document.getElementById("btnExport"),
+        btnApply: document.getElementById("btnApply"),
+        btnDelete: document.getElementById("btnDelete"),
+        btnGenEntrancePages: document.getElementById("btnGenEntrancePages"),
+        btnClearEntrancePages: document.getElementById("btnClearEntrancePages"),
+        globalWarehouse: document.getElementById("globalWarehouse"),
+        entranceCode: document.getElementById("entranceCode"),
+        status: document.getElementById("status"),
+        i_text: document.getElementById("i_text"),
+        i_extra: document.getElementById("i_extra"),
+        i_width: document.getElementById("i_width"),
+        i_height: document.getElementById("i_height"),
+        i_fontSize: document.getElementById("i_fontSize"),
+        exportSurface: document.getElementById("exportSurface"),
+      };
+
+      const CONST = { quietZone: 15 };
+
+      let labels = [];
+      let activeIndex = -1;
+      let entrancePages = [];
+
+      function setFormatLandscape(key) {
+        const root = document.documentElement.style;
+        switch (key) {
+          case "A5":
+            root.setProperty("--page-mm-w", "210");
+            root.setProperty("--page-mm-h", "148");
+            root.setProperty("--title-font", "16px");
+            root.setProperty("--extra-font", "12px");
+            break;
+          case "75x120":
+            root.setProperty("--page-mm-w", "120");
+            root.setProperty("--page-mm-h", "75");
+            root.setProperty("--title-font", "14px");
+            root.setProperty("--extra-font", "11px");
+            break;
+          case "58x40":
+            root.setProperty("--page-mm-w", "58");
+            root.setProperty("--page-mm-h", "40");
+            root.setProperty("--title-font", "12px");
+            root.setProperty("--extra-font", "10px");
+            break;
+          case "A4":
+          default:
+            root.setProperty("--page-mm-w", "297");
+            root.setProperty("--page-mm-h", "210");
+            root.setProperty("--title-font", "18px");
+            root.setProperty("--extra-font", "12px");
+            break;
+        }
+        requestAnimationFrame(updatePreviewScale);
+      }
+
+      function updatePreviewScale() {
+        const sample = document.querySelector(".page-inner");
+        if (!sample) return;
+
+        // reset scale
+        document.documentElement.style.setProperty("--preview-scale", "1");
+
+        const stage = sample.closest(".page-stage");
+        if (!stage) return;
+
+        const stageRect = stage.getBoundingClientRect();
+        const pageRect = sample.getBoundingClientRect();
+
+        // guard a few px to eliminate fractional overflows
+        const guard = 6;
+        const availW = Math.max(100, stageRect.width - guard);
+
+        let scale = Math.min(1, availW / pageRect.width);
+
+        // trim to 3 decimals to avoid 1-2 px rounding overflows
+        scale = Math.max(0, Math.floor(scale * 1000) / 1000);
+
+        document.documentElement.style.setProperty(
+          "--preview-scale",
+          String(scale)
+        );
+      }
+
+      function emptyLabel() {
+        return {
+          text: "",
+          extraText: "",
+          options: { width: 2, height: 100, fontSize: 11 },
+        };
+      }
+      function validateInput(t) {
+        return t.length > 0;
+      }
+      function escapeHtml(v) {
+        return String(v)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      function renderList() {
+        els.labelsList.innerHTML = labels
+          .map(
+            (l, i) => `
+          <div class="page-item ${i === activeIndex ? "active" : ""}" data-i="${i}">
+            <div class="item-title">${
+              escapeHtml((l.text || "").trim() || `Этикетка ${i + 1}`)
+            }</div>
+            <div class="item-sub">${l.options.width}×${
+              l.options.height
+            } • цифры видимы</div>
+          </div>`
+          )
+          .join("");
+        els.labelsList.querySelectorAll(".page-item").forEach((el) => {
+          el.addEventListener("click", () => {
+            activeIndex = Number(el.getAttribute("data-i"));
+            syncUI();
+          });
+        });
+      }
+
+      function renderLineWithBoldLast4(line) {
+        const m = line.match(/^(.*?)(?:\s*[×x]\s*)(.+)$/);
+        let code = line,
+          qty = "";
+        if (m) {
+          code = m[1];
+          qty = m[2];
+        }
+        const codeTrim = code.trim();
+        const mDigits = codeTrim.match(/(\d{1,4})\s*$/);
+        let html = "";
+        if (mDigits) {
+          const idx = codeTrim.lastIndexOf(mDigits[1]);
+          const head = codeTrim.slice(0, idx);
+          const tailBold = mDigits[1];
+          html = `${escapeHtml(head)}<span class="bold-last4">${escapeHtml(
+            tailBold
+          )}</span>`;
+        } else {
+          html = escapeHtml(codeTrim);
+        }
+        if (qty) return `${html} × ${escapeHtml(qty.trim())}`;
+        return html;
+      }
+
+      function loadEditorFromModel() {
+        const dis = (f) =>
+          [
+            els.i_text,
+            els.i_extra,
+            els.i_width,
+            els.i_height,
+            els.i_fontSize,
+          ].forEach((i) => (i.disabled = f));
+        if (activeIndex < 0) {
+          dis(true);
+          return;
+        }
+        dis(false);
+        const l = labels[activeIndex],
+          o = l.options;
+        els.i_text.value = l.text || "";
+        els.i_extra.value = l.extraText || "";
+        els.i_width.value = o.width;
+        els.i_height.value = o.height;
+        els.i_fontSize.value = o.fontSize;
+      }
+      function saveEditorToModel() {
+        if (activeIndex < 0) return;
+        const l = labels[activeIndex],
+          o = l.options;
+        l.text = (els.i_text.value || "").trim();
+        l.extraText = (els.i_extra.value || "").trim();
+        o.width = Math.min(10, Math.max(1, parseInt(els.i_width.value || "2", 10)));
+        o.height = Math.min(300, Math.max(20, parseInt(els.i_height.value || "100", 10)));
+        o.fontSize = Math.min(48, Math.max(8, parseInt(els.i_fontSize.value || "11", 10)));
+      }
+
+      function renderPreview() {
+        const all = [...labels, ...entrancePages];
+        els.pagesPreview.innerHTML = all
+          .map(
+            () => `
+          <div class="page-stage">
+            <section class="page-inner">
+              <div class="page-title"></div>
+              <figure class="label-figure"><svg class="barcode-svg"></svg></figure>
+              <div class="box-contents"></div>
+            </section>
+          </div>`
+          )
+          .join("");
+
+        const title = (els.globalWarehouse.value || "").trim();
+
+        document.querySelectorAll(".page-stage").forEach((stageEl, idx) => {
+          const inner = stageEl.querySelector(".page-inner");
+          inner.querySelector(".page-title").textContent = title;
+
+          const item = all[idx];
+
+          // Barcode
+          const svg = inner.querySelector(".barcode-svg");
+          if (item && validateInput(item.text)) {
+            try {
+              JsBarcode(svg, item.text, {
+                format: "CODE128",
+                lineColor: "#000000",
+                background: "#FFFFFF",
+                width: item.options.width,
+                height: item.options.height,
+                margin: CONST.quietZone,
+                displayValue: true,
+                fontOptions: "bold",
+                font: "monospace",
+                textMargin: 6,
+              });
+            } catch (e) {
+              console.warn("Barcode error:", e);
+            }
+          }
+
+          // Contents: ≤5 → single centered; ≥6 → two columns
+          const cont = inner.querySelector(".box-contents");
+          const lines = (item.extraText || "").split(/\r?\n/).filter(Boolean);
+          cont.style.fontSize = `${item.options.fontSize}px`;
+          cont.innerHTML = "";
+
+          if (lines.length <= 5) {
+            cont.classList.remove("multicol");
+            cont.classList.add("centered");
+            cont.style.columnCount = "1";
+            for (const ln of lines) {
+              const d = document.createElement("div");
+              d.innerHTML = renderLineWithBoldLast4(ln);
+              cont.appendChild(d);
+            }
+          } else {
+            cont.classList.add("multicol");
+            cont.classList.remove("centered");
+            cont.style.columnCount = "2";
+            for (const ln of lines) {
+              const d = document.createElement("div");
+              d.innerHTML = renderLineWithBoldLast4(ln);
+              cont.appendChild(d);
+            }
+          }
+        });
+
+        requestAnimationFrame(updatePreviewScale);
+      }
+
+      // Export with same rules + centered two-column grid + smart filename
+      async function exportPDF() {
+        const total = labels.length + entrancePages.length;
+        if (!total) {
+          els.status.textContent = "Нет этикеток для экспорта";
+          return;
+        }
+
+        els.btnExport.disabled = true;
+        const prev = els.btnExport.textContent;
+        els.btnExport.textContent = "Генерация...";
+        els.status.textContent = "Генерация PDF...";
+
+        try {
+          const fmt = els.pageFormat.value;
+          setFormatLandscape(fmt);
+          renderPreview();
+          await new Promise((r) => setTimeout(r, 60));
+
+          const JS = getJsPDF();
+          const mm2px = 3.7795275591;
+          const mmW = parseFloat(
+            getComputedStyle(document.documentElement).getPropertyValue(
+              "--page-mm-w"
+            )
+          );
+          const mmH = parseFloat(
+            getComputedStyle(document.documentElement).getPropertyValue(
+              "--page-mm-h"
+            )
+          );
+          const pxW = Math.round(mmW * mm2px);
+          const pxH = Math.round(mmH * mm2px);
+          const scale = fmt === "58x40" || fmt === "75x120" ? 3 : 2;
+
+          const surface = els.exportSurface;
+          surface.innerHTML = "";
+          surface.style.width = pxW + "px";
+          surface.style.height = pxH + "px";
+
+          const pages = [...labels, ...entrancePages];
+          const titleText = (els.globalWarehouse.value || "").trim();
+
+          for (const item of pages) {
+            const page = document.createElement("section");
+            page.className = "xpage";
+            page.style.width = pxW + "px";
+            page.style.minHeight = pxH + "px";
+
+            const title = document.createElement("div");
+            title.className = "xtitle";
+            title.style.fontSize = getComputedStyle(
+              document.documentElement
+            ).getPropertyValue("--title-font");
+            title.textContent = titleText;
+            page.appendChild(title);
+
+            const fig = document.createElement("figure");
+            fig.className = "xfigure";
+            const svg = document.createElementNS(
+              "http://www.w3.org/2000/svg",
+              "svg"
+            );
+            fig.appendChild(svg);
+            page.appendChild(fig);
+
+            const cont = document.createElement("div");
+            cont.className = "xcontents";
+            cont.style.fontSize = `${item.options.fontSize}px`;
+
+            const lines = (item.extraText || "").split(/\r?\n/).filter(Boolean);
+
+            if (lines.length <= 5) {
+              cont.style.textAlign = "center";
+              const wrap = document.createElement("div");
+              wrap.style.whiteSpace = "pre-wrap";
+              for (const ln of lines) {
+                const div = document.createElement("div");
+                div.innerHTML = renderLineWithBoldLast4(ln);
+                wrap.appendChild(div);
+              }
+              cont.appendChild(wrap);
+            } else {
+              const n = lines.length;
+              const leftCount = Math.floor(n / 2);
+              const rightCount = n - leftCount;
+
+              const grid = document.createElement("div");
+              grid.className = "xcols";
+
+              const left = document.createElement("div");
+              left.style.whiteSpace = "pre-wrap";
+              for (const ln of lines.slice(0, leftCount)) {
+                const div = document.createElement("div");
+                div.innerHTML = renderLineWithBoldLast4(ln);
+                left.appendChild(div);
+              }
+
+              const right = document.createElement("div");
+              right.style.whiteSpace = "pre-wrap";
+              for (const ln of lines.slice(leftCount)) {
+                const div = document.createElement("div");
+                div.innerHTML = renderLineWithBoldLast4(ln);
+                right.appendChild(div);
+              }
+
+              grid.appendChild(left);
+              grid.appendChild(right);
+              cont.appendChild(grid);
+            }
+
+            page.appendChild(cont);
+            surface.appendChild(page);
+
+            if (validateInput(item.text)) {
+              JsBarcode(svg, item.text, {
+                format: "CODE128",
+                lineColor: "#000000",
+                background: "#FFFFFF",
+                width: item.options.width,
+                height: item.options.height,
+                margin: CONST.quietZone,
+                displayValue: true,
+                fontOptions: "bold",
+                font: "monospace",
+                textMargin: 6,
+              });
+            }
+          }
+
+          // Smart filename: Warehouse + count of boxes (labels only)
+          const boxesCount = labels.length;
+          const whRaw = els.globalWarehouse.value || "";
+          const wh = safeFilePart(whRaw) || "Без_склада_и_даты";
+          const filename = `${wh} — коробов ${boxesCount}.pdf`;
+
+          const pdf = new JS({
+            unit: "mm",
+            format: [mmW, mmH],
+            orientation: "landscape",
+          });
+
+          const nodes = surface.querySelectorAll(".xpage");
+          for (let i = 0; i < nodes.length; i++) {
+            const canvas = await html2canvas(nodes[i], {
+              backgroundColor: "#ffffff",
+              scale,
+              useCORS: true,
+              scrollX: 0,
+              scrollY: 0,
+            });
+            const dataURL = canvas.toDataURL("image/jpeg", 0.98);
+            if (i > 0) pdf.addPage([mmW, mmH], "landscape");
+            pdf.addImage(dataURL, "JPEG", 0, 0, mmW, mmH);
+          }
+
+          pdf.save(filename);
+          els.status.textContent = "PDF сохранён";
+        } catch (e) {
+          console.error(e);
+          els.status.textContent = "Ошибка генерации PDF";
+          alert("Ошибка при генерации PDF: " + e.message);
+        } finally {
+          els.btnExport.disabled = false;
+          els.btnExport.textContent = "Скачать PDF";
+          els.exportSurface.innerHTML = "";
+        }
+      }
+
+      // WB Import (A: item, B: qty, C: box)
+      async function importWBFile(file) {
+        if (!window.XLSX) throw new Error("XLSX library is not available");
+        els.status.textContent = "Чтение файла...";
+        const buf = await file.arrayBuffer();
+        const wb = XLSX.read(buf, { type: "array" });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false });
+        if (!rows || rows.length < 2) {
+          els.status.textContent = "Файл пуст или без данных.";
+          return;
+        }
+        const groups = new Map();
+        for (const r of rows.slice(1)) {
+          if (!r || r.length === 0) continue;
+          const A = String(r[0] || "").trim();
+          const B = String(r[1] || "").trim();
+          const C = String(r[2] || "").trim();
+          if (!C) continue;
+          if (!groups.has(C)) groups.set(C, []);
+          if (A || B) groups.get(C).push(`${A} × ${(+B || 1)}`);
+        }
+        if (!groups.size) {
+          els.status.textContent =
+            "Не найдено данных по столбцу «ШК короба» (C).";
+        } else {
+          labels = [];
+          for (const [box, lines] of groups.entries()) {
+            labels.push({
+              text: box,
+              extraText: lines.join("\n"),
+              options: { width: 2, height: 100, fontSize: 11 },
+            });
+          }
+          activeIndex = labels.length ? 0 : -1;
+          entrancePages = []; // reset pass pages after import
+          syncUI();
+          els.status.textContent = `Импортировано этикеток: ${labels.length}`;
+        }
+      }
+
+      function generateEntrancePages() {
+        const code = (els.entranceCode.value || "").trim();
+        if (!code) {
+          alert("Введите код пропуска авто (формат: WB-GI-1234567890).");
+          return;
+        }
+        const count = labels.length;
+        if (!count) {
+          alert("Сначала импортируйте этикетки или добавьте хотя бы одну.");
+          return;
+        }
+        entrancePages = [];
+        for (let i = 0; i < count; i++) {
+          entrancePages.push({
+            _type: "entrance",
+            text: code,
+            extraText: "",
+            options: { width: 2, height: 100, fontSize: 14 },
+          });
+        }
+        renderPreview();
+        els.status.textContent = `Добавлено страниц с пропуском: ${entrancePages.length}`;
+      }
+
+      // Clear only entrance code pages
+      function clearEntrancePages() {
+        if (!entrancePages.length) {
+          els.status.textContent = "Нет страниц пропусков для удаления";
+          return;
+        }
+        entrancePages = [];
+        renderPreview();
+        els.status.textContent = "Страницы пропусков удалены";
+      }
+
+      // Bindings
+      els.btnImportWB.addEventListener("click", async () => {
+        const f = els.wbFile.files?.[0];
+        if (!f) {
+          alert("Выберите Excel-файл (WB) перед импортом.");
+          return;
+        }
+        try {
+          await importWBFile(f);
+        } catch (e) {
+          console.error(e);
+          alert("Ошибка чтения файла: " + e.message);
+          els.status.textContent = "Ошибка чтения файла";
+        }
+      });
+
+      els.btnAddEmpty.addEventListener("click", () => {
+        labels.push(emptyLabel());
+        activeIndex = labels.length - 1;
+        syncUI();
+        setTimeout(() => els.i_text?.focus(), 50);
+      });
+
+      els.btnDelete.addEventListener("click", () => {
+        if (activeIndex < 0) return;
+        if (!confirm("Удалить текущую этикетку?")) return;
+        labels.splice(activeIndex, 1);
+        activeIndex = labels.length ? Math.min(activeIndex, labels.length - 1) : -1;
+        syncUI();
+      });
+
+      els.btnApply.addEventListener("click", () => {
+        saveEditorToModel();
+        syncUI();
+        els.status.textContent = "Изменения сохранены";
+      });
+
+      els.pageFormat.addEventListener("change", (e) => {
+        setFormatLandscape(e.target.value);
+        renderPreview();
+      });
+
+      els.btnGenEntrancePages.addEventListener("click", generateEntrancePages);
+      els.btnClearEntrancePages.addEventListener("click", clearEntrancePages);
+
+      els.globalWarehouse.addEventListener("input", renderPreview);
+
+      els.btnExport.addEventListener("click", exportPDF);
+
+      document
+        .querySelectorAll("#editor input, #editor textarea, #editor select")
+        .forEach((inp) => {
+          inp.addEventListener("input", () => {
+            saveEditorToModel();
+            renderPreview();
+          });
+        });
+
+      // Throttled resize/orientation scaling
+      (function () {
+        let rafId = null;
+        function onResize() {
+          if (rafId) return;
+          rafId = requestAnimationFrame(() => {
+            rafId = null;
+            updatePreviewScale();
+          });
+        }
+        window.addEventListener("resize", onResize);
+        window.addEventListener("orientationchange", onResize);
+      })();
+
+      function syncUI() {
+        loadEditorFromModel();
+        renderList();
+        renderPreview();
+      }
+
+      // INIT — default 75×120
+      setFormatLandscape("75x120");
+      labels.push(emptyLabel());
+      activeIndex = 0;
+      syncUI();
+    </script>
+  </body>
+</html>
