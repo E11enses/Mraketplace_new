@@ -1,13 +1,19 @@
 <?php
 // api/wb-promotions-details.php
-// Returns detailed promotions list (name, description, advantages, counts, etc.)
-// from WB endpoint: GET /api/v1/calendar/promotions/details
+// Fetches detailed info for specific promotions.
+// Usage example:
+//   /api/wb-promotions-details.php?promotionIDs=1&promotionIDs=3&promotionIDs=64
+//
+// Notes:
+// - Up to 100 promotionIDs allowed (per WB docs)
+// - Token loading: ENV WB_ADS_TOKEN -> file api/wb_ads_token.php (plain text)
+// - Header: Authorization: <token> (switch to X-Api-Key if your account requires it)
 
 declare(strict_types=1);
 ini_set('display_errors', '1');
 error_reporting(E_ALL);
 
-// Token: ENV -> file wb_ads_token.php (plain text)
+// 1) Load token
 $token = getenv('WB_ADS_TOKEN');
 if (!$token) {
   $secretFile = __DIR__ . '/wb_ads_token.php';
@@ -26,41 +32,55 @@ if (!$token) {
   exit;
 }
 
-function rfc3339_utc(int $ts): string {
-  return gmdate('Y-m-d\TH:i:s\Z', $ts);
+// 2) Read promotionIDs from query (repeated param)
+// Accept both promotionIDs[]=1&promotionIDs[]=2 and promotionIDs=1&promotionIDs=2
+$ids = [];
+if (isset($_GET['promotionIDs'])) {
+  $raw = $_GET['promotionIDs'];
+  if (is_array($raw)) {
+    $ids = $raw;
+  } else {
+    // If a single comma-separated string is passed, split it
+    // e.g., promotionIDs=1,2,3
+    $ids = preg_split('/,/', (string)$raw);
+  }
+}
+$ids = array_values(array_unique(array_filter(array_map(function ($v) {
+  // keep only positive integer-like values
+  if ($v === null) return null;
+  if (is_numeric($v)) {
+    $i = (int)$v;
+    return $i > 0 ? $i : null;
+  }
+  return null;
+}, $ids))));
+
+if (count($ids) === 0) {
+  http_response_code(400);
+  echo json_encode(['error' => 'Missing required query params: promotionIDs (repeat up to 100)']);
+  exit;
+}
+if (count($ids) > 100) {
+  $ids = array_slice($ids, 0, 100);
 }
 
-$now = time();
-// Automatic 60-day window from now
-$startDateTime = isset($_GET['startDateTime']) && $_GET['startDateTime'] !== '' ? (string)$_GET['startDateTime'] : rfc3339_utc($now);
-$endDateTime   = isset($_GET['endDateTime'])   && $_GET['endDateTime']   !== '' ? (string)$_GET['endDateTime']   : rfc3339_utc($now + 60 * 86400);
-
-// allPromo: false by default (only available to participate)
-$allPromo = isset($_GET['allPromo'])
-  ? (($_GET['allPromo'] === '1' || strtolower((string)$_GET['allPromo']) === 'true') ? 'true' : 'false')
-  : 'false';
-
-// Pagination
-$limit  = isset($_GET['limit'])  && is_numeric($_GET['limit'])  ? max(1, min(1000, (int)$_GET['limit'])) : 500;
-$offset = isset($_GET['offset']) && is_numeric($_GET['offset']) ? max(0, (int)$_GET['offset']) : 0;
-
+// 3) Build WB URL with repeated promotionIDs
 $endpointBase = 'https://dp-calendar-api.wildberries.ru/api/v1/calendar/promotions/details';
-$q = [
-  'startDateTime' => $startDateTime,
-  'endDateTime'   => $endDateTime,
-  'allPromo'      => $allPromo,
-  'limit'         => $limit,
-  'offset'        => $offset,
-];
-$endpoint = $endpointBase . '?' . http_build_query($q);
+$q = [];
+foreach ($ids as $id) {
+  // repeated keys: promotionIDs=1&promotionIDs=3
+  $q[] = 'promotionIDs=' . rawurlencode((string)$id);
+}
+$endpoint = $endpointBase . '?' . implode('&', $q);
 
-// Call WB with your preferred Authorization header
+// 4) Call WB (Authorization header as requested)
+// If your account requires X-Api-Key, change the header line accordingly.
 $ch = curl_init($endpoint);
 curl_setopt_array($ch, [
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_TIMEOUT => 25,
   CURLOPT_HTTPHEADER => [
-    'Authorization: ' . $token,
+    'Authorization: ' . $token, // change to 'X-Api-Key: ' . $token if needed
     'Accept: application/json',
   ],
 ]);
@@ -75,13 +95,13 @@ if ($resp === false) {
   echo json_encode(['error' => 'Curl error', 'detail' => $err], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
   exit;
 }
-
 if ($http < 200 || $http >= 300) {
   http_response_code($http);
   echo json_encode(['error' => 'WB API error', 'status' => $http, 'detail' => $resp], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
   exit;
 }
 
+// 5) Parse JSON
 $raw = json_decode($resp, true);
 if ($raw === null && json_last_error() !== JSON_ERROR_NONE) {
   http_response_code(502);
@@ -93,22 +113,11 @@ if ($raw === null && json_last_error() !== JSON_ERROR_NONE) {
   exit;
 }
 
-// Expecting: { data: { promotions: [...] } }
-$data = [];
-if (isset($raw['data']) && is_array($raw['data'])) {
-  $data = $raw['data'];
-} else {
-  // Fallback: some deployments might return top-level 'promotions'
-  $data = $raw;
-}
-$promos = [];
-if (isset($data['promotions']) && is_array($data['promotions'])) {
-  $promos = $data['promotions'];
-} elseif (isset($data[0]) && is_array($data[0])) {
-  // Fallback if array returned directly
-  $promos = $data;
-}
+// 6) Extract data.promotions
+$data = (isset($raw['data']) && is_array($raw['data'])) ? $raw['data'] : $raw;
+$promos = (isset($data['promotions']) && is_array($data['promotions'])) ? $data['promotions'] : [];
 
+// 7) Normalize output for frontend
 function isoOrNull($v) {
   if (!is_string($v) || $v === '') return null;
   $t = strtotime($v);
@@ -121,9 +130,6 @@ $out = [];
 foreach ($promos as $p) {
   if (!is_array($p)) continue;
 
-  $id   = isset($p['id']) ? (int)$p['id'] : null;
-  $name = isset($p['name']) ? (string)$p['name'] : null;
-
   $start = isoOrNull($p['startDateTime'] ?? null);
   $end   = isoOrNull($p['endDateTime'] ?? null);
 
@@ -135,29 +141,26 @@ foreach ($promos as $p) {
   }
 
   $out[] = [
-    'id'                         => $id,
-    'name'                       => $name,
-    'description'                => isset($p['description']) ? (string)$p['description'] : null,
-    'advantages'                 => isset($p['advantages']) && is_array($p['advantages']) ? array_values($p['advantages']) : [],
-    'startDate'                  => $start,
-    'endDate'                    => $end,
-    'active'                     => $active,
-    'inPromoActionLeftovers'     => isset($p['inPromoActionLeftovers']) ? (int)$p['inPromoActionLeftovers'] : null,
-    'inPromoActionTotal'         => isset($p['inPromoActionTotal']) ? (int)$p['inPromoActionTotal'] : null,
-    'notInPromoActionLeftovers'  => isset($p['notInPromoActionLeftovers']) ? (int)$p['notInPromoActionLeftovers'] : null,
-    'notInPromoActionTotal'      => isset($p['notInPromoActionTotal']) ? (int)$p['notInPromoActionTotal'] : null,
-    'participationPercentage'    => isset($p['participationPercentage']) ? (int)$p['participationPercentage'] : null,
-    'type'                       => isset($p['type']) ? (string)$p['type'] : null, // "regular" | "auto"
-    'exceptionProductsCount'     => isset($p['exceptionProductsCount']) ? (int)$p['exceptionProductsCount'] : null,
-    'ranging'                    => isset($p['ranging']) && is_array($p['ranging']) ? array_values($p['ranging']) : [],
+    'id'                        => isset($p['id']) ? (int)$p['id'] : null,
+    'name'                      => isset($p['name']) ? (string)$p['name'] : null,
+    'description'               => isset($p['description']) ? (string)$p['description'] : null,
+    'advantages'                => isset($p['advantages']) && is_array($p['advantages']) ? array_values($p['advantages']) : [],
+    'startDate'                 => $start,
+    'endDate'                   => $end,
+    'active'                    => $active,
+    'inPromoActionLeftovers'    => isset($p['inPromoActionLeftovers']) ? (int)$p['inPromoActionLeftovers'] : null,
+    'inPromoActionTotal'        => isset($p['inPromoActionTotal']) ? (int)$p['inPromoActionTotal'] : null,
+    'notInPromoActionLeftovers' => isset($p['notInPromoActionLeftovers']) ? (int)$p['notInPromoActionLeftovers'] : null,
+    'notInPromoActionTotal'     => isset($p['notInPromoActionTotal']) ? (int)$p['notInPromoActionTotal'] : null,
+    'participationPercentage'   => isset($p['participationPercentage']) ? (int)$p['participationPercentage'] : null,
+    'type'                      => isset($p['type']) ? (string)$p['type'] : null, // "regular" | "auto"
+    'exceptionProductsCount'    => isset($p['exceptionProductsCount']) ? (int)$p['exceptionProductsCount'] : null,
+    'ranging'                   => isset($p['ranging']) && is_array($p['ranging']) ? array_values($p['ranging']) : [],
   ];
 }
 
-// Sort: active first, then start date asc, then name
+// Optional: sort by startDate asc then name
 usort($out, static function ($a, $b) {
-  $aAct = $a['active'] ? 1 : 0;
-  $bAct = $b['active'] ? 1 : 0;
-  if ($aAct !== $bAct) return $bAct - $aAct;
   $as = $a['startDate'] ?? '';
   $bs = $b['startDate'] ?? '';
   $cmp = strcmp($as, $bs);
