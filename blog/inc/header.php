@@ -134,7 +134,7 @@ natsort($categoriesForNav); // simple sort
       <ul class="header__social">
         <li class="ss-youtube"><a href="https://youtube.com/@mraketplace"><span class="screen-reader-text">Youtube</span></a></li>
         <li class="ss-telegram"><a href="https://t.me/mraketplace"><span class="screen-reader-text">Telegram</span></a></li>
-        <li class="ss-VK"><a href="https://vk.com/mraketplace"><span class="screen-reader-text">VK</span></a></li>
+        <li class="ss-vk"><a href="https://vk.com/mraketplace"><span class="screen-reader-text">VK</span></a></li>
         <li class="ss-rss"><a href="https://yandex.ru"><span class="screen-reader-text">RSS</span></a></li>
       </ul>
     </nav>
