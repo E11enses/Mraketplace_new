@@ -308,6 +308,26 @@
     .wrap {
       grid-template-columns: 1fr;
     }
+    <style>
+  @media (max-width: 960px) {
+    /* Stack layout already set, now hide calendar and keep details */
+    #calendar {
+      display: none !important;
+    }
+
+    /* Make right column stack: header row + details, and details scroll */
+    .right {
+      grid-template-rows: auto 1fr; /* header + details */
+      max-height: calc(100vh - 24px); /* respect page padding (12px*2) */
+      overflow: hidden;
+    }
+
+    /* Details fills remaining space with internal scroll */
+    .details {
+      overflow: auto;
+    }
+  }
+</style>
   }
 </style>
 </head>
