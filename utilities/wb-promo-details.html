@@ -98,6 +98,40 @@
     #calendar{display:none!important;}
     .right{grid-template-rows:auto 1fr; max-height:calc(100vh - 24px); overflow:hidden;}
     .details{overflow:auto;}
+    
+      .d-name {
+      font-size: 14px;  
+      line-height: 1.2;
+      }
+
+      .d-dates,
+      .d-meta {
+        font-size: 12px;      /* was ~14px */
+        line-height: 1.25;
+        }
+
+      .d-dates b,
+      .d-meta b {
+      font-size: 12px;      /* keep labels same size as text to avoid wrapping */
+      line-height: 1.25;
+      }
+
+      /* Tighter spacing between labels row items */
+      .d-meta-row {
+      gap: 10px;
+      }
+
+      /* Advantage chips a bit smaller */
+
+      .tag {
+        font-size: 11px;      
+        padding: 4px 8px;     
+      }
+
+      /* Optional: smaller month title to save a line on small phones */
+      .month-title {
+      font-size: 18px;
+      }
   }
 </style>
 
