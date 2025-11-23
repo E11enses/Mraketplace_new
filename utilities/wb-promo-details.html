@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>WB Promotion Details</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif; background: #0f1115; color: #e5e7eb; }
+      .wrap { display: grid; grid-template-columns: 380px 1fr; gap: 16px; height: 100vh; padding: 16px; box-sizing: border-box; }
+      .panel { background: #161a22; border-radius: 12px; padding: 16px; overflow: auto; }
+      .row { margin-bottom: 12px; }
+      input { width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid #293042; background: #0f1320; color: #e5e7eb; }
+      .list { display: grid; gap: 8px; }
+      .item { background: #0f1320; border: 1px solid #23304a; border-radius: 10px; padding: 10px; cursor: pointer; }
+      .item.active { border-color: #16a34a; background: rgba(22,163,74,.1); }
+      .title { font-weight: 600; }
+      .sub { color: #94a3b8; font-size: 12px; }
+      .err { color: #fecaca; background: #331a1a; border: 1px solid #7f1d1d; padding: 10px; border-radius: 8px; font-size: 14px; }
+      .kv { margin: 6px 0; color: #94a3b8; white-space: pre-wrap; }
+      h2, h3 { margin: 0 0 10px; }
+      .chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+      .chip { padding: 3px 8px; background: #1f2937; border-radius: 999px; font-size: 12px; color: #94a3b8; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <aside class="panel">
+        <h2>Promotions</h2>
+        <div class="row">
+          <input id="q" type="text" placeholder="Search by name/description..." />
+        </div>
+        <div id="list" class="list"></div>
+        <div id="error" class="err" hidden></div>
+      </aside>
+
+      <main class="panel">
+        <h2>Details</h2>
+        <div class="chips" id="chips"></div>
+        <div id="details"></div>
+      </main>
+    </div>
+
+    <script>
+      const ENDPOINT = '/api/wb-promo-details-hydrated.php';
+
+      const listEl = document.getElementById('list');
+      const detailsEl = document.getElementById('details');
+      const chipsEl = document.getElementById('chips');
+      const errorEl = document.getElementById('error');
+      const qEl = document.getElementById('q');
+
+      let all = [];
+      let filtered = [];
+      let selectedId = null;
+
+      function fmt(d) {
+        return d
+          ? new Date(d).toLocaleString(undefined, { year: 'numeric', month: 'short', day: '2-digit' })
+          : '—';
+      }
+
+      function renderList() {
+        listEl.innerHTML = '';
+        filtered.forEach((p) => {
+          const div = document.createElement('div');
+          div.className = 'item' + (p.id === selectedId ? ' active' : '');
+          div.innerHTML = `
+            <div class="title">${p.name || '(No name)'}</div>
+            <div class="sub">${fmt(p.startDate)} — ${fmt(p.endDate)}</div>
+          `;
+          div.onclick = () => { selectedId = p.id; renderList(); renderDetails(); };
+          listEl.appendChild(div);
+        });
+        chipsEl.innerHTML = '';
+        const c1 = document.createElement('span');
+        c1.className = 'chip';
+        c1.textContent = `Shown: ${filtered.length}`;
+        chipsEl.appendChild(c1);
+        const c2 = document.createElement('span');
+        c2.className = 'chip';
+        c2.textContent = `Active: ${filtered.filter((x) => x.active).length}`;
+        chipsEl.appendChild(c2);
+      }
+
+      function renderDetails() {
+        const p = filtered.find((x) => x.id === selectedId);
+        if (!p) { detailsEl.innerHTML = '<div class="kv">Select a promotion</div>'; return; }
+
+        const adv = Array.isArray(p.advantages) ? p.advantages.filter(Boolean) : [];
+        const rng = Array.isArray(p.ranging) ? p.ranging : [];
+
+        detailsEl.innerHTML = `
+          <h3>${p.name || '(No name)'}</h3>
+          <div class="kv">When: ${fmt(p.startDate)} — ${fmt(p.endDate)}</div>
+          <div class="kv">Type: ${p.type || '—'}</div>
+          <div class="kv">Description: ${p.description || '—'}</div>
+          <div class="kv">Advantages: ${adv.length ? adv.join('; ') : '—'}</div>
+          <div class="kv">
+            Stats:
+            ${p.inPromoActionLeftovers != null ? ' in-stock in promo: ' + p.inPromoActionLeftovers : ''}
+            ${p.inPromoActionTotal != null ? ' | total in promo: ' + p.inPromoActionTotal : ''}
+            ${p.notInPromoActionLeftovers != null ? ' | in-stock not in promo: ' + p.notInPromoActionLeftovers : ''}
+            ${p.notInPromoActionTotal != null ? ' | total not in promo: ' + p.notInPromoActionTotal : ''}
+            ${p.participationPercentage != null ? ' | participation: ' + p.participationPercentage + '%' : ''}
+          </div>
+          <div class="kv">${p.type === 'auto' && p.exceptionProductsCount != null ? 'Excluded before start (auto): ' + p.exceptionProductsCount : ''}</div>
+          <div class="kv">Ranging: ${rng.length ? JSON.stringify(rng) : '—'}</div>
+        `;
+      }
+
+      function applyFilter() {
+        const q = qEl.value.trim().toLowerCase();
+        filtered = !q
+          ? all.slice()
+          : all.filter((p) => {
+              const hay = `${p.name || ''} ${p.description || ''} ${(p.advantages || []).join(' ')}`;
+              return hay.toLowerCase().includes(q);
+            });
+        if (filtered.length && !filtered.some((p) => p.id === selectedId)) {
+          selectedId = filtered[0].id;
+        }
+        renderList();
+        renderDetails();
+      }
+
+      async function load() {
+        errorEl.hidden = true;
+        try {
+          const res = await fetch(ENDPOINT, { cache: 'no-store' });
+          if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+          const data = await res.json();
+          if (!Array.isArray(data)) throw new Error('Invalid payload');
+          all = data;
+          filtered = data.slice();
+          selectedId = filtered[0]?.id ?? null;
+          renderList();
+          renderDetails();
+        } catch (e) {
+          errorEl.textContent = 'Failed to load details: ' + e.message;
+          errorEl.hidden = false;
+          console.error(e);
+        }
+      }
+
+      qEl.addEventListener('input', debounce(applyFilter, 200));
+      function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+
+      load();
+    </script>
+  </body>
+</html>
