@@ -2,7 +2,7 @@
 <html lang="ru">
   <head>
     <meta charset="utf-8" />
-    <title>Акции WB — 30 узких колонок за месяц (без timeline)</title>
+    <title>Акции WB — узкий месяц (пастельные цвета, детали снизу)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <link
@@ -15,23 +15,18 @@
       :root {
         --bg: #ffffff;
         --panel: #ffffff;
-        --muted: #444;
-        --text: #000000;
+        --muted: #475569; /* slate-600 */
+        --text: #0f172a;  /* slate-900 */
         --border: #e5e7eb;
         --chip: #f3f4f6;
 
-        --active-bg: #e8f7ee;
-        --active-border: #16a34a;
-        --active-text: #065f46;
+        --status-active-bg: #eaf7ef;
+        --status-active-border: #16a34a;
+        --status-active-text: #06603e;
 
-        --planned-bg: #eef2ff;
-        --planned-border: #6366f1;
-        --planned-text: #3730a3;
-
-        --type-regular-border: #6366f1;
-        --type-regular-text: #3730a3;
-        --type-auto-border: #14b8a6;
-        --type-auto-text: #0f766e;
+        --status-planned-bg: #eef2ff;
+        --status-planned-border: #6366f1;
+        --status-planned-text: #3730a3;
       }
 
       html, body {
@@ -55,7 +50,7 @@
         border: 1px solid var(--border);
         border-radius: 12px;
         padding: 12px;
-        overflow: visible;
+        overflow: hidden;
       }
 
       .row { margin-bottom: 10px; }
@@ -86,45 +81,53 @@
         white-space: nowrap;
       }
 
-      /* left list */
-      .list { display: grid; gap: 8px; }
+      /* LEFT list */
+      .list { display: grid; gap: 10px; }
       .item {
         background: #fff;
         border: 2px solid var(--border);
-        border-radius: 10px;
-        padding: 10px;
+        border-radius: 12px;
+        padding: 12px;
         cursor: pointer;
         transition: box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
       }
       .item:hover { box-shadow: 0 1px 6px rgba(0,0,0,.08); }
       .title { font-weight: 600; font-size: 13px; }
-      .sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
+      .sub   { color: var(--muted); font-size: 12px; margin-top: 4px; }
 
       .topline {
         display: flex; justify-content: space-between; align-items: center;
-        gap: 6px; flex-wrap: wrap;
+        gap: 8px; flex-wrap: wrap;
       }
       .pills { display: inline-flex; gap: 6px; align-items: center; }
       .pill {
-        padding: 2px 6px; border-radius: 999px; border: 1px solid var(--border);
+        padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border);
         font-size: 11px; white-space: nowrap; background: #fff; color: var(--muted);
       }
       .status-active {
-        background: var(--active-bg); border-color: var(--active-border); color: var(--active-text);
+        background: var(--status-active-bg);
+        border-color: var(--status-active-border);
+        color: var(--status-active-text);
       }
       .status-planned {
-        background: var(--planned-bg); border-color: var(--planned-border); color: var(--planned-text);
+        background: var(--status-planned-bg);
+        border-color: var(--status-planned-border);
+        color: var(--status-planned-text);
       }
-      .type-regular { border-color: var(--type-regular-border); color: var(--type-regular-text); background: #f5f7ff; }
-      .type-auto    { border-color: var(--type-auto-border);    color: var(--type-auto-text);    background: #ecfeff; }
 
-      /* right column */
-      .right { display: grid; grid-template-rows: auto 1fr auto; gap: 10px; min-height: 0; }
+      /* RIGHT column: calendar top (75%), details bottom (25%) */
+      .right {
+        display: grid;
+        grid-template-rows: auto minmax(300px, 1fr) minmax(220px, 25vh);
+        gap: 10px;
+        min-height: 0;
+      }
       #calendar {
-        background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 6px; min-height: 420px;
+        background: #fff; border: 1px solid var(--border); border-radius: 12px;
+        padding: 6px; min-height: 320px;
       }
 
-      /* FullCalendar tweaks */
+      /* FullCalendar toolbar */
       .fc .fc-toolbar-title { font-size: 18px; font-weight: 700; color: var(--text); }
       .fc .fc-button {
         background: #f8fafc; border: 1px solid var(--border); color: var(--text);
@@ -133,40 +136,47 @@
       .fc .fc-button-primary:not(:disabled):hover { background: #eef2f7; border-color: #d1d5db; }
       .fc-theme-standard td, .fc-theme-standard th { border-color: var(--border); }
 
-      /* Force event text black by default; fill when selected via JS */
-      .fc .fc-event, .fc .fc-timegrid-event { color: #000 !important; }
-      .fc .fc-event, .fc .fc-event * { color: inherit; }
-
-      /* Compact all-day rows in timeGrid */
-      .fc-timegrid .fc-timegrid-axis-frame { font-size: 11px; color: var(--muted); }
-
-      /* Hide time rows; we display only all-day row */
-      .fc-timegrid-slot, .fc-timegrid-slots, .fc-timegrid-axis { display: none !important; }
-      .fc-timegrid .fc-timegrid-body { display: none !important; }
-
-      /* Make all-day row visible and compact */
-      .fc-timegrid .fc-timegrid-allday { display: block !important; }
-      .fc-timegrid .fc-timegrid-allday .fc-timegrid-cols { height: auto !important; }
-      .fc-timegrid .fc-timegrid-allday .fc-daygrid-body-unbalanced .fc-daygrid-day-events { margin: 2px; }
-
-      /* Narrow day columns: we reduce padding and font sizes */
+      /* Compact header line */
       .fc .fc-col-header-cell-cushion { font-size: 12px; padding: 2px 0; }
-      .fc .fc-timegrid-col-frame { padding: 2px 0; }
 
-      /* Event chips in all-day row */
-      .fc .fc-h-event {
-        background: transparent !important; border-width: 2px; border-radius: 6px;
-        padding: 1px 3px; font-size: 12px; line-height: 1.2;
-        overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      /* Month/week: taller event rows (less crammed) */
+      .fc-daygrid-event {
+        margin-top: 3px;             /* more vertical space */
+        padding: 3px 6px;            /* taller chips */
+        border-radius: 8px;
+        line-height: 1.25;
+        font-size: 12px;
+      }
+      .fc-timegrid-event {
+        border-radius: 8px;
+        padding: 4px 6px;
+        font-size: 12px;
+        line-height: 1.25;
       }
 
-      /* Details block */
-      .details { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 10px; }
+      /* Hide time rows; show only all-day area in our narrow month */
+      .fc-timegrid-slot, .fc-timegrid-slots, .fc-timegrid-axis { display: none !important; }
+      .fc-timegrid .fc-timegrid-body { display: none !important; }
+      .fc-timegrid .fc-timegrid-allday { display: block !important; }
+
+      /* Always filled pastel background in month/week, controlled via inline style (JS).
+         Ensure event text inherits color we set in JS. */
+      .fc .fc-event, .fc .fc-timegrid-event, .fc .fc-daygrid-event { color: inherit !important; }
+      .fc .fc-event, .fc .fc-event * { color: inherit; }
+
+      /* DETAILS bottom fixed area */
+      .details {
+        background: #fff; border: 1px solid var(--border); border-radius: 12px;
+        padding: 12px; overflow: auto;
+      }
       .kv { margin: 6px 0; color: var(--muted); white-space: pre-wrap; }
 
       .err { color: #b91c1c; background: #fee2e2; border: 1px solid #fecaca; padding: 10px; border-radius: 10px; font-size: 14px; }
 
-      @media (max-width: 960px) { .wrap { grid-template-columns: 1fr; } }
+      @media (max-width: 960px) {
+        .wrap { grid-template-columns: 1fr; }
+        .right { grid-template-rows: auto minmax(240px, 1fr) minmax(200px, 30vh); }
+      }
     </style>
   </head>
   <body>
@@ -208,13 +218,14 @@
 
         <div id="calendar"></div>
 
-        <div id="details" class="details" hidden>
-          <h3 id="d-title" style="margin:0 0 6px;"></h3>
-          <div class="kv" id="d-when"></div>
-          <div class="kv" id="d-type"></div>
-          <div class="kv" id="d-adv"></div>
-          <div class="kv" id="d-boost"></div>
-          <div class="kv" id="d-desc"></div>
+        <!-- Persistent details area (25% height) -->
+        <div id="details" class="details">
+          <h3 id="d-title" style="margin:0 0 6px;">Детали акции</h3>
+          <div class="kv" id="d-when">Период: —</div>
+          <div class="kv" id="d-type">Тип: —</div>
+          <div class="kv" id="d-adv">Преимущества: —</div>
+          <div class="kv" id="d-boost">Диапазон бустинга: —</div>
+          <div class="kv" id="d-desc">Описание: —</div>
         </div>
       </section>
     </div>
@@ -223,14 +234,25 @@
       const ENDPOINT = '/api/wb-promo-details.php';
       const EXCLUDE_BY_NAME = ['Распродажа в счет долга'];
 
-      const COLOR_PALETTE = [
-        '#0ea5e9', '#22c55e', '#f59e0b', '#ef4444',
-        '#a855f7', '#14b8a6', '#e11d48', '#84cc16',
-        '#06b6d4', '#f97316', '#8b5cf6', '#10b981',
+      // Softer pastel palette (stroke and fill base)
+      const PASTEL_PALETTE = [
+        '#7cc3ff', // pastel sky
+        '#8bd8c1', // mint/teal
+        '#ffd28a', // amber soft
+        '#ffa3a3', // red soft
+        '#c7b4f5', // violet soft
+        '#a0e0ff', // cyan soft
+        '#f9a8d4', // pink soft
+        '#b2f2a7', // green soft
+        '#fbcfe8', // rose pale
+        '#fde68a', // yellow pale
+        '#c4b5fd', // indigo soft
+        '#86efac', // emerald soft
       ];
+
       function colorForId(id) {
         const i = Math.abs(Number(id) || 0);
-        return COLOR_PALETTE[i % COLOR_PALETTE.length];
+        return PASTEL_PALETTE[i % PASTEL_PALETTE.length];
       }
       function isDark(hex) {
         const c = hex.replace('#', '');
@@ -239,6 +261,18 @@
         const b = parseInt(c.substring(4, 6), 16);
         const L = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
         return L < 0.55;
+      }
+      function hexToRgb(hex) {
+        const c = hex.replace('#', '');
+        return {
+          r: parseInt(c.substring(0, 2), 16),
+          g: parseInt(c.substring(2, 4), 16),
+          b: parseInt(c.substring(4, 6), 16),
+        };
+      }
+      function rgba(hex, a) {
+        const { r, g, b } = hexToRgb(hex);
+        return `rgba(${r}, ${g}, ${b}, ${a})`;
       }
 
       const listEl = document.getElementById('list');
@@ -299,7 +333,7 @@
       function buildEventContent(arg) {
         const e = arg.event.extendedProps.raw;
         const name = arg.event.title || '(без названия)';
-        const typeP = `<span class="pill ${typeClass(e.type)}">${typeRu(e.type)}</span>`;
+        const typeP = `<span class="pill ${typeClass(e.type)}" style="border-color:#cbd5e1;color:#64748b;background:#f8fafc">${typeRu(e.type)}</span>`;
         const adv = compactAdvantages(e.advantages);
         const boost = getBoostRange(e.ranging);
         const parts = [];
@@ -308,27 +342,30 @@
         const meta = parts.join(' • ');
         const container = document.createElement('div');
         container.innerHTML = `
-          <div class="ev-title">${name} ${typeP}</div>
-          <div class="ev-meta">${meta}</div>
+          <div class="ev-title" style="font-weight:600">${name} ${typeP}</div>
+          <div class="ev-meta" style="opacity:.9">${meta}</div>
         `;
         return { domNodes: [container] };
       }
 
+      // Non-selected opacity for fill
+      const FILL_OPACITY = 0.28; // ~28% pastel fill
       function styleEventElement(el, color, selected) {
+        // border uses solid pastel color
         el.style.borderColor = color;
         el.style.borderWidth = '2px';
         el.style.borderStyle = 'solid';
-        if (selected) {
-          el.style.background = color;
-          const txt = isDark(color) ? '#ffffff' : '#000000';
-          el.style.color = txt;
-          el.querySelectorAll('*').forEach(n => n.style.color = txt);
-        } else {
-          el.style.background = 'transparent';
-          el.style.color = '#000000';
-          el.querySelectorAll('*').forEach(n => n.style.color = '#000000');
-        }
+
+        // filled background always visible in month/week; opacity changes with selection
+        const bg = selected ? color : rgba(color, FILL_OPACITY);
+        el.style.background = bg;
+
+        // text contrast
+        const txt = selected ? (isDark(color) ? '#ffffff' : '#000000') : '#000000';
+        el.style.color = txt;
+        el.querySelectorAll('*').forEach(n => (n.style.color = txt));
       }
+
       function registerEventEl(id, el) {
         if (!eventElsById.has(id)) eventElsById.set(id, []);
         eventElsById.get(id).push(el);
@@ -375,26 +412,22 @@
           const sel = selectedId === p.id;
 
           div.className = 'item' + (sel ? ' active' : '');
+          // pastel border
           div.style.borderColor = color;
-          if (sel) {
-            div.style.background = color;
-            const txt = isDark(color) ? '#ffffff' : '#000000';
-            div.style.color = txt;
-          } else {
-            div.style.background = '#ffffff';
-            div.style.color = '#000000';
-          }
+          // pastel fill in list too, light opacity; stronger if selected
+          div.style.background = sel ? rgba(color, 0.25) : rgba(color, 0.12);
+          div.style.color = '#0f172a';
 
           const statusClass = p.active ? 'status-active' : 'status-planned';
-          const textColorStyle = sel && isDark(color) ? 'style="color:#ffffff;"' : '';
-          const subColorStyle = sel && isDark(color) ? 'style="color:rgba(255,255,255,0.9)"' : 'style="color:var(--muted)"';
+          const textColorStyle = ''; // keep dark for list
+          const subColorStyle = 'style="color:var(--muted)"';
 
           div.innerHTML = `
             <div class="topline">
               <div class="title" ${textColorStyle}>${p.name || '(без названия)'}</div>
               <div class="pills">
                 <span class="pill ${statusClass}">${statusPillText(p.active)}</span>
-                <span class="pill ${typeClass(p.type)}">${typeRu(p.type)}</span>
+                <span class="pill" style="border-color:#cbd5e1;color:#64748b;background:#f8fafc">${typeRu(p.type)}</span>
               </div>
             </div>
             <div class="sub" ${subColorStyle}>${fmt(p.startDate)} — ${fmt(p.endDate)}</div>
@@ -412,27 +445,35 @@
       }
 
       function showDetails(p) {
-        if (!p) { detailsBox.hidden = true; return; }
+        if (!p) {
+          dTitle.textContent = 'Детали акции';
+          dWhen.textContent = 'Период: —';
+          dType.textContent = 'Тип: —';
+          dAdv.textContent = 'Преимущества: —';
+          dBoost.textContent = 'Диапазон бустинга: —';
+          dDesc.textContent = 'Описание: —';
+          return;
+        }
         const adv = Array.isArray(p.advantages) ? p.advantages.filter(Boolean) : [];
         const boost = getBoostRange(p.ranging);
         const color = colorForId(p.id);
 
-        dTitle.innerHTML = `${p.name || '(без названия)'} <span class="pill ${typeClass(p.type)}">${typeRu(p.type)}</span>`;
+        dTitle.innerHTML = `${p.name || '(без названия)'} <span class="pill" style="border-color:#cbd5e1;color:#64748b;background:#f8fafc">${typeRu(p.type)}</span>`;
         dTitle.style.borderLeft = `6px solid ${color}`;
         dTitle.style.paddingLeft = '8px';
-        dTitle.style.color = '#000000';
+        dTitle.style.color = '#0f172a';
 
         dWhen.textContent = `Период: ${fmt(p.startDate)} — ${fmt(p.endDate)}`;
         dType.textContent = `Тип: ${typeRu(p.type)}`;
         dAdv.textContent = `Преимущества: ${adv.length ? adv.join(', ') : '—'}`;
         dBoost.textContent = `Диапазон бустинга: ${boost || '—'}`;
         dDesc.textContent = `Описание: ${p.description || '—'}`;
-        detailsBox.hidden = false;
       }
 
       function sortItems(items, mode) {
         const copy = items.slice();
-        const cmpStr = (a, b) => String(a || '').localeCompare(String(b || ''), 'ru', { sensitivity: 'base' });
+        const cmpStr = (a, b) =>
+          String(a || '').localeCompare(String(b || ''), 'ru', { sensitivity: 'base' });
         const cmpDate = (a, b) => String(a || '').localeCompare(String(b || ''));
         switch (mode) {
           case 'startAsc': return copy.sort((a, b) => cmpDate(a.startDate, b.startDate));
@@ -451,6 +492,7 @@
         }
       }
 
+      // Narrow-month helpers (timeGrid month made of 28..31 columns)
       function firstOfMonth(d) {
         const x = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1));
         return x;
@@ -473,7 +515,6 @@
           locale: 'ru',
           timeZone: 'UTC',
 
-          // custom "narrow month": timeGrid with 28..31 day duration
           initialView: 'timeGridMonthNarrow',
           initialDate: start.toISOString(),
           headerToolbar: {
@@ -491,20 +532,19 @@
           views: {
             timeGridMonthNarrow: {
               type: 'timeGrid',
-              duration: { days },     // 28..31 вертикальных узких колонок
-              slotDuration: '24:00',  // один слот = день
-              allDaySlot: true,       // показываем только all-day
-              dayHeaderFormat: { weekday: 'short', day: 'numeric' }, // заголовки колонок
+              duration: { days },
+              slotDuration: '24:00',
+              allDaySlot: true,
+              dayHeaderFormat: { weekday: 'short', day: 'numeric' },
             },
           },
 
-          events,               // ваши allDay события
+          events,
           eventDisplay: 'block',
           eventTimeFormat: false,
 
-          // keep week/list available
-          slotMinTime: '00:00',
-          slotMaxTime: '24:00',
+          // Let day cells hold more visible rows before collapsing into "+ещё"
+          dayMaxEvents: 8,
 
           eventDidMount: (arg) => {
             const p = arg.event.extendedProps.raw;
@@ -565,7 +605,7 @@
         renderChips();
         initCalendar(toEvents(filtered));
         renderList();
-        showDetails(filtered.find((x) => x.id === selectedId));
+        showDetails(filtered.find((x) => x.id === selectedId) || null);
       }
 
       qEl.addEventListener('input', debounce(applyFilter, 200));
