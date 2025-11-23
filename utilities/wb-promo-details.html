@@ -2,18 +2,15 @@
 <html lang="ru">
   <head>
     <meta charset="utf-8" />
-    <title>Акции WB — календарь и детали</title>
+    <title>Акции WB — календарь и детали (без плагинов)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- FullCalendar base bundle -->
+    <!-- FullCalendar base bundle (dayGrid/timeGrid/list внутри) -->
     <link
       href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css"
       rel="stylesheet"
     />
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
-    <!-- Core (explicit) and resource-timeline plugin -->
-    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.15/index.global.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/resource-timeline@6.1.15/index.global.min.js"></script>
 
     <style>
       :root {
@@ -45,6 +42,7 @@
         font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       }
 
+      /* 15% / 85% раскладка */
       .wrap {
         display: grid;
         grid-template-columns: 15% 85%;
@@ -90,7 +88,7 @@
         white-space: nowrap;
       }
 
-      /* List (left 15%) */
+      /* Список (левая колонка) */
       .list {
         display: grid;
         gap: 8px;
@@ -145,7 +143,7 @@
         background: #ecfeff;
       }
 
-      /* Right column (85%): calendar + details */
+      /* Правая колонка (календарь + детали) */
       .right {
         display: grid;
         grid-template-rows: auto 1fr auto;
@@ -160,7 +158,7 @@
         min-height: 420px;
       }
 
-      /* FullCalendar tweaks */
+      /* Заголовки календаря */
       .fc .fc-toolbar-title { font-size: 18px; font-weight: 700; color: var(--text); }
       .fc .fc-button {
         background: #f8fafc;
@@ -173,21 +171,28 @@
       .fc .fc-button-primary:not(:disabled):hover { background: #eef2f7; border-color: #d1d5db; }
       .fc-theme-standard td, .fc-theme-standard th { border-color: var(--border); }
 
-      /* Event text must be black by default (border-only) */
-      .fc .fc-event, .fc .fc-daygrid-event { color: #000000 !important; }
+      /* Уплотняем ячейки month-view, чтобы "узкий" месяц поместился */
+      .fc .fc-daygrid-day-frame { padding: 2px; }      /* меньше отступы внутри дня */
+      .fc .fc-daygrid-day-number { font-size: 11px; }  /* номер дня меньше */
+      .fc .fc-col-header-cell-cushion { font-size: 12px; } /* шапка дней */
+
+      /* События — компактные, текст черный по умолчанию */
+      .fc .fc-event, .fc .fc-daygrid-event { color: #000 !important; }
       .fc .fc-event, .fc .fc-event * { color: inherit; }
 
-      .fc-event {
-        font-size: 12px;
-        line-height: 1.25;
-        padding: 2px 4px;
+      .fc-daygrid-event {
+        margin-top: 1px;      /* меньше вертикальный отступ между событиями */
+        padding: 1px 3px;     /* компактнее */
         border-radius: 6px;
-        background: transparent !important;
+        background: transparent !important; /* по умолчанию только рамка */
+        line-height: 1.2;
+        font-size: 12px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
-      .ev-title { font-weight: 600; }
-      .ev-meta { opacity: 0.9; }
 
-      /* Details */
+      /* Детали */
       .details {
         background: #fff;
         border: 1px solid var(--border);
@@ -205,7 +210,7 @@
         font-size: 14px;
       }
 
-      /* Responsive */
+      /* Адаптив */
       @media (max-width: 960px) {
         .wrap { grid-template-columns: 1fr; }
       }
@@ -265,7 +270,6 @@
       const ENDPOINT = '/api/wb-promo-details.php';
       const EXCLUDE_BY_NAME = ['Распродажа в счет долга'];
 
-      // Palette for stable per-promo colors
       const COLOR_PALETTE = [
         '#0ea5e9', '#22c55e', '#f59e0b', '#ef4444',
         '#a855f7', '#14b8a6', '#e11d48', '#84cc16',
@@ -284,7 +288,6 @@
         return L < 0.55;
       }
 
-      // DOM
       const listEl = document.getElementById('list');
       const detailsBox = document.getElementById('details');
       const dTitle = document.getElementById('d-title');
@@ -300,7 +303,6 @@
       const typeEl = document.getElementById('typeFilter');
       const todayEl = document.getElementById('today');
 
-      // State
       let all = [];
       let filtered = [];
       let selectedId = null;
@@ -500,77 +502,31 @@
         }
       }
 
-      function startOfMonth(d) {
-        const x = new Date(d);
-        x.setUTCDate(1);
-        x.setUTCHours(0, 0, 0, 0);
-        return x;
-      }
-      function endOfMonth(d) {
-        const x = new Date(d);
-        x.setUTCMonth(x.getUTCMonth() + 1, 0); // set to last day of current month
-        x.setUTCHours(23, 59, 59, 999);
-        return x;
-      }
-
       function initCalendar(events) {
         const el = document.getElementById('calendar');
         if (calendar) { calendar.destroy(); eventElsById.clear(); }
 
-        const now = new Date();
-        const monthStart = startOfMonth(now);
-        const monthEnd = endOfMonth(now);
-
         calendar = new FullCalendar.Calendar(el, {
           locale: 'ru',
           timeZone: 'UTC',
-
-          initialView: 'resourceTimelineMonthNarrow',
-          initialDate: monthStart.toISOString(),
-
+          initialView: 'dayGridMonth',
           headerToolbar: {
             left: 'prev,next today',
             center: 'title',
-            right: 'resourceTimelineMonthNarrow,timeGridWeek,listWeek',
+            right: 'dayGridMonth,timeGridWeek,listWeek',
           },
           buttonText: {
             today: 'сегодня',
-            resourceTimelineMonthNarrow: 'месяц',
+            month: 'месяц',
             week: 'неделя',
             list: 'список',
           },
 
-          // Provide required resources (not used visually, but plugin expects it)
-          resources: [{ id: 'r1', title: 'Промо' }],
-
-          views: {
-            resourceTimelineMonthNarrow: {
-              type: 'resourceTimeline',
-              // full month range (from 1st to last day)
-              visibleRange: {
-                start: monthStart.toISOString(),
-                end: new Date(monthEnd.getTime() + 1).toISOString(), // exclusive end
-              },
-              slotDuration: { days: 1 },
-              slotMinWidth: 22, // narrow day columns so the month fits
-              slotLabelFormat: [
-                { month: 'long', year: 'numeric' },  // top row: "ноябрь 2025"
-                { weekday: 'short', day: 'numeric' } // bottom: "пн 1"
-              ],
-              slotLabelInterval: { days: 1 },
-              resourceAreaWidth: 1, // hide resource area visually
-              resourceAreaHeaderContent: '',
-
-              // Make events compact
-              eventMinHeight: 18,
-              eventShortHeight: 18,
-            },
-          },
-
-          events: events.map(e => ({ ...e, resourceId: 'r1' })), // attach all to single resource
+          events,
           eventDisplay: 'block',
-          allDaySlot: true,
           eventTimeFormat: false,
+          dayMaxEvents: 6,           // больше событий в ячейке (компактный список)
+          dayMaxEventRows: true,     // разрешаем перенос событий внутри дня
 
           eventDidMount: (arg) => {
             const p = arg.event.extendedProps.raw;
@@ -578,6 +534,8 @@
             const sel = selectedId === p.id;
             styleEventElement(arg.el, color, sel);
             registerEventEl(String(p.id), arg.el);
+            // тонкая рамка вокруг всей ячейки события
+            arg.el.style.borderColor = color;
           },
           eventClick: (info) => {
             const d = info.event.extendedProps.raw || {};
@@ -590,20 +548,6 @@
         });
 
         calendar.render();
-
-        // Hide time rows in week view (if user switches)
-        const style = document.createElement('style');
-        style.textContent = `
-          .fc-timegrid-slot-label { display: none !important; }
-          .fc-timegrid-axis { display: none !important; }
-          .fc .fc-timegrid-slot { height: 0 !important; }
-          /* Hide resource area column borders */
-          .fc-timeline .fc-resource-area { width: 0 !important; min-width: 0 !important; }
-          .fc-timeline .fc-resource-area .fc-scrollgrid-sync-inner { display: none !important; }
-        `;
-        el.appendChild(style);
-
-        calendar.gotoDate(monthStart);
       }
 
       function applyFilter() {
