@@ -7,3 +7,5 @@ RewriteRule ^post/([A-Za-z0-9._-]+)/?$ view.php?slug=$1 [L,QSA]
 # categories and tags (allow Cyrillic via URL-encoding)
 RewriteRule ^category/(.+)/?$ taxonomy.php?type=category&value=$1 [L,QSA]
 RewriteRule ^tag/(.+)/?$ taxonomy.php?type=tag&value=$1 [L,QSA]
+
+RewriteRule ^feed\.xml$ feed.php [L,QSA]

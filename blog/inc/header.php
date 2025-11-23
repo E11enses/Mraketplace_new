@@ -97,6 +97,8 @@ natsort($categoriesForNav); // simple sort
   <link rel="stylesheet" href="/blog/css/base.css">
   <link rel="stylesheet" href="/blog/css/vendor.css">
   <link rel="stylesheet" href="/blog/css/main.css">
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS - Блог МРАКЕТПЛЕЙСЫ" href="/blog/feed.xml" />
 </head>
 <body>
 <div id="preloader"><div id="loader" class="dots-fade"><div></div><div></div><div></div></div></div>
