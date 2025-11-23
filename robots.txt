@@ -1,9 +1,5 @@
 User-agent: *
-Disallow: /order.js
-Disallow: /tooplate-minimal-script.js
-Disallow: /favicon/
 Allow: /
-
-Host: mraketplace.ru
-
 Sitemap: https://mraketplace.ru/sitemap.xml
+Sitemap: https://mraketplace.ru/blog/sitemap.xml
+Sitemap: https://mraketplace.ru/blog/feed.xml

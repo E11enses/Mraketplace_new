@@ -1,54 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset
-  xmlns="https://www.sitemaps.org/schemas/sitemap/0.9"
-  xmlns:xhtml="https://www.w3.org/1999/xhtml">
-
-  <!-- Главная -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Root pages -->
   <url>
     <loc>https://mraketplace.ru/</loc>
-    <lastmod>2025-11-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
-
-  <!-- Раздел: О нас -->
   <url>
-    <loc>https://mraketplace.ru/#about</loc>
-    <lastmod>2025-11-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://mraketplace.ru/locations.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
-
-  <!-- Раздел: Услуги -->
-  <url>
-    <loc>https://mraketplace.ru/#services</loc>
-    <lastmod>2025-11-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- Раздел: Контакты -->
-  <url>
-    <loc>https://mraketplace.ru/#contact</loc>
-    <lastmod>2025-11-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- Политика конфиденциальности -->
   <url>
     <loc>https://mraketplace.ru/privacy.html</loc>
-    <lastmod>2025-11-15</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.3</priority>
   </url>
-
-  <!-- Условия использования -->
   <url>
     <loc>https://mraketplace.ru/terms.html</loc>
-    <lastmod>2025-11-15</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.3</priority>
   </url>
 
+  <!-- Utilities section -->
+  <url>
+    <loc>https://mraketplace.ru/utilities/index.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url><loc>https://mraketplace.ru/utilities/barcoder.html</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://mraketplace.ru/utilities/box-barcoder.html</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://mraketplace.ru/utilities/calc.html</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://mraketplace.ru/utilities/ozon-spp.html</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://mraketplace.ru/utilities/packing-list.html</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://mraketplace.ru/utilities/utilities.html</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://mraketplace.ru/utilities/wb-commission.html</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://mraketplace.ru/utilities/wb-promo-details.html</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://mraketplace.ru/utilities/wb-spp.html</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://mraketplace.ru/utilities/wb-transit.html</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://mraketplace.ru/utilities/wb-warehouses.html</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
 </urlset>

@@ -9,3 +9,4 @@ RewriteRule ^category/(.+)/?$ taxonomy.php?type=category&value=$1 [L,QSA]
 RewriteRule ^tag/(.+)/?$ taxonomy.php?type=tag&value=$1 [L,QSA]
 
 RewriteRule ^feed\.xml$ feed.php [L,QSA]
+RewriteRule ^sitemap.xml$ sitemap.php [L,QSA]

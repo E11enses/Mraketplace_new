@@ -12,20 +12,18 @@ $feedUrl  = $siteUrl . '/blog/feed.xml';
 $postsDir = __DIR__ . '/posts';
 $maxItems = 50;
 
-// Helper: make URLs absolute inside HTML (src, href)
-function absolutize_urls(string $html, string $base): string {
-    // src and href that don't start with http/https/mailto/tel/# become absolute
-    $cb = function ($m) use ($base) {
+// Absolutize src/href in HTML fragments
+function absolutize_urls(string $html, string $origin): string {
+    $cb = function ($m) use ($origin) {
         $attr = $m[1];
         $url  = trim($m[2]);
-        if ($url === '' || strpos($url, '#') === 0) return $m[0]; // leave anchors
+        if ($url === '' || $url[0] === '#') return $m[0];
         if (preg_match('~^(?:https?:|mailto:|tel:)~i', $url)) return $m[0];
-        // if starts with /, prepend origin; else treat as relative to /blog/
+        // If starts with /, make absolute to origin; else treat relative to /blog/
         if ($url[0] === '/') {
-            $abs = rtrim($base, '/') . $url;
+            $abs = rtrim($origin, '/') . $url;
         } else {
-            // feed is at /blog/; most content URLs are relative to /blog/
-            $abs = rtrim($base, '/') . '/blog/' . $url;
+            $abs = rtrim($origin, '/') . '/blog/' . $url;
         }
         return $attr . '="' . htmlspecialchars($abs, ENT_QUOTES, 'UTF-8') . '"';
     };
@@ -34,7 +32,7 @@ function absolutize_urls(string $html, string $base): string {
     return $html;
 }
 
-// Collect files and sort newest first
+// Collect and sort posts (newest first)
 $files = glob($postsDir . '/*.html') ?: [];
 usort($files, function ($a, $b) {
     $fa = basename($a, '.html'); $fb = basename($b, '.html');
@@ -51,9 +49,8 @@ $channelDescription = 'Статьи о фулфилменте и работе с
 $channelLanguage    = 'ru-RU';
 $lastBuildDateRfc   = date(DATE_RSS);
 
-// Namespaces: content, yandex, media, atom
+// Output
 header('Content-Type: application/rss+xml; charset=UTF-8');
-
 echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 ?>
 <rss version="2.0"
@@ -71,36 +68,29 @@ echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
     <generator>Custom PHP RSS</generator>
     <atom:link href="<?= e($feedUrl) ?>" rel="self" type="application/rss+xml" />
 
-<?php
-foreach ($files as $file) {
+<?php foreach ($files as $file): 
     $html = file_get_contents($file);
     $meta = parse_meta_from_html($html);
 
     // Title
     $title = '';
-    if (preg_match('/<h1[^>]*>(.*?)<\/h1>/is', $html, $m)) {
-        $title = trim(strip_tags($m[1]));
-    }
-    if ($title === '' && preg_match('/<h2[^>]*>(.*?)<\/h2>/is', $html, $m)) {
-        $title = trim(strip_tags($m[1]));
-    }
+    if (preg_match('/<h1[^>]*>(.*?)<\/h1>/is', $html, $m)) $title = trim(strip_tags($m[1]));
+    if ($title === '' && preg_match('/<h2[^>]*>(.*?)<\/h2>/is', $html, $m)) $title = trim(strip_tags($m[1]));
 
     // Slug and link
     $name = basename($file, '.html');
     $slug = preg_replace('/^\d{4}-\d{2}-\d{2}-/', '', $name);
     $link = $siteUrl . '/blog/post/' . rawurlencode($slug);
 
-    // Pub date
+    // pubDate
     $pubTs = 0;
     if (preg_match('/^(\d{4}-\d{2}-\d{2})-/', $name, $mm)) {
         $pubTs = strtotime($mm[1] . ' 00:00:00 Europe/Moscow');
     }
-    if (!$pubTs) {
-        $pubTs = @filemtime($file) ?: time();
-    }
+    if (!$pubTs) $pubTs = @filemtime($file) ?: time();
     $pubDateRfc = date(DATE_RSS, $pubTs);
 
-    // Summary
+    // Summary (first paragraph)
     $summary = '';
     if (preg_match('/<p[^>]*>(.*?)<\/p>/is', $html, $m)) {
         $summary = trim(preg_replace('/\s+/', ' ', strip_tags($m[1])));
@@ -111,28 +101,19 @@ foreach ($files as $file) {
 
     // Full HTML with absolute URLs
     $fullHtml = absolutize_urls($html, $siteUrl);
-
-    // Plain full text for yandex
     $fullText = trim(preg_replace('/\s+/', ' ', strip_tags($html)));
 
-    // Image (absolute)
+    // Image (thumb) and enclosure length
     $img = $meta['thumb'] ?? '';
-    if ($img !== '' && strpos($img, 'http') !== 0) {
-        $img = $siteUrl . $img;
-    }
+    if ($img !== '' && strpos($img, 'http') !== 0) $img = $siteUrl . $img;
 
-    // enclosure length (bytes) if we can read it
     $enclosureLength = '';
     if ($img) {
-        $localPath = null;
-        // map absolute URL to local path if it starts with site origin
         $prefix = $siteUrl;
         if (stripos($img, $prefix) === 0) {
-            $rel = substr($img, strlen($prefix)); // starts with /...
-            $localPath = $_SERVER['DOCUMENT_ROOT'] . $rel;
-            if (is_file($localPath)) {
-                $enclosureLength = (string) filesize($localPath);
-            }
+            $rel = substr($img, strlen($prefix)); // /path
+            $local = $_SERVER['DOCUMENT_ROOT'] . $rel;
+            if (is_file($local)) $enclosureLength = (string) filesize($local);
         }
     }
 
@@ -168,7 +149,6 @@ foreach ($files as $file) {
       <content:encoded><![CDATA[<?= $fullHtml ?>]]></content:encoded>
       <yandex:full-text><![CDATA[<?= $fullText ?>]]></yandex:full-text>
     </item>
-
-<?php } // foreach ?>
+<?php endforeach; ?>
   </channel>
 </rss>
