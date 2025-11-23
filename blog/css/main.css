@@ -2519,6 +2519,18 @@ input::-moz-focus-inner {
     background-image: url(../images/icons/social/icon-rss.svg);
 }
 
+.header__social .ss-vk a::after {
+    background-image: url(../images/icons/social/icon-vk.svg);
+}
+
+.header__social .ss-telegram a::after {
+    background-image: url(../images/icons/social/icon-telegram.svg);
+}
+
+.header__social .ss-youtube a::after {
+    background-image: url(../images/icons/social/icon-youtube.svg);
+}
+
 /* ------------------------------------------------------------------- 
  * responsive:
  * header
