@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>WB Promotions Calendar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- FullCalendar (via CDN) -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+
+    <style>
+      :root {
+        --bg: #0f1115;
+        --panel: #161a22;
+        --muted: #94a3b8;
+        --text: #e5e7eb;
+        --accent: #7c3aed;
+        --ok: #16a34a;
+        --warn: #eab308;
+        --err: #ef4444;
+        --chip: #1f2937;
+      }
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: var(--bg);
+        color: var(--text);
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial,
+          sans-serif;
+      }
+      .wrap {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 16px;
+        height: 100%;
+        padding: 16px;
+        box-sizing: border-box;
+      }
+      .side {
+        background: var(--panel);
+        border-radius: 12px;
+        padding: 16px;
+        overflow: auto;
+      }
+      .side h2 {
+        margin: 0 0 12px;
+        font-size: 18px;
+      }
+      .row {
+        margin-bottom: 12px;
+      }
+      label {
+        display: block;
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+      select,
+      input[type="text"] {
+        width: 100%;
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: 1px solid #293042;
+        background: #0f1320;
+        color: var(--text);
+      }
+      .chips {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+      .chip {
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: var(--chip);
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .legend {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 6px;
+      }
+      .cal {
+        background: var(--panel);
+        border-radius: 12px;
+        padding: 12px;
+      }
+      /* Event colors */
+      .fc-event.active {
+        background: rgba(22, 163, 74, 0.15);
+        border-color: var(--ok);
+        color: #a7f3d0;
+      }
+      .fc-event.inactive {
+        background: rgba(124, 58, 237, 0.15);
+        border-color: var(--accent);
+        color: #ddd6fe;
+      }
+      .details {
+        margin-top: 16px;
+        padding: 12px;
+        border-radius: 10px;
+        background: #111521;
+        border: 1px solid #23304a;
+      }
+      .details h3 {
+        margin: 0 0 8px;
+        font-size: 16px;
+      }
+      .details .kv {
+        font-size: 13px;
+        color: var(--muted);
+        margin: 4px 0;
+      }
+      .link {
+        color: #93c5fd;
+        text-decoration: none;
+      }
+      .link:hover {
+        text-decoration: underline;
+      }
+      .err {
+        color: #fecaca;
+        background: #331a1a;
+        border: 1px solid #7f1d1d;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <aside class="side">
+        <h2>Filters</h2>
+        <div class="row">
+          <label for="q">Search (name/region)</label>
+          <input id="q" type="text" placeholder="Type to filter..." />
+        </div>
+        <div class="row">
+          <label for="type">Type</label>
+          <select id="type">
+            <option value="">All types</option>
+          </select>
+        </div>
+        <div class="row">
+          <label for="status">Status</label>
+          <select id="status">
+            <option value="">All statuses</option>
+          </select>
+        </div>
+        <div class="row">
+          <div class="legend">
+            <span><span class="dot" style="background: var(--ok)"></span>Active</span>
+            <span
+              ><span class="dot" style="background: var(--accent)"></span>Upcoming /
+              Past</span
+            >
+          </div>
+        </div>
+
+        <div class="details" id="details" hidden>
+          <h3 id="d-title"></h3>
+          <div class="kv" id="d-when"></div>
+          <div class="kv" id="d-type"></div>
+          <div class="kv" id="d-status"></div>
+          <div class="kv" id="d-region"></div>
+          <div class="kv" id="d-discount"></div>
+          <div class="kv" id="d-budget"></div>
+          <div class="kv" id="d-link"></div>
+        </div>
+
+        <div id="error" class="err" hidden></div>
+
+        <div class="row">
+          <label>Loaded info</label>
+          <div class="chips" id="chips"></div>
+        </div>
+      </aside>
+
+      <main class="cal">
+        <div id="calendar"></div>
+      </main>
+    </div>
+
+    <script>
+      // Config: path to your PHP endpoint
+      const ENDPOINT = 'api/wb-promotions-calendar.php';
+
+      // Local state
+      let rawItems = [];
+      let filtered = [];
+
+      // DOM refs
+      const qEl = document.getElementById('q');
+      const typeEl = document.getElementById('type');
+      const statusEl = document.getElementById('status');
+      const chipsEl = document.getElementById('chips');
+      const errorEl = document.getElementById('error');
+
+      const detailsBox = document.getElementById('details');
+      const dTitle = document.getElementById('d-title');
+      const dWhen = document.getElementById('d-when');
+      const dType = document.getElementById('d-type');
+      const dStatus = document.getElementById('d-status');
+      const dRegion = document.getElementById('d-region');
+      const dDiscount = document.getElementById('d-discount');
+      const dBudget = document.getElementById('d-budget');
+      const dLink = document.getElementById('d-link');
+
+      // Calendar init
+      let calendar;
+      function initCalendar(events) {
+        const el = document.getElementById('calendar');
+        if (calendar) {
+          calendar.destroy();
+        }
+        calendar = new FullCalendar.Calendar(el, {
+          initialView: 'dayGridMonth',
+          height: '100%',
+          headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,listWeek',
+          },
+          navLinks: true,
+          nowIndicator: true,
+          eventDisplay: 'block',
+          eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
+          events,
+          eventClick: (info) => {
+            const d = info.event.extendedProps.raw || {};
+            showDetails(info.event.title, info.event.start, info.event.end, d);
+          },
+          eventDidMount: (arg) => {
+            // Color by active flag
+            const active = !!arg.event.extendedProps.active;
+            const classList = arg.el.classList;
+            classList.add(active ? 'active' : 'inactive');
+          },
+        });
+        calendar.render();
+      }
+
+      // Convert API items to FullCalendar events
+      function toEvents(items) {
+        return items.map((x) => {
+          return {
+            id: x.id || undefined,
+            title: x.name || '(No name)',
+            start: x.startDate || null,
+            end: x.endDate || null,
+            allDay: true,
+            active: !!x.active,
+            raw: x,
+          };
+        });
+      }
+
+      // Filtering
+      function applyFilters() {
+        const q = qEl.value.trim().toLowerCase();
+        const t = typeEl.value;
+        const s = statusEl.value;
+
+        filtered = rawItems.filter((x) => {
+          if (t && (x.type || '') !== t) return false;
+          if (s && (x.status || '') !== s) return false;
+          if (q) {
+            const hay =
+              (x.name || '') +
+              ' ' +
+              (x.region || '') +
+              ' ' +
+              (x.type || '') +
+              ' ' +
+              (x.status || '');
+            if (!hay.toLowerCase().includes(q)) return false;
+          }
+          return true;
+        });
+
+        const events = toEvents(filtered);
+        initCalendar(events);
+        updateChips();
+      }
+
+      // Details panel
+      function showDetails(title, start, end, raw) {
+        dTitle.textContent = title || '(No name)';
+        const fmt = (d) =>
+          d
+            ? new Date(d).toLocaleString(undefined, {
+                year: 'numeric',
+                month: 'short',
+                day: '2-digit',
+              })
+            : '—';
+        dWhen.textContent = `When: ${fmt(start)} — ${fmt(end)}`;
+        dType.textContent = `Type: ${raw.type || '—'}`;
+        dStatus.textContent = `Status: ${raw.status || '—'}`;
+        dRegion.textContent = `Region: ${raw.region || '—'}`;
+        dDiscount.textContent =
+          'discount' in raw && raw.discount != null
+            ? `Discount: ${raw.discount}%`
+            : 'Discount: —';
+        dBudget.textContent =
+          'budget' in raw && raw.budget != null
+            ? `Budget: ${raw.budget}`
+            : 'Budget: —';
+        if (raw.link) {
+          dLink.innerHTML = `Link: <a class="link" href="${raw.link}" target="_blank" rel="noopener">open</a>`;
+        } else {
+          dLink.textContent = 'Link: —';
+        }
+        detailsBox.hidden = false;
+      }
+
+      function updateChips() {
+        chipsEl.innerHTML = '';
+        const total = document.createElement('span');
+        total.className = 'chip';
+        total.textContent = `Shown: ${filtered.length}`;
+        chipsEl.appendChild(total);
+
+        const activeCnt = filtered.filter((x) => x.active).length;
+        const c2 = document.createElement('span');
+        c2.className = 'chip';
+        c2.textContent = `Active: ${activeCnt}`;
+        chipsEl.appendChild(c2);
+
+        const range = (() => {
+          const ds = filtered
+            .map((x) => (x.startDate ? Date.parse(x.startDate) : null))
+            .filter((t) => t != null);
+          const de = filtered
+            .map((x) => (x.endDate ? Date.parse(x.endDate) : null))
+            .filter((t) => t != null);
+          if (!ds.length && !de.length) return null;
+          const min = ds.length ? new Date(Math.min(...ds)) : null;
+          const max = de.length ? new Date(Math.max(...de)) : null;
+          return [min, max];
+        })();
+
+        if (range) {
+          const [min, max] = range;
+          const s = min
+            ? min.toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: 'short',
+                day: '2-digit',
+              })
+            : '—';
+          const e = max
+            ? max.toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: 'short',
+                day: '2-digit',
+              })
+            : '—';
+          const r = document.createElement('span');
+          r.className = 'chip';
+          r.textContent = `Range: ${s} — ${e}`;
+          chipsEl.appendChild(r);
+        }
+      }
+
+      // Populate filter dropdowns from data
+      function populateFilters(items) {
+        const types = [...new Set(items.map((x) => x.type).filter(Boolean))].sort();
+        const statuses = [...new Set(items.map((x) => x.status).filter(Boolean))].sort();
+
+        // Reset options except first
+        typeEl.length = 1;
+        statusEl.length = 1;
+        for (const v of types) {
+          const o = document.createElement('option');
+          o.value = v;
+          o.textContent = v;
+          typeEl.appendChild(o);
+        }
+        for (const v of statuses) {
+          const o = document.createElement('option');
+          o.value = v;
+          o.textContent = v;
+          statusEl.appendChild(o);
+        }
+      }
+
+      // Fetch data
+      async function load() {
+        errorEl.hidden = true;
+        detailsBox.hidden = true;
+        try {
+          const res = await fetch(ENDPOINT, { cache: 'no-store' });
+          if (!res.ok) {
+            const text = await res.text();
+            throw new Error(`HTTP ${res.status}: ${text}`);
+          }
+          const data = await res.json();
+          if (!Array.isArray(data)) throw new Error('Invalid payload');
+          rawItems = data;
+          filtered = data.slice();
+
+          populateFilters(rawItems);
+          applyFilters();
+        } catch (e) {
+          errorEl.textContent = 'Failed to load promotions: ' + e.message;
+          errorEl.hidden = false;
+          console.error(e);
+        }
+      }
+
+      // Wire filters
+      qEl.addEventListener('input', debounce(applyFilters, 200));
+      typeEl.addEventListener('change', applyFilters);
+      statusEl.addEventListener('change', applyFilters);
+
+      function debounce(fn, ms) {
+        let t;
+        return (...args) => {
+          clearTimeout(t);
+          t = setTimeout(() => fn.apply(null, args), ms);
+        };
+      }
+
+      load();
+    </script>
+  </body>
+</html>
