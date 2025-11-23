@@ -1,20 +1,15 @@
 <?php
-// api/wb-promo-details-hydrated.php
-// One-call endpoint:
-// 1) Fetches promotions list (ids) for a window
-// 2) Fetches details for those ids
-// 3) Returns normalized detailed promotions
-//
-// Optional query params (pass-through to list):
-//   startDateTime, endDateTime (RFC3339 UTC), allPromo=true|false, limit, offset
-//
-// Change only the header line if your account requires X-Api-Key.
+// api/wb-promo-details.php
+// Final production endpoint:
+// 1) Lists promotions for a rolling 60-day window (now -> +60d, allPromo=true)
+// 2) Fetches detailed info for those IDs
+// 3) Returns normalized array of detailed promotions
 
 declare(strict_types=1);
-ini_set('display_errors', '1');
+ini_set('display_errors', '0');
 error_reporting(E_ALL);
 
-// 1) Load token
+// Load token: ENV -> file api/wb_ads_token.php
 $token = getenv('WB_ADS_TOKEN');
 if (!$token) {
   $secretFile = __DIR__ . '/wb_ads_token.php';
@@ -29,124 +24,128 @@ header('Cache-Control: no-store');
 
 if (!$token) {
   http_response_code(500);
-  echo json_encode(['error' => 'WB_ADS_TOKEN not configured']);
+  echo json_encode(['error' => 'WB_ADS_TOKEN not configured'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
   exit;
 }
 
-// 2) Helper: RFC3339 UTC
-function rfc3339_utc(int $ts): string {
-  return gmdate('Y-m-d\TH:i:s\Z', $ts);
+function rfc3339_utc(int $ts): string { return gmdate('Y-m-d\TH:i:s\Z', $ts); }
+function iso_or_null($v) {
+  if (!is_string($v) || $v === '') return null;
+  $t = strtotime($v);
+  if ($t === false) return null;
+  return gmdate('c', $t);
 }
 
-// 3) Gather params for list call (defaults: now -> +60 days, allPromo=true)
+// Defaults: window now -> +60 days, allPromo=true
 $now = time();
-$startDateTime = isset($_GET['startDateTime']) && $_GET['startDateTime'] !== '' ? (string)$_GET['startDateTime'] : rfc3339_utc($now);
-$endDateTime   = isset($_GET['endDateTime'])   && $_GET['endDateTime']   !== '' ? (string)$_GET['endDateTime']   : rfc3339_utc($now + 60 * 86400);
-$allPromo = isset($_GET['allPromo'])
+$startDateTime = $_GET['startDateTime'] ?? rfc3339_utc($now);
+$endDateTime   = $_GET['endDateTime']   ?? rfc3339_utc($now + 60 * 86400);
+$allPromo      = isset($_GET['allPromo'])
   ? (($_GET['allPromo'] === '1' || strtolower((string)$_GET['allPromo']) === 'true') ? 'true' : 'false')
   : 'true';
 $limit  = isset($_GET['limit'])  && is_numeric($_GET['limit'])  ? max(1, min(1000, (int)$_GET['limit'])) : 500;
 $offset = isset($_GET['offset']) && is_numeric($_GET['offset']) ? max(0, (int)$_GET['offset']) : 0;
 
-// 4) Call WB list endpoint directly (to avoid depending on a local file path)
-$listQuery = http_build_query([
+// WB header type: Authorization (change to 'X-Api-Key' if your account requires it)
+$HEADER_NAME = 'Authorization';
+
+// Step 1: list promotions
+$listQS = http_build_query([
   'startDateTime' => $startDateTime,
   'endDateTime'   => $endDateTime,
   'allPromo'      => $allPromo,
   'limit'         => $limit,
   'offset'        => $offset,
 ]);
-$listUrl = 'https://dp-calendar-api.wildberries.ru/api/v1/calendar/promotions?' . $listQuery;
+$listURL = 'https://dp-calendar-api.wildberries.ru/api/v1/calendar/promotions?' . $listQS;
 
-$ch = curl_init($listUrl);
+$ch = curl_init($listURL);
 curl_setopt_array($ch, [
   CURLOPT_RETURNTRANSFER => true,
-  CURLOPT_TIMEOUT => 25,
+  CURLOPT_TIMEOUT => 30,
   CURLOPT_HTTPHEADER => [
-    'Authorization: ' . $token, // if needed: 'X-Api-Key: ' . $token
+    $HEADER_NAME . ': ' . $token,
     'Accept: application/json',
   ],
 ]);
-$listResp = curl_exec($ch);
-$listHttp = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$listBody = curl_exec($ch);
+$listCode = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $listErr  = curl_error($ch);
 curl_close($ch);
 
-if ($listResp === false) {
+if ($listBody === false) {
   http_response_code(500);
   echo json_encode(['error' => 'Curl error (list)', 'detail' => $listErr], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
   exit;
 }
-if ($listHttp < 200 || $listHttp >= 300) {
-  http_response_code($listHttp);
-  echo json_encode(['error' => 'WB API error (list)', 'status' => $listHttp, 'detail' => $listResp], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+if ($listCode < 200 || $listCode >= 300) {
+  http_response_code($listCode);
+  echo json_encode(['error' => 'WB API error (list)', 'status' => $listCode, 'detail' => $listBody], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
   exit;
 }
 
-$listJson = json_decode($listResp, true);
+$listJson = json_decode($listBody, true);
 if ($listJson === null && json_last_error() !== JSON_ERROR_NONE) {
   http_response_code(502);
   echo json_encode(['error' => 'JSON decode error (list)', 'json_error' => json_last_error_msg()], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
   exit;
 }
+
 $listData = $listJson['data'] ?? $listJson;
 $promosList = [];
 if (is_array($listData)) {
-  if (isset($listData['promotions']) && is_array($listData['promotions'])) {
-    $promosList = $listData['promotions'];
-  } else {
-    $promosList = $listData;
-  }
+  if (isset($listData['promotions']) && is_array($listData['promotions'])) $promosList = $listData['promotions'];
+  else $promosList = $listData;
 }
 
-// 5) Collect IDs
+// Collect IDs (max 100)
 $ids = [];
 foreach ((array)$promosList as $p) {
   if (!is_array($p)) continue;
   $id = $p['id'] ?? ($p['promotionId'] ?? null);
   if ($id === null) continue;
-  $ids[] = (int)$id;
+  $i = (int)$id;
+  if ($i > 0) $ids[] = $i;
 }
-$ids = array_values(array_unique(array_filter($ids, fn($v) => $v > 0)));
+$ids = array_values(array_unique($ids));
 if (!$ids) {
   echo json_encode([], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
   exit;
 }
-// WB limit is 100 IDs; trim if necessary
 if (count($ids) > 100) $ids = array_slice($ids, 0, 100);
 
-// 6) Call WB details with repeated promotionIDs
+// Step 2: details for these IDs
 $detailsBase = 'https://dp-calendar-api.wildberries.ru/api/v1/calendar/promotions/details';
 $qs = [];
-foreach ($ids as $id) $qs[] = 'promotionIDs=' . rawurlencode((string)$id);
-$detailsUrl = $detailsBase . '?' . implode('&', $qs);
+foreach ($ids as $i) $qs[] = 'promotionIDs=' . rawurlencode((string)$i);
+$detailsURL = $detailsBase . '?' . implode('&', $qs);
 
-$ch = curl_init($detailsUrl);
+$ch = curl_init($detailsURL);
 curl_setopt_array($ch, [
   CURLOPT_RETURNTRANSFER => true,
-  CURLOPT_TIMEOUT => 25,
+  CURLOPT_TIMEOUT => 30,
   CURLOPT_HTTPHEADER => [
-    'Authorization: ' . $token, // if needed: 'X-Api-Key: ' . $token
+    $HEADER_NAME . ': ' . $token,
     'Accept: application/json',
   ],
 ]);
-$detResp = curl_exec($ch);
-$detHttp = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$detBody = curl_exec($ch);
+$detCode = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $detErr  = curl_error($ch);
 curl_close($ch);
 
-if ($detResp === false) {
+if ($detBody === false) {
   http_response_code(500);
   echo json_encode(['error' => 'Curl error (details)', 'detail' => $detErr], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
   exit;
 }
-if ($detHttp < 200 || $detHttp >= 300) {
-  http_response_code($detHttp);
-  echo json_encode(['error' => 'WB API error (details)', 'status' => $detHttp, 'detail' => $detResp], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+if ($detCode < 200 || $detCode >= 300) {
+  http_response_code($detCode);
+  echo json_encode(['error' => 'WB API error (details)', 'status' => $detCode, 'detail' => $detBody], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
   exit;
 }
 
-$detJson = json_decode($detResp, true);
+$detJson = json_decode($detBody, true);
 if ($detJson === null && json_last_error() !== JSON_ERROR_NONE) {
   http_response_code(502);
   echo json_encode(['error' => 'JSON decode error (details)', 'json_error' => json_last_error_msg()], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -156,21 +155,13 @@ if ($detJson === null && json_last_error() !== JSON_ERROR_NONE) {
 $detData = $detJson['data'] ?? $detJson;
 $promos = (isset($detData['promotions']) && is_array($detData['promotions'])) ? $detData['promotions'] : [];
 
-// 7) Normalize
-function isoOrNull($v) {
-  if (!is_string($v) || $v === '') return null;
-  $t = strtotime($v);
-  if ($t === false) return null;
-  return gmdate('c', $t);
-}
-
 $nowTs = time();
 $out = [];
 foreach ($promos as $p) {
   if (!is_array($p)) continue;
 
-  $start = isoOrNull($p['startDateTime'] ?? null);
-  $end   = isoOrNull($p['endDateTime'] ?? null);
+  $start = iso_or_null($p['startDateTime'] ?? null);
+  $end   = iso_or_null($p['endDateTime'] ?? null);
   $active = null;
   if ($start !== null) {
     $s = strtotime($start);

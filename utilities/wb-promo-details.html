@@ -5,7 +5,7 @@
     <title>WB Promotion Details</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
-      body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif; background: #0f1115; color: #e5e7eb; }
+      body { margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: #0f1115; color: #e5e7eb; }
       .wrap { display: grid; grid-template-columns: 380px 1fr; gap: 16px; height: 100vh; padding: 16px; box-sizing: border-box; }
       .panel { background: #161a22; border-radius: 12px; padding: 16px; overflow: auto; }
       .row { margin-bottom: 12px; }
@@ -36,12 +36,12 @@
       <main class="panel">
         <h2>Details</h2>
         <div class="chips" id="chips"></div>
-        <div id="details"></div>
+        <div id="details" class="kv">Loading…</div>
       </main>
     </div>
 
     <script>
-      const ENDPOINT = '/api/wb-promo-details-hydrated.php';
+      const ENDPOINT = '/api/wb-promo-details.php';
 
       const listEl = document.getElementById('list');
       const detailsEl = document.getElementById('details');
@@ -84,7 +84,7 @@
 
       function renderDetails() {
         const p = filtered.find((x) => x.id === selectedId);
-        if (!p) { detailsEl.innerHTML = '<div class="kv">Select a promotion</div>'; return; }
+        if (!p) { detailsEl.textContent = 'Select a promotion'; return; }
 
         const adv = Array.isArray(p.advantages) ? p.advantages.filter(Boolean) : [];
         const rng = Array.isArray(p.ranging) ? p.ranging : [];
@@ -125,6 +125,7 @@
 
       async function load() {
         errorEl.hidden = true;
+        detailsEl.textContent = 'Loading…';
         try {
           const res = await fetch(ENDPOINT, { cache: 'no-store' });
           if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
@@ -136,8 +137,9 @@
           renderList();
           renderDetails();
         } catch (e) {
-          errorEl.textContent = 'Failed to load details: ' + e.message;
+          errorEl.textContent = 'Failed to load promotions: ' + e.message;
           errorEl.hidden = false;
+          detailsEl.textContent = '—';
           console.error(e);
         }
       }
