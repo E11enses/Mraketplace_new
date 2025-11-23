@@ -2,10 +2,9 @@
 <html lang="ru">
   <head>
     <meta charset="utf-8" />
-    <title>Акции WB — календарь и детали (без плагинов)</title>
+    <title>Акции WB — 30 узких колонок за месяц (без timeline)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- FullCalendar base bundle (dayGrid/timeGrid/list внутри) -->
     <link
       href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css"
       rel="stylesheet"
@@ -42,7 +41,6 @@
         font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       }
 
-      /* 15% / 85% раскладка */
       .wrap {
         display: grid;
         grid-template-columns: 15% 85%;
@@ -88,11 +86,8 @@
         white-space: nowrap;
       }
 
-      /* Список (левая колонка) */
-      .list {
-        display: grid;
-        gap: 8px;
-      }
+      /* left list */
+      .list { display: grid; gap: 8px; }
       .item {
         background: #fff;
         border: 2px solid var(--border);
@@ -101,124 +96,82 @@
         cursor: pointer;
         transition: box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
       }
-      .item:hover { box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08); }
+      .item:hover { box-shadow: 0 1px 6px rgba(0,0,0,.08); }
       .title { font-weight: 600; font-size: 13px; }
       .sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
 
       .topline {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 6px;
-        flex-wrap: wrap;
+        display: flex; justify-content: space-between; align-items: center;
+        gap: 6px; flex-wrap: wrap;
       }
       .pills { display: inline-flex; gap: 6px; align-items: center; }
       .pill {
-        padding: 2px 6px;
-        border-radius: 999px;
-        border: 1px solid var(--border);
-        font-size: 11px;
-        white-space: nowrap;
-        background: #fff;
-        color: var(--muted);
+        padding: 2px 6px; border-radius: 999px; border: 1px solid var(--border);
+        font-size: 11px; white-space: nowrap; background: #fff; color: var(--muted);
       }
       .status-active {
-        background: var(--active-bg);
-        border-color: var(--active-border);
-        color: var(--active-text);
+        background: var(--active-bg); border-color: var(--active-border); color: var(--active-text);
       }
       .status-planned {
-        background: var(--planned-bg);
-        border-color: var(--planned-border);
-        color: var(--planned-text);
+        background: var(--planned-bg); border-color: var(--planned-border); color: var(--planned-text);
       }
-      .type-regular {
-        border-color: var(--type-regular-border);
-        color: var(--type-regular-text);
-        background: #f5f7ff;
-      }
-      .type-auto {
-        border-color: var(--type-auto-border);
-        color: var(--type-auto-text);
-        background: #ecfeff;
-      }
+      .type-regular { border-color: var(--type-regular-border); color: var(--type-regular-text); background: #f5f7ff; }
+      .type-auto    { border-color: var(--type-auto-border);    color: var(--type-auto-text);    background: #ecfeff; }
 
-      /* Правая колонка (календарь + детали) */
-      .right {
-        display: grid;
-        grid-template-rows: auto 1fr auto;
-        gap: 10px;
-        min-height: 0;
-      }
+      /* right column */
+      .right { display: grid; grid-template-rows: auto 1fr auto; gap: 10px; min-height: 0; }
       #calendar {
-        background: #fff;
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 6px;
-        min-height: 420px;
+        background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 6px; min-height: 420px;
       }
 
-      /* Заголовки календаря */
+      /* FullCalendar tweaks */
       .fc .fc-toolbar-title { font-size: 18px; font-weight: 700; color: var(--text); }
       .fc .fc-button {
-        background: #f8fafc;
-        border: 1px solid var(--border);
-        color: var(--text);
-        padding: 5px 9px;
-        border-radius: 8px;
-        text-transform: none;
+        background: #f8fafc; border: 1px solid var(--border); color: var(--text);
+        padding: 5px 9px; border-radius: 8px; text-transform: none;
       }
       .fc .fc-button-primary:not(:disabled):hover { background: #eef2f7; border-color: #d1d5db; }
       .fc-theme-standard td, .fc-theme-standard th { border-color: var(--border); }
 
-      /* Уплотняем ячейки month-view, чтобы "узкий" месяц поместился */
-      .fc .fc-daygrid-day-frame { padding: 2px; }      /* меньше отступы внутри дня */
-      .fc .fc-daygrid-day-number { font-size: 11px; }  /* номер дня меньше */
-      .fc .fc-col-header-cell-cushion { font-size: 12px; } /* шапка дней */
-
-      /* События — компактные, текст черный по умолчанию */
-      .fc .fc-event, .fc .fc-daygrid-event { color: #000 !important; }
+      /* Force event text black by default; fill when selected via JS */
+      .fc .fc-event, .fc .fc-timegrid-event { color: #000 !important; }
       .fc .fc-event, .fc .fc-event * { color: inherit; }
 
-      .fc-daygrid-event {
-        margin-top: 1px;      /* меньше вертикальный отступ между событиями */
-        padding: 1px 3px;     /* компактнее */
-        border-radius: 6px;
-        background: transparent !important; /* по умолчанию только рамка */
-        line-height: 1.2;
-        font-size: 12px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+      /* Compact all-day rows in timeGrid */
+      .fc-timegrid .fc-timegrid-axis-frame { font-size: 11px; color: var(--muted); }
+
+      /* Hide time rows; we display only all-day row */
+      .fc-timegrid-slot, .fc-timegrid-slots, .fc-timegrid-axis { display: none !important; }
+      .fc-timegrid .fc-timegrid-body { display: none !important; }
+
+      /* Make all-day row visible and compact */
+      .fc-timegrid .fc-timegrid-allday { display: block !important; }
+      .fc-timegrid .fc-timegrid-allday .fc-timegrid-cols { height: auto !important; }
+      .fc-timegrid .fc-timegrid-allday .fc-daygrid-body-unbalanced .fc-daygrid-day-events { margin: 2px; }
+
+      /* Narrow day columns: we reduce padding and font sizes */
+      .fc .fc-col-header-cell-cushion { font-size: 12px; padding: 2px 0; }
+      .fc .fc-timegrid-col-frame { padding: 2px 0; }
+
+      /* Event chips in all-day row */
+      .fc .fc-h-event {
+        background: transparent !important; border-width: 2px; border-radius: 6px;
+        padding: 1px 3px; font-size: 12px; line-height: 1.2;
+        overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
       }
 
-      /* Детали */
-      .details {
-        background: #fff;
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 10px;
-      }
+      /* Details block */
+      .details { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 10px; }
       .kv { margin: 6px 0; color: var(--muted); white-space: pre-wrap; }
 
-      .err {
-        color: #b91c1c;
-        background: #fee2e2;
-        border: 1px solid #fecaca;
-        padding: 10px;
-        border-radius: 10px;
-        font-size: 14px;
-      }
+      .err { color: #b91c1c; background: #fee2e2; border: 1px solid #fecaca; padding: 10px; border-radius: 10px; font-size: 14px; }
 
-      /* Адаптив */
-      @media (max-width: 960px) {
-        .wrap { grid-template-columns: 1fr; }
-      }
+      @media (max-width: 960px) { .wrap { grid-template-columns: 1fr; } }
     </style>
   </head>
   <body>
     <div class="wrap">
-      <!-- LEFT 15% -->
+      <!-- LEFT -->
       <aside class="panel">
         <h3 style="margin:0 0 6px;">Список акций</h3>
         <div class="row">
@@ -243,13 +196,13 @@
         <div id="error" class="err" hidden></div>
       </aside>
 
-      <!-- RIGHT 85% -->
+      <!-- RIGHT -->
       <section class="right">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-          <h3 style="margin:0;">Календарь (месяц)</h3>
+          <h3 style="margin:0;">Календарь (узкий месяц)</h3>
           <div class="chips">
             <span class="chip">Сегодня: <span id="today"></span></span>
-            <span class="chip">Вид: месяц / неделя / список</span>
+            <span class="chip">Вид: узкий месяц / неделя / список</span>
           </div>
         </div>
 
@@ -318,11 +271,7 @@
           ? new Date(d).toLocaleString('ru-RU', { year: 'numeric', month: 'short', day: '2-digit' })
           : '—';
       }
-      function typeRu(type) {
-        if (type === 'auto') return 'авто';
-        if (type === 'regular') return 'регулярная';
-        return '—';
-      }
+      function typeRu(type) { return type === 'auto' ? 'авто' : (type === 'regular' ? 'регулярная' : '—'); }
       function typeClass(type) { return type === 'auto' ? 'type-auto' : 'type-regular'; }
       function statusPillText(active) { return active ? 'Активна' : 'Запланирована'; }
 
@@ -502,31 +451,60 @@
         }
       }
 
+      function firstOfMonth(d) {
+        const x = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1));
+        return x;
+      }
+      function monthLength(d) {
+        const y = d.getUTCFullYear();
+        const m = d.getUTCMonth();
+        return new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+      }
+
       function initCalendar(events) {
         const el = document.getElementById('calendar');
         if (calendar) { calendar.destroy(); eventElsById.clear(); }
 
+        const now = new Date();
+        const start = firstOfMonth(new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)));
+        const days = monthLength(start); // 28..31
+
         calendar = new FullCalendar.Calendar(el, {
           locale: 'ru',
           timeZone: 'UTC',
-          initialView: 'dayGridMonth',
+
+          // custom "narrow month": timeGrid with 28..31 day duration
+          initialView: 'timeGridMonthNarrow',
+          initialDate: start.toISOString(),
           headerToolbar: {
             left: 'prev,next today',
             center: 'title',
-            right: 'dayGridMonth,timeGridWeek,listWeek',
+            right: 'timeGridMonthNarrow,timeGridWeek,listWeek',
           },
           buttonText: {
             today: 'сегодня',
-            month: 'месяц',
+            timeGridMonthNarrow: 'узкий месяц',
             week: 'неделя',
             list: 'список',
           },
 
-          events,
+          views: {
+            timeGridMonthNarrow: {
+              type: 'timeGrid',
+              duration: { days },     // 28..31 вертикальных узких колонок
+              slotDuration: '24:00',  // один слот = день
+              allDaySlot: true,       // показываем только all-day
+              dayHeaderFormat: { weekday: 'short', day: 'numeric' }, // заголовки колонок
+            },
+          },
+
+          events,               // ваши allDay события
           eventDisplay: 'block',
           eventTimeFormat: false,
-          dayMaxEvents: 6,           // больше событий в ячейке (компактный список)
-          dayMaxEventRows: true,     // разрешаем перенос событий внутри дня
+
+          // keep week/list available
+          slotMinTime: '00:00',
+          slotMaxTime: '24:00',
 
           eventDidMount: (arg) => {
             const p = arg.event.extendedProps.raw;
@@ -534,8 +512,6 @@
             const sel = selectedId === p.id;
             styleEventElement(arg.el, color, sel);
             registerEventEl(String(p.id), arg.el);
-            // тонкая рамка вокруг всей ячейки события
-            arg.el.style.borderColor = color;
           },
           eventClick: (info) => {
             const d = info.event.extendedProps.raw || {};
@@ -548,6 +524,24 @@
         });
 
         calendar.render();
+        calendar.gotoDate(start);
+      }
+
+      async function load() {
+        errorEl.hidden = true;
+        try {
+          const res = await fetch(ENDPOINT, { cache: 'no-store' });
+          if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+          const data = await res.json();
+          if (!Array.isArray(data)) throw new Error('Некорректный ответ сервера');
+          all = data;
+          selectedId = null;
+          applyFilter();
+        } catch (e) {
+          errorEl.textContent = 'Не удалось загрузить акции: ' + e.message;
+          errorEl.hidden = false;
+          console.error(e);
+        }
       }
 
       function applyFilter() {
@@ -574,34 +568,11 @@
         showDetails(filtered.find((x) => x.id === selectedId));
       }
 
-      async function load() {
-        errorEl.hidden = true;
-        try {
-          const res = await fetch(ENDPOINT, { cache: 'no-store' });
-          if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-          const data = await res.json();
-          if (!Array.isArray(data)) throw new Error('Некорректный ответ сервера');
-          all = data;
-          selectedId = null;
-          applyFilter();
-        } catch (e) {
-          errorEl.textContent = 'Не удалось загрузить акции: ' + e.message;
-          errorEl.hidden = false;
-          console.error(e);
-        }
-      }
-
       qEl.addEventListener('input', debounce(applyFilter, 200));
       sortEl.addEventListener('change', applyFilter);
       typeEl.addEventListener('change', applyFilter);
 
-      function debounce(fn, ms) {
-        let t;
-        return (...a) => {
-          clearTimeout(t);
-          t = setTimeout(() => fn(...a), ms);
-        };
-      }
+      function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
 
       load();
     </script>
