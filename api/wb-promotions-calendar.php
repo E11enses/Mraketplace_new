@@ -5,11 +5,11 @@
 
 declare(strict_types=1);
 
-// Error visibility (optionally disable in prod)
+// Error visibility (optionally disable on prod)
 ini_set('display_errors', '1');
 error_reporting(E_ALL);
 
-// 1) Get Promotions token: ENV -> file wb_ads_token (plain text, no extra formatting)
+// 1) Get Promotions token: ENV -> file wb_ads_token.php (plain text, no extra formatting)
 $token = getenv('WB_ADS_TOKEN');
 if (!$token) {
   $secretFile = __DIR__ . '/wb_ads_token.php';
@@ -18,7 +18,6 @@ if (!$token) {
   }
 }
 
-// 2) Basic headers
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 header('Cache-Control: no-store');
@@ -29,17 +28,51 @@ if (!$token) {
   exit;
 }
 
-// 3) Endpoint (as per docs)
-$endpoint = 'https://dp-calendar-api.wildberries.ru/api/v1/calendar/promotions';
+// Helpers
+function rfc3339_utc(int $ts): string {
+  return gmdate('Y-m-d\TH:i:s\Z', $ts);
+}
 
-// 4) Perform request
+// Required query params per WB docs
+// If not provided via GET, use sane defaults: last 7 days to next 60 days
+$now = time();
+$defaultStart = rfc3339_utc($now - 7 * 86400);
+$defaultEnd   = rfc3339_utc($now + 60 * 86400);
+
+$startDateTime = isset($_GET['startDateTime']) && $_GET['startDateTime'] !== ''
+  ? (string)$_GET['startDateTime']
+  : $defaultStart;
+
+$endDateTime = isset($_GET['endDateTime']) && $_GET['endDateTime'] !== ''
+  ? (string)$_GET['endDateTime']
+  : $defaultEnd;
+
+// allPromo: false by default (only available-to-participate)
+$allPromo = isset($_GET['allPromo'])
+  ? (($_GET['allPromo'] === '1' || strtolower((string)$_GET['allPromo']) === 'true') ? 'true' : 'false')
+  : 'false';
+
+// Pagination (optional)
+$limit  = isset($_GET['limit'])  && is_numeric($_GET['limit'])  ? max(1, min(1000, (int)$_GET['limit'])) : 500;
+$offset = isset($_GET['offset']) && is_numeric($_GET['offset']) ? max(0, (int)$_GET['offset']) : 0;
+
+// Endpoint + query
+$endpointBase = 'https://dp-calendar-api.wildberries.ru/api/v1/calendar/promotions';
+$q = [
+  'startDateTime' => $startDateTime,
+  'endDateTime'   => $endDateTime,
+  'allPromo'      => $allPromo,
+  'limit'         => $limit,
+  'offset'        => $offset,
+];
+$endpoint = $endpointBase . '?' . http_build_query($q);
+
+// Request (Authorization header as per your preference)
 $ch = curl_init($endpoint);
 curl_setopt_array($ch, [
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_TIMEOUT => 25,
   CURLOPT_HTTPHEADER => [
-    // Most WB promo endpoints accept Authorization with the token
-    // If docs state 'X-Api-Key', switch the header below accordingly.
     'Authorization: ' . $token,
     'Accept: application/json',
   ],
@@ -50,7 +83,6 @@ $http = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $err  = curl_error($ch);
 curl_close($ch);
 
-// 5) Transport-level errors
 if ($resp === false) {
   http_response_code(500);
   echo json_encode(['error' => 'Curl error', 'detail' => $err], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -59,11 +91,21 @@ if ($resp === false) {
 
 if ($http < 200 || $http >= 300) {
   http_response_code($http);
-  echo json_encode(['error' => 'WB API error', 'status' => $http, 'detail' => $resp], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+  $payload = [
+    'error' => 'WB API error',
+    'status' => $http,
+    'detail' => $resp,
+  ];
+  if ($http === 401) {
+    $payload['hint'] = 'Unauthorized: token may not have Promotions scope or header may not be accepted.';
+  } elseif ($http === 400) {
+    $payload['hint'] = 'Bad Request: check startDateTime/endDateTime/allPromo/limit/offset format.';
+  }
+  echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
   exit;
 }
 
-// 6) Parse JSON safely
+// Parse JSON
 $raw = json_decode($resp, true);
 if ($raw === null && json_last_error() !== JSON_ERROR_NONE) {
   http_response_code(502);
@@ -75,7 +117,7 @@ if ($raw === null && json_last_error() !== JSON_ERROR_NONE) {
   exit;
 }
 
-// 7) Unwrap common containers (defensive)
+// Unwrap common containers if present
 if (!is_array($raw)) {
   $raw = [];
 } elseif (isset($raw['data']) && is_array($raw['data'])) {
@@ -86,38 +128,31 @@ if (!is_array($raw)) {
   $raw = $raw['rows'];
 }
 
-// 8) Utility: parse date safely and create flags
-function parseDate(?string $s): ?string {
+// Normalization
+function parseIso(?string $s): ?string {
   if (!$s) return null;
   $ts = strtotime($s);
   if ($ts === false) return null;
-  // Return ISO8601 in UTC to be consistent for frontend
   return gmdate('c', $ts);
 }
 
 $nowTs = time();
-
-// 9) Normalize for calendar UI
 $items = [];
+
 foreach ($raw as $p) {
   if (!is_array($p)) continue;
 
-  // Try common field names from the WB Promotions Calendar API.
-  // Adjust keys if your actual payload uses different ones.
-  $id          = isset($p['id']) ? (string)$p['id'] : (isset($p['promotionId']) ? (string)$p['promotionId'] : null);
-  $name        = isset($p['name']) ? (string)$p['name'] : (isset($p['promotionName']) ? (string)$p['promotionName'] : null);
-  $type        = isset($p['type']) ? (string)$p['type'] : (isset($p['promotionType']) ? (string)$p['promotionType'] : null);
-  $status      = isset($p['status']) ? (string)$p['status'] : null;
-  $region      = isset($p['region']) ? (string)$p['region'] : (isset($p['regionName']) ? (string)$p['regionName'] : null);
+  // Map likely fields (adjust if WB returns different keys)
+  $id    = isset($p['id']) ? (string)$p['id'] : (isset($p['promotionId']) ? (string)$p['promotionId'] : null);
+  $name  = isset($p['name']) ? (string)$p['name'] : (isset($p['promotionName']) ? (string)$p['promotionName'] : null);
+  $type  = isset($p['type']) ? (string)$p['type'] : (isset($p['promotionType']) ? (string)$p['promotionType'] : null);
+  $status= isset($p['status']) ? (string)$p['status'] : null;
+  $region= isset($p['region']) ? (string)$p['region'] : (isset($p['regionName']) ? (string)$p['regionName'] : null);
 
-  // Date fields (common patterns in such APIs)
-  $startRaw    = $p['startDate'] ?? $p['start'] ?? $p['dateFrom'] ?? null;
-  $endRaw      = $p['endDate']   ?? $p['end']   ?? $p['dateTo']   ?? null;
+  // Dates as provided by API might already be RFC3339
+  $startIso = parseIso(is_string($p['startDateTime'] ?? null) ? $p['startDateTime'] : ($p['startDate'] ?? $p['dateFrom'] ?? null));
+  $endIso   = parseIso(is_string($p['endDateTime'] ?? null) ? $p['endDateTime'] : ($p['endDate'] ?? $p['dateTo'] ?? null));
 
-  $startIso = parseDate(is_string($startRaw) ? $startRaw : null);
-  $endIso   = parseDate(is_string($endRaw) ? $endRaw : null);
-
-  // Active flag: now between start and end (inclusive if end present)
   $active = null;
   if ($startIso !== null) {
     $sTs = strtotime($startIso);
@@ -127,30 +162,26 @@ foreach ($raw as $p) {
     }
   }
 
-  // Optional promo parameters frequently present
-  $discount    = isset($p['discount']) ? $p['discount'] : (isset($p['discountPercent']) ? $p['discountPercent'] : null);
-  $budget      = isset($p['budget']) ? $p['budget'] : null;
-  $link        = isset($p['link']) ? (string)$p['link'] : null;
+  $discount = $p['discount'] ?? ($p['discountPercent'] ?? null);
+  $budget   = $p['budget'] ?? null;
+  $link     = isset($p['link']) ? (string)$p['link'] : null;
 
   $items[] = [
-    'id'            => $id,
-    'name'          => $name,
-    'type'          => $type,
-    'status'        => $status,
-    'region'        => $region,
-    'startDate'     => $startIso,
-    'endDate'       => $endIso,
-    'active'        => $active,
-    'discount'      => is_numeric($discount) ? (0 + $discount) : null,
-    'budget'        => is_numeric($budget) ? (0 + $budget) : null,
-    'link'          => $link,
-    // rawSnapshot gives you an escape hatch for fields not normalized yet
-    // Comment this out if you don’t want any passthrough data.
-    // 'rawSnapshot'   => $p,
+    'id'        => $id,
+    'name'      => $name,
+    'type'      => $type,
+    'status'    => $status,
+    'region'    => $region,
+    'startDate' => $startIso,
+    'endDate'   => $endIso,
+    'active'    => $active,
+    'discount'  => is_numeric($discount) ? (0 + $discount) : null,
+    'budget'    => is_numeric($budget) ? (0 + $budget) : null,
+    'link'      => $link,
   ];
 }
 
-// 10) Sort: active first, then start date asc, then name
+// Sort: active first, then start date asc, then name
 usort($items, static function ($a, $b) {
   $aAct = $a['active'] ? 1 : 0;
   $bAct = $b['active'] ? 1 : 0;
@@ -162,5 +193,4 @@ usort($items, static function ($a, $b) {
   return strcmp($a['name'] ?? '', $b['name'] ?? '');
 });
 
-// 11) Output
 echo json_encode(array_values($items), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
