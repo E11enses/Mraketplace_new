@@ -12,15 +12,15 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 
     <style>
-      /* Light theme */
       :root {
         --bg: #ffffff;
         --panel: #ffffff;
-        --muted: #5b6472;
-        --text: #0f172a;
+        --muted: #444;      /* darker muted for readability on light bg */
+        --text: #000000;    /* request: black text */
         --border: #e5e7eb;
         --chip: #f3f4f6;
 
+        /* Pills (status/type) use subtle colors but never overwhelm content */
         --active-bg: #e8f7ee;
         --active-border: #16a34a;
         --active-text: #065f46;
@@ -31,7 +31,7 @@
 
         --type-regular-border: #6366f1; /* indigo */
         --type-regular-text: #3730a3;
-        --type-auto-border: #14b8a6; /* teal */
+        --type-auto-border: #14b8a6;    /* teal */
         --type-auto-text: #0f766e;
       }
 
@@ -51,14 +51,12 @@
         box-sizing: border-box;
       }
 
-      /* Panels */
       .panel {
         background: var(--panel);
         border: 1px solid var(--border);
         border-radius: 12px;
         padding: 16px;
-        /* Remove independent scroll; page will scroll instead */
-        overflow: visible;
+        overflow: visible; /* no independent scroll */
       }
 
       .row { margin-bottom: 12px; }
@@ -96,23 +94,25 @@
       }
       .item {
         background: #fff;
-        border: 1px solid var(--border);
+        border: 2px solid var(--border); /* will be recolored per promo */
         border-radius: 12px;
         padding: 12px;
         cursor: pointer;
-        transition: box-shadow 0.15s ease, border-color 0.15s ease;
+        transition: box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
       }
       .item:hover {
-        box-shadow: 0 1px 6px rgba(15, 23, 42, 0.08);
-        border-color: #d1d5db;
-      }
-      .item.active {
-        border-color: var(--active-border);
-        box-shadow: 0 2px 8px rgba(22, 163, 74, 0.12);
+        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
       }
       .title { font-weight: 600; }
       .sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
 
+      .topline {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
       .pills {
         display: inline-flex;
         gap: 8px;
@@ -124,8 +124,9 @@
         border: 1px solid var(--border);
         font-size: 11px;
         white-space: nowrap;
+        background: #fff;
+        color: var(--muted);
       }
-      /* Status pills */
       .status-active {
         background: var(--active-bg);
         border-color: var(--active-border);
@@ -136,7 +137,6 @@
         border-color: var(--planned-border);
         color: var(--planned-text);
       }
-      /* Type pills */
       .type-regular {
         border-color: var(--type-regular-border);
         color: var(--type-regular-text);
@@ -155,7 +155,6 @@
         gap: 12px;
         min-height: 0;
       }
-
       #calendar {
         background: #fff;
         border: 1px solid var(--border);
@@ -163,13 +162,7 @@
         padding: 8px;
         min-height: 400px;
       }
-
-      /* FullCalendar light tweaks */
-      .fc .fc-toolbar-title {
-        font-size: 18px;
-        font-weight: 700;
-        color: var(--text);
-      }
+      .fc .fc-toolbar-title { font-size: 18px; font-weight: 700; color: var(--text); }
       .fc .fc-button {
         background: #f8fafc;
         border: 1px solid var(--border);
@@ -178,37 +171,22 @@
         border-radius: 8px;
         text-transform: none;
       }
-      .fc .fc-button-primary:not(:disabled):hover {
-        background: #eef2f7;
-        border-color: #d1d5db;
-      }
-      .fc-theme-standard td, .fc-theme-standard th {
-        border-color: var(--border);
-      }
-      .fc .fc-daygrid-day-number, .fc .fc-col-header-cell-cushion {
-        color: var(--muted);
-      }
+      .fc .fc-button-primary:not(:disabled):hover { background: #eef2f7; border-color: #d1d5db; }
+      .fc-theme-standard td, .fc-theme-standard th { border-color: var(--border); }
+      .fc .fc-daygrid-day-number, .fc .fc-col-header-cell-cushion { color: var(--muted); }
 
-      /* Event look by active/planned */
+      /* Event basics: border-only by default, filled when selected */
       .fc-event {
         font-size: 12px;
         line-height: 1.25;
         padding: 2px 4px;
         border-radius: 6px;
+        background: transparent !important; /* border-only default */
       }
-      .fc-event.active {
-        background: var(--active-bg);
-        border-color: var(--active-border);
-        color: var(--active-text);
-      }
-      .fc-event.inactive {
-        background: #f3f4ff;
-        border-color: var(--planned-border);
-        color: var(--planned-text);
-      }
+      /* We'll set border colors dynamically via JS */
 
       .ev-title { font-weight: 600; }
-      .ev-meta { opacity: 0.95; }
+      .ev-meta { opacity: 0.9; }
 
       /* Details */
       .details {
@@ -230,9 +208,7 @@
 
       /* Responsive */
       @media (max-width: 960px) {
-        .wrap {
-          grid-template-columns: 1fr;
-        }
+        .wrap { grid-template-columns: 1fr; }
         .calendar-wrap { order: -1; }
         .panel { padding: 12px; }
         #calendar { padding: 4px; }
@@ -296,6 +272,36 @@
       const ENDPOINT = '/api/wb-promo-details.php';
       const EXCLUDE_BY_NAME = ['Распродажа в счет долга'];
 
+      // Color palette (expand if needed). Soft but distinct.
+      const COLOR_PALETTE = [
+        '#0ea5e9', // sky
+        '#22c55e', // green
+        '#f59e0b', // amber
+        '#ef4444', // red
+        '#a855f7', // violet
+        '#14b8a6', // teal
+        '#e11d48', // rose
+        '#84cc16', // lime
+        '#06b6d4', // cyan
+        '#f97316', // orange
+        '#8b5cf6', // indigo/violet
+        '#10b981', // emerald
+      ];
+      function colorForId(id) {
+        const i = Math.abs(Number(id) || 0);
+        return COLOR_PALETTE[i % COLOR_PALETTE.length];
+      }
+      function isDark(hex) {
+        // hex like #rrggbb
+        const c = hex.replace('#', '');
+        const r = parseInt(c.substring(0, 2), 16);
+        const g = parseInt(c.substring(2, 4), 16);
+        const b = parseInt(c.substring(4, 6), 16);
+        // perceived luminance
+        const L = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        return L < 0.55;
+      }
+
       // DOM
       const listEl = document.getElementById('list');
       const detailsBox = document.getElementById('details');
@@ -317,6 +323,7 @@
       let filtered = [];
       let selectedId = null;
       let calendar;
+      let eventElsById = new Map(); // id -> array of DOM nodes for events
 
       todayEl.textContent = new Date().toLocaleDateString('ru-RU', {
         year: 'numeric',
@@ -335,11 +342,9 @@
         if (type === 'regular') return 'регулярная';
         return '—';
       }
-
       function typeClass(type) {
         return type === 'auto' ? 'type-auto' : 'type-regular';
       }
-
       function statusPillText(active) {
         return active ? 'Активна' : 'Запланирована';
       }
@@ -369,7 +374,7 @@
       function buildEventContent(arg) {
         const e = arg.event.extendedProps.raw;
         const name = arg.event.title || '(без названия)';
-        const typePill = `<span class="pill ${typeClass(e.type)}">${typeRu(e.type)}</span>`;
+        const typeP = `<span class="pill ${typeClass(e.type)}">${typeRu(e.type)}</span>`;
         const adv = compactAdvantages(e.advantages);
         const boost = getBoostRange(e.ranging);
         const parts = [];
@@ -379,15 +384,34 @@
 
         const container = document.createElement('div');
         container.innerHTML = `
-          <div class="ev-title">${name} ${typePill}</div>
+          <div class="ev-title">${name} ${typeP}</div>
           <div class="ev-meta">${meta}</div>
         `;
         return { domNodes: [container] };
       }
 
+      function styleEventElement(el, color, selected) {
+        // border always visible
+        el.style.borderColor = color;
+        el.style.borderWidth = '2px';
+        el.style.borderStyle = 'solid';
+        if (selected) {
+          el.style.background = color;
+          el.style.color = isDark(color) ? '#ffffff' : '#000000';
+        } else {
+          el.style.background = 'transparent';
+          el.style.color = '#000000';
+        }
+      }
+
+      function registerEventEl(id, el) {
+        if (!eventElsById.has(id)) eventElsById.set(id, []);
+        eventElsById.get(id).push(el);
+      }
+
       function initCalendar(events) {
         const el = document.getElementById('calendar');
-        if (calendar) calendar.destroy();
+        if (calendar) { calendar.destroy(); eventElsById.clear(); }
         calendar = new FullCalendar.Calendar(el, {
           locale: 'ru',
           initialView: 'dayGridMonth',
@@ -408,20 +432,24 @@
           eventTimeFormat: false,
 
           eventDidMount: (arg) => {
-            const active = !!arg.event.extendedProps.active;
-            arg.el.classList.add(active ? 'active' : 'inactive');
+            const p = arg.event.extendedProps.raw;
+            const color = colorForId(p.id);
+            const sel = selectedId === p.id;
+            styleEventElement(arg.el, color, sel);
+            registerEventEl(String(p.id), arg.el);
           },
           eventClick: (info) => {
             const d = info.event.extendedProps.raw || {};
             selectedId = d.id ?? null;
-            renderList();
+            applySelectionStyles();
+            renderList(); // sync highlight
             showDetails(d);
           },
           eventContent: buildEventContent,
         });
         calendar.render();
 
-        // Also hide time column labels in timeGridWeek
+        // Hide time grid labels in week view
         const style = document.createElement('style');
         style.textContent = `
           .fc-timegrid-slot-label { display: none !important; }
@@ -462,20 +490,38 @@
         listEl.innerHTML = '';
         filtered.forEach((p) => {
           const div = document.createElement('div');
-          div.className = 'item' + (p.id === selectedId ? ' active' : '');
+          const color = colorForId(p.id);
+          const sel = selectedId === p.id;
+
+          // Base card styles per color + selection
+          div.className = 'item' + (sel ? ' active' : '');
+          div.style.borderColor = color;
+          if (sel) {
+            div.style.background = color;
+            div.style.color = isDark(color) ? '#ffffff' : '#000000';
+          } else {
+            div.style.background = '#ffffff';
+            div.style.color = '#000000';
+          }
+
           const statusClass = p.active ? 'status-active' : 'status-planned';
+          const textColorStyle = sel && isDark(color) ? 'style="color:#ffffff;"' : '';
+          const subColorStyle = sel && isDark(color) ? 'style="color:rgba(255,255,255,0.9)"' : 'style="color:var(--muted)"';
+
           div.innerHTML = `
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
-              <div class="title">${p.name || '(без названия)'}</div>
+            <div class="topline">
+              <div class="title" ${textColorStyle}>${p.name || '(без названия)'}</div>
               <div class="pills">
-                <span class="pill ${statusClass}">${statusPillText(p.active)}</span>
+                <span class="pill ${statusClass}">${p.active ? 'Активна' : 'Запланирована'}</span>
                 <span class="pill ${typeClass(p.type)}">${typeRu(p.type)}</span>
               </div>
             </div>
-            <div class="sub">${fmt(p.startDate)} — ${fmt(p.endDate)}</div>
+            <div class="sub" ${subColorStyle}>${fmt(p.startDate)} — ${fmt(p.endDate)}</div>
           `;
+
           div.onclick = () => {
             selectedId = p.id;
+            applySelectionStyles();
             renderList();
             showDetails(p);
             if (p.startDate && calendar) calendar.gotoDate(p.startDate);
@@ -484,12 +530,28 @@
         });
       }
 
+      function applySelectionStyles() {
+        // Update calendar event elements
+        for (const [id, nodes] of eventElsById.entries()) {
+          const color = colorForId(id);
+          const sel = String(selectedId) === String(id);
+          (nodes || []).forEach((el) => styleEventElement(el, color, sel));
+        }
+      }
+
       function showDetails(p) {
         if (!p) { detailsBox.hidden = true; return; }
         const adv = Array.isArray(p.advantages) ? p.advantages.filter(Boolean) : [];
         const boost = getBoostRange(p.ranging);
+        const color = colorForId(p.id);
+        const dark = isDark(color);
 
+        // Title line with a colored left bar matching selection color
         dTitle.innerHTML = `${p.name || '(без названия)'} <span class="pill ${typeClass(p.type)}">${typeRu(p.type)}</span>`;
+        dTitle.style.borderLeft = `6px solid ${color}`;
+        dTitle.style.paddingLeft = '8px';
+        dTitle.style.color = '#000000';
+
         dWhen.textContent = `Период: ${fmt(p.startDate)} — ${fmt(p.endDate)}`;
         dType.textContent = `Тип: ${typeRu(p.type)}`;
         dAdv.textContent = `Преимущества: ${adv.length ? adv.join(', ') : '—'}`;
@@ -539,8 +601,8 @@
         }
 
         renderChips();
+        initCalendar(toEvents(filtered)); // rebuild with fresh mapping
         renderList();
-        initCalendar(toEvents(filtered));
         showDetails(filtered.find((x) => x.id === selectedId));
       }
 
