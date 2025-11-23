@@ -12,7 +12,7 @@ error_reporting(E_ALL);
 // 1) Get Promotions token: ENV -> file wb_ads_token (plain text, no extra formatting)
 $token = getenv('WB_ADS_TOKEN');
 if (!$token) {
-  $secretFile = __DIR__ . '/wb_ads_token';
+  $secretFile = __DIR__ . '/wb_ads_token.php';
   if (file_exists($secretFile)) {
     $token = trim((string)file_get_contents($secretFile));
   }
