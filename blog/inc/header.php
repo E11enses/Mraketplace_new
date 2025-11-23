@@ -18,21 +18,30 @@ natsort($categoriesForNav); // simple sort
 <html class="no-js" lang="ru_RU">
 <head>
   <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="yandex-verification" content="049701e98722a755" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="yandex-verification" content="049701e98722a755" />
 
-    <title>Блог МРАКЕТПЛЕЙСЫ</title>
-    <meta name="description"
-        content="Ищете фулфилмент? Мы поможем с хранением, упаковкой, отгрузкой и ведением магазина на маркетплейсах. Звоните +7 916 240 44 26">
-    <meta name="keywords"
-        content="фулфилмент, фулфилмент для маркетплейсов, склад, хранение, упаковка, доставка, ведение магазина, Wildberries, Ozon, Яндекс Маркет">
+  <!-- Dynamic page title if provided by the page -->
+  <title><?= isset($pageTitle) ? e($pageTitle) : 'Блог МРАКЕТПЛЕЙСЫ' ?></title>
 
+  <meta name="description" content="Ищете фулфилмент? Мы поможем с хранением, упаковкой, отгрузкой и ведением магазина на маркетплейсах. Звоните +7 916 240 44 26">
+  <meta name="keywords" content="фулфилмент, фулфилмент для маркетплейсов, склад, хранение, упаковка, доставка, ведение магазина, Wildberries, Ozon, Яндекс Маркет">
+  <meta name="author" content="МРАКЕТПЛЕЙСЫ">
+  <meta property="yandex" content="noretranslate">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!-- Site-wide canonical for non-post pages only -->
+  <?php if (empty($og)): ?>
+    <link rel="canonical" href="https://mraketplace.ru/" />
+  <?php endif; ?>
+
+  <!-- Site-wide OG/Twitter defaults (hidden on post pages when $og is set) -->
+  <?php if (empty($og)): ?>
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ru_RU" />
     <meta property="og:title" content="Фулфилмент для маркетплейсов | МРАКЕТПЛЕЙСЫ" />
-    <meta property="og:description"
-        content="Хранение, упаковка, отгрузка и ведение магазинов на маркетплейсах. Опыт с Wildberries, Ozon, Яндекс.Маркет, Авито." />
+    <meta property="og:description" content="Хранение, упаковка, отгрузка и ведение магазинов на маркетплейсах. Опыт с Wildberries, Ozon, Яндекс.Маркет, Авито." />
     <meta property="og:url" content="https://mraketplace.ru/" />
     <meta property="og:site_name" content="МРАКЕТПЛЕЙСЫ" />
     <meta property="og:image" content="https://mraketplace.ru/images/og-preview.jpg" />
@@ -40,30 +49,54 @@ natsort($categoriesForNav); // simple sort
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
 
-    <!-- Twitter (использует OG-данные, но может дополняться своими тегами) -->
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Фулфилмент для маркетплейсов | МРАКЕТПЛЕЙСЫ" />
     <meta name="twitter:description" content="Услуги хранения, упаковки и продвижения для продавцов на маркетплейсах" />
     <meta name="twitter:image" content="https://mraketplace.ru/images/og-preview.jpg" />
+  <?php endif; ?>
 
-    <meta name="author" content="МРАКЕТПЛЕЙСЫ">
-    <meta property="yandex" content="noretranslate">
-    <link rel="canonical" href="https://mraketplace.ru/" />
+  <!-- Dynamic OG/Twitter per post (provided by view.php) -->
+  <?php if (!empty($og) && is_array($og)): ?>
+    <link rel="canonical" href="<?= e($og['url']) ?>">
+    <meta property="og:site_name" content="МРАКЕТПЛЕЙСЫ">
+    <meta property="og:title" content="<?= e($og['title']) ?>">
+    <meta property="og:description" content="<?= e($og['description']) ?>">
+    <meta property="og:url" content="<?= e($og['url']) ?>">
+    <meta property="og:type" content="<?= e($og['type']) ?>">
+    <?php if (!empty($og['image'])): ?>
+      <meta property="og:image" content="<?= e($og['image']) ?>">
+      <meta name="twitter:image" content="<?= e($og['image']) ?>">
+      <!-- Optional fixed dims if all thumbs match -->
+      <!-- <meta property="og:image:width" content="1200">
+      <meta property="og:image:height" content="630"> -->
+    <?php endif; ?>
+    <?php if (!empty($og['published'])): ?>
+      <meta property="article:published_time" content="<?= e($og['published']) ?>">
+    <?php endif; ?>
+    <?php if (!empty($og['tags']) && is_array($og['tags'])): ?>
+      <?php foreach ($og['tags'] as $t): ?>
+        <meta property="article:tag" content="<?= e($t) ?>">
+      <?php endforeach; ?>
+    <?php endif; ?>
 
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<?= e($og['title']) ?>">
+    <meta name="twitter:description" content="<?= e($og['description']) ?>">
+    <meta name="twitter:url" content="<?= e($og['url']) ?>">
+  <?php endif; ?>
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="shortcut icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
-    <link rel="manifest" href="/favicon/site.webmanifest" />
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
+  <link rel="manifest" href="/favicon/site.webmanifest" />
 
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="/blog/css/base.css">
-    <link rel="stylesheet" href="/blog/css/vendor.css">
-    <link rel="stylesheet" href="/blog/css/main.css">
-
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="/blog/css/base.css">
+  <link rel="stylesheet" href="/blog/css/vendor.css">
+  <link rel="stylesheet" href="/blog/css/main.css">
 </head>
 <body>
 <div id="preloader"><div id="loader" class="dots-fade"><div></div><div></div><div></div></div></div>
@@ -81,7 +114,7 @@ natsort($categoriesForNav); // simple sort
     </div>
     <nav class="header__nav-wrap">
       <ul class="header__nav">
-        <li class="current"><a href="index.php" title="">Главная</a></li>
+        <li class="current"><a href="/index.html" title="">На главную</a></li>
         <li class="has-children">
   <a href="#0" title="">Категории</a>
   <ul class="sub-menu">

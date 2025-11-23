@@ -41,11 +41,59 @@ if (!$path) {
 $html = file_get_contents($path);
 $meta = parse_meta_from_html($html);
 
-// Optional: set page title from first H1
-$pageTitle = 'Post';
+/* ====== DYNAMIC OG/TWITTER: add this block ====== */
+
+// Title and summary from content
+$title = '';
 if (preg_match('/<h1[^>]*>(.*?)<\/h1>/is', $html, $m)) {
-    $pageTitle = trim(strip_tags($m[1])) . ' - Блог Мракетплейсы';
+    $title = trim(strip_tags($m[1]));
 }
+$summary = '';
+if (preg_match('/<p[^>]*>(.*?)<\/p>/is', $html, $m)) {
+    $summary = trim(preg_replace('/\s+/', ' ', strip_tags($m[1])));
+}
+$summaryShort = function_exists('mb_strimwidth')
+    ? mb_strimwidth($summary, 0, 160, '…', 'UTF-8')
+    : substr($summary, 0, 160) . '…';
+
+// Canonical post URL
+$canonical = 'https://' . $_SERVER['HTTP_HOST'] . '/blog/post/' . rawurlencode($slug);
+
+// Published date (from filename)
+$name = basename($path, '.html');
+$publishedIso = '';
+if (preg_match('/^(\d{4}-\d{2}-\d{2})-/', $name, $mm)) {
+    $publishedIso = $mm[1] . 'T00:00:00+03:00'; // adjust offset if needed
+}
+
+// OG image from thumb; make absolute URL
+$ogImage = $meta['thumb'] ?? '';
+if ($ogImage !== '' && strpos($ogImage, 'http') !== 0) {
+    $ogImage = 'https://' . $_SERVER['HTTP_HOST'] . $ogImage;
+}
+
+// Supply data to header.php
+$og = [
+    'title'       => $title ?: 'Пост',
+    'description' => $summaryShort ?: 'Запись блога',
+    'url'         => $canonical,
+    'image'       => $ogImage,                // can be empty; header will handle
+    'type'        => 'article',
+    'published'   => $publishedIso,           // ISO 8601 or ''
+    'tags'        => $meta['tags'] ?? [],
+];
+
+// Dynamic <title> for the page
+$pageTitle = ($title ? $title . ' - Блог Мракетплейсы' : 'Блог Мракетплейсы');
+
+/* ====== END OG/TWITTER BLOCK ====== */
+
+// (You may keep this older block, but $pageTitle is already set above)
+// Optional: set page title from first H1
+// $pageTitle = 'Post';
+// if (preg_match('/<h1[^>]*>(.*?)<\/h1>/is', $html, $m)) {
+//     $pageTitle = trim(strip_tags($m[1])) . ' - Блог Мракетплейсы';
+// }
 
 include __DIR__ . '/inc/header.php';
 ?>
