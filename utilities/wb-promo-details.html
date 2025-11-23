@@ -12,39 +12,67 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 
     <style>
-      body {
-        margin: 0;
-        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial,
-          sans-serif;
-        background: #0f1115;
-        color: #e5e7eb;
+      /* Light theme */
+      :root {
+        --bg: #ffffff;
+        --panel: #ffffff;
+        --muted: #5b6472;
+        --text: #0f172a;
+        --border: #e5e7eb;
+        --chip: #f3f4f6;
+
+        --active-bg: #e8f7ee;
+        --active-border: #16a34a;
+        --active-text: #065f46;
+
+        --planned-bg: #eef2ff;
+        --planned-border: #6366f1;
+        --planned-text: #3730a3;
+
+        --type-regular-border: #6366f1; /* indigo */
+        --type-regular-text: #3730a3;
+        --type-auto-border: #14b8a6; /* teal */
+        --type-auto-text: #0f766e;
       }
+
+      html, body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      }
+
       .wrap {
         display: grid;
-        grid-template-columns: 30% 70%;
+        grid-template-columns: 32% 68%;
         gap: 16px;
-        height: 100vh;
+        min-height: 100vh;
         padding: 16px;
         box-sizing: border-box;
       }
+
+      /* Panels */
       .panel {
-        background: #161a22;
+        background: var(--panel);
+        border: 1px solid var(--border);
         border-radius: 12px;
         padding: 16px;
-        overflow: auto;
+        /* Remove independent scroll; page will scroll instead */
+        overflow: visible;
       }
-      .row {
-        margin-bottom: 12px;
-      }
-      input,
-      select {
+
+      .row { margin-bottom: 12px; }
+
+      input, select {
         width: 100%;
-        padding: 8px 10px;
-        border-radius: 8px;
-        border: 1px solid #293042;
-        background: #0f1320;
-        color: #e5e7eb;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: #fff;
+        color: var(--text);
+        font-size: 14px;
       }
+
       .chips {
         display: flex;
         gap: 8px;
@@ -52,118 +80,168 @@
         margin: 8px 0 12px 0;
       }
       .chip {
-        padding: 3px 8px;
-        background: #1f2937;
+        padding: 4px 10px;
+        background: var(--chip);
+        border: 1px solid var(--border);
         border-radius: 999px;
         font-size: 12px;
-        color: #94a3b8;
+        color: var(--muted);
+        white-space: nowrap;
       }
 
       /* List */
       .list {
         display: grid;
-        gap: 8px;
+        gap: 10px;
       }
       .item {
-        background: #0f1320;
-        border: 1px solid #23304a;
-        border-radius: 10px;
-        padding: 10px;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px;
         cursor: pointer;
+        transition: box-shadow 0.15s ease, border-color 0.15s ease;
+      }
+      .item:hover {
+        box-shadow: 0 1px 6px rgba(15, 23, 42, 0.08);
+        border-color: #d1d5db;
       }
       .item.active {
-        border-color: #16a34a;
-        background: rgba(22, 163, 74, 0.12);
+        border-color: var(--active-border);
+        box-shadow: 0 2px 8px rgba(22, 163, 74, 0.12);
       }
-      .title {
-        font-weight: 600;
-      }
-      .sub {
-        color: #94a3b8;
-        font-size: 12px;
+      .title { font-weight: 600; }
+      .sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+      .pills {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
       }
       .pill {
-        font-size: 11px;
-        padding: 2px 6px;
+        padding: 2px 8px;
         border-radius: 999px;
-        border: 1px solid #7c3aed;
-        color: #c4b5fd;
-        margin-left: 8px;
+        border: 1px solid var(--border);
+        font-size: 11px;
         white-space: nowrap;
       }
-      .pill.auto {
-        border-color: #22c55e;
-        color: #86efac;
+      /* Status pills */
+      .status-active {
+        background: var(--active-bg);
+        border-color: var(--active-border);
+        color: var(--active-text);
       }
-      .badge-active {
-        border: 1px solid #16a34a;
-        color: #86efac;
+      .status-planned {
+        background: var(--planned-bg);
+        border-color: var(--planned-border);
+        color: var(--planned-text);
+      }
+      /* Type pills */
+      .type-regular {
+        border-color: var(--type-regular-border);
+        color: var(--type-regular-text);
+        background: #f5f7ff;
+      }
+      .type-auto {
+        border-color: var(--type-auto-border);
+        color: var(--type-auto-text);
+        background: #ecfeff;
       }
 
       /* Calendar */
       .calendar-wrap {
         display: grid;
         grid-template-rows: auto 1fr auto;
-        gap: 10px;
-        height: 100%;
+        gap: 12px;
+        min-height: 0;
       }
+
       #calendar {
-        background: #0f1320;
-        border: 1px solid #23304a;
-        border-radius: 10px;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 12px;
         padding: 8px;
+        min-height: 400px;
       }
-      .fc .fc-toolbar-chunk button {
+
+      /* FullCalendar light tweaks */
+      .fc .fc-toolbar-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text);
+      }
+      .fc .fc-button {
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 6px 10px;
+        border-radius: 8px;
         text-transform: none;
       }
+      .fc .fc-button-primary:not(:disabled):hover {
+        background: #eef2f7;
+        border-color: #d1d5db;
+      }
+      .fc-theme-standard td, .fc-theme-standard th {
+        border-color: var(--border);
+      }
+      .fc .fc-daygrid-day-number, .fc .fc-col-header-cell-cushion {
+        color: var(--muted);
+      }
+
+      /* Event look by active/planned */
       .fc-event {
         font-size: 12px;
         line-height: 1.25;
         padding: 2px 4px;
+        border-radius: 6px;
       }
       .fc-event.active {
-        background: rgba(22, 163, 74, 0.15);
-        border-color: #16a34a;
-        color: #a7f3d0;
+        background: var(--active-bg);
+        border-color: var(--active-border);
+        color: var(--active-text);
       }
       .fc-event.inactive {
-        background: rgba(124, 58, 237, 0.15);
-        border-color: #7c3aed;
-        color: #ddd6fe;
+        background: #f3f4ff;
+        border-color: var(--planned-border);
+        color: var(--planned-text);
       }
-      .ev-title {
-        font-weight: 600;
-      }
-      .ev-meta {
-        opacity: 0.95;
-      }
+
+      .ev-title { font-weight: 600; }
+      .ev-meta { opacity: 0.95; }
 
       /* Details */
       .details {
-        background: #0f1320;
-        border: 1px solid #23304a;
-        border-radius: 10px;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 12px;
         padding: 12px;
       }
-      .kv {
-        margin: 6px 0;
-        color: #94a3b8;
-        white-space: pre-wrap;
-      }
+      .kv { margin: 6px 0; color: var(--muted); white-space: pre-wrap; }
 
       .err {
-        color: #fecaca;
-        background: #331a1a;
-        border: 1px solid #7f1d1d;
+        color: #b91c1c;
+        background: #fee2e2;
+        border: 1px solid #fecaca;
         padding: 10px;
-        border-radius: 8px;
+        border-radius: 10px;
         font-size: 14px;
+      }
+
+      /* Responsive */
+      @media (max-width: 960px) {
+        .wrap {
+          grid-template-columns: 1fr;
+        }
+        .calendar-wrap { order: -1; }
+        .panel { padding: 12px; }
+        #calendar { padding: 4px; }
       }
     </style>
   </head>
   <body>
     <div class="wrap">
-      <!-- ЛЕВАЯ ПАНЕЛЬ -->
+      <!-- LEFT: LIST -->
       <aside class="panel">
         <h2 style="margin:0 0 8px;">Список акций</h2>
 
@@ -191,7 +269,7 @@
         <div id="error" class="err" hidden></div>
       </aside>
 
-      <!-- ПРАВАЯ ПАНЕЛЬ -->
+      <!-- RIGHT: CALENDAR -->
       <section class="panel calendar-wrap">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
           <h2 style="margin:0;">Календарь акций</h2>
@@ -218,6 +296,7 @@
       const ENDPOINT = '/api/wb-promo-details.php';
       const EXCLUDE_BY_NAME = ['Распродажа в счет долга'];
 
+      // DOM
       const listEl = document.getElementById('list');
       const detailsBox = document.getElementById('details');
       const dTitle = document.getElementById('d-title');
@@ -233,6 +312,7 @@
       const typeEl = document.getElementById('typeFilter');
       const todayEl = document.getElementById('today');
 
+      // State
       let all = [];
       let filtered = [];
       let selectedId = null;
@@ -246,11 +326,7 @@
 
       function fmt(d) {
         return d
-          ? new Date(d).toLocaleString('ru-RU', {
-              year: 'numeric',
-              month: 'short',
-              day: '2-digit',
-            })
+          ? new Date(d).toLocaleString('ru-RU', { year: 'numeric', month: 'short', day: '2-digit' })
           : '—';
       }
 
@@ -260,12 +336,12 @@
         return '—';
       }
 
-      function typePill(type) {
-        if (!type) return '';
-        const isAuto = type === 'auto';
-        const cls = isAuto ? 'pill auto' : 'pill';
-        const text = typeRu(type);
-        return `<span class="${cls}">${text}</span>`;
+      function typeClass(type) {
+        return type === 'auto' ? 'type-auto' : 'type-regular';
+      }
+
+      function statusPillText(active) {
+        return active ? 'Активна' : 'Запланирована';
       }
 
       function compactAdvantages(arr) {
@@ -293,7 +369,7 @@
       function buildEventContent(arg) {
         const e = arg.event.extendedProps.raw;
         const name = arg.event.title || '(без названия)';
-        const pill = typePill(e.type);
+        const typePill = `<span class="pill ${typeClass(e.type)}">${typeRu(e.type)}</span>`;
         const adv = compactAdvantages(e.advantages);
         const boost = getBoostRange(e.ranging);
         const parts = [];
@@ -303,7 +379,7 @@
 
         const container = document.createElement('div');
         container.innerHTML = `
-          <div class="ev-title">${name} ${pill}</div>
+          <div class="ev-title">${name} ${typePill}</div>
           <div class="ev-meta">${meta}</div>
         `;
         return { domNodes: [container] };
@@ -324,7 +400,13 @@
           buttonText: { today: 'сегодня', month: 'месяц', week: 'неделя', list: 'список' },
           events,
           eventDisplay: 'block',
-          eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
+
+          // Week view: hide time-of-day
+          slotMinTime: '00:00:00',
+          slotMaxTime: '24:00:00',
+          allDaySlot: true,
+          eventTimeFormat: false,
+
           eventDidMount: (arg) => {
             const active = !!arg.event.extendedProps.active;
             arg.el.classList.add(active ? 'active' : 'inactive');
@@ -338,6 +420,15 @@
           eventContent: buildEventContent,
         });
         calendar.render();
+
+        // Also hide time column labels in timeGridWeek
+        const style = document.createElement('style');
+        style.textContent = `
+          .fc-timegrid-slot-label { display: none !important; }
+          .fc-timegrid-axis { display: none !important; }
+          .fc .fc-timegrid-slot { height: 0 !important; }
+        `;
+        el.appendChild(style);
       }
 
       function toEvents(items) {
@@ -372,14 +463,16 @@
         filtered.forEach((p) => {
           const div = document.createElement('div');
           div.className = 'item' + (p.id === selectedId ? ' active' : '');
+          const statusClass = p.active ? 'status-active' : 'status-planned';
           div.innerHTML = `
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
               <div class="title">${p.name || '(без названия)'}</div>
-              <span class="pill ${p.active ? 'badge-active' : ''}">
-                ${p.active ? 'Активна' : 'Запланирована'}
-              </span>
+              <div class="pills">
+                <span class="pill ${statusClass}">${statusPillText(p.active)}</span>
+                <span class="pill ${typeClass(p.type)}">${typeRu(p.type)}</span>
+              </div>
             </div>
-            <div class="sub">${fmt(p.startDate)} — ${fmt(p.endDate)} ${typePill(p.type)}</div>
+            <div class="sub">${fmt(p.startDate)} — ${fmt(p.endDate)}</div>
           `;
           div.onclick = () => {
             selectedId = p.id;
@@ -392,14 +485,11 @@
       }
 
       function showDetails(p) {
-        if (!p) {
-          detailsBox.hidden = true;
-          return;
-        }
+        if (!p) { detailsBox.hidden = true; return; }
         const adv = Array.isArray(p.advantages) ? p.advantages.filter(Boolean) : [];
         const boost = getBoostRange(p.ranging);
 
-        dTitle.innerHTML = `${p.name || '(без названия)'} ${typePill(p.type)}`;
+        dTitle.innerHTML = `${p.name || '(без названия)'} <span class="pill ${typeClass(p.type)}">${typeRu(p.type)}</span>`;
         dWhen.textContent = `Период: ${fmt(p.startDate)} — ${fmt(p.endDate)}`;
         dType.textContent = `Тип: ${typeRu(p.type)}`;
         dAdv.textContent = `Преимущества: ${adv.length ? adv.join(', ') : '—'}`;
@@ -414,19 +504,14 @@
           String(a || '').localeCompare(String(b || ''), 'ru', { sensitivity: 'base' });
         const cmpDate = (a, b) => String(a || '').localeCompare(String(b || ''));
         switch (mode) {
-          case 'startAsc':
-            return copy.sort((a, b) => cmpDate(a.startDate, b.startDate));
-          case 'startDesc':
-            return copy.sort((a, b) => cmpDate(b.startDate, a.startDate));
-          case 'nameAsc':
-            return copy.sort((a, b) => cmpStr(a.name, b.name));
-          case 'nameDesc':
-            return copy.sort((a, b) => cmpStr(b.name, a.name));
+          case 'startAsc': return copy.sort((a, b) => cmpDate(a.startDate, b.startDate));
+          case 'startDesc': return copy.sort((a, b) => cmpDate(b.startDate, a.startDate));
+          case 'nameAsc': return copy.sort((a, b) => cmpStr(a.name, b.name));
+          case 'nameDesc': return copy.sort((a, b) => cmpStr(b.name, a.name));
           case 'active':
           default:
             return copy.sort((a, b) => {
-              const aa = a.active ? 1 : 0,
-                bb = b.active ? 1 : 0;
+              const aa = a.active ? 1 : 0, bb = b.active ? 1 : 0;
               if (aa !== bb) return bb - aa;
               const d = cmpDate(a.startDate, b.startDate);
               if (d !== 0) return d;
