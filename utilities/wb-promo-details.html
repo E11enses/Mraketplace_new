@@ -5,6 +5,7 @@
     <title>Акции WB — календарь и детали</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+    <!-- FullCalendar (includes timeline in index.global bundle) -->
     <link
       href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css"
       rel="stylesheet"
@@ -15,12 +16,11 @@
       :root {
         --bg: #ffffff;
         --panel: #ffffff;
-        --muted: #444;      /* darker muted for readability on light bg */
-        --text: #000000;    /* request: black text */
+        --muted: #444;      /* readable muted text */
+        --text: #000000;    /* black text by request */
         --border: #e5e7eb;
         --chip: #f3f4f6;
 
-        /* Pills (status/type) use subtle colors but never overwhelm content */
         --active-bg: #e8f7ee;
         --active-border: #16a34a;
         --active-text: #065f46;
@@ -56,7 +56,7 @@
         border: 1px solid var(--border);
         border-radius: 12px;
         padding: 16px;
-        overflow: visible; /* no independent scroll */
+        overflow: visible; /* left column no independent scroll */
       }
 
       .row { margin-bottom: 12px; }
@@ -100,9 +100,7 @@
         cursor: pointer;
         transition: box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
       }
-      .item:hover {
-        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
-      }
+      .item:hover { box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08); }
       .title { font-weight: 600; }
       .sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
 
@@ -113,11 +111,7 @@
         gap: 8px;
         flex-wrap: wrap;
       }
-      .pills {
-        display: inline-flex;
-        gap: 8px;
-        align-items: center;
-      }
+      .pills { display: inline-flex; gap: 8px; align-items: center; }
       .pill {
         padding: 2px 8px;
         border-radius: 999px;
@@ -148,7 +142,7 @@
         background: #ecfeff;
       }
 
-      /* Calendar */
+      /* Calendar container */
       .calendar-wrap {
         display: grid;
         grid-template-rows: auto 1fr auto;
@@ -162,6 +156,8 @@
         padding: 8px;
         min-height: 400px;
       }
+
+      /* FullCalendar light tweaks + event text contrast */
       .fc .fc-toolbar-title { font-size: 18px; font-weight: 700; color: var(--text); }
       .fc .fc-button {
         background: #f8fafc;
@@ -175,16 +171,23 @@
       .fc-theme-standard td, .fc-theme-standard th { border-color: var(--border); }
       .fc .fc-daygrid-day-number, .fc .fc-col-header-cell-cushion { color: var(--muted); }
 
-      /* Event basics: border-only by default, filled when selected */
+      /* Force event text to black by default (border-only mode) */
+      .fc .fc-daygrid-event,
+      .fc .fc-event {
+        color: #000000 !important;
+      }
+      .fc .fc-event, .fc .fc-event * {
+        color: inherit;
+      }
+
+      /* Event base */
       .fc-event {
         font-size: 12px;
         line-height: 1.25;
         padding: 2px 4px;
         border-radius: 6px;
-        background: transparent !important; /* border-only default */
+        background: transparent !important; /* border-only default; fill on selection via JS */
       }
-      /* We'll set border colors dynamically via JS */
-
       .ev-title { font-weight: 600; }
       .ev-meta { opacity: 0.9; }
 
@@ -251,7 +254,7 @@
           <h2 style="margin:0;">Календарь акций</h2>
           <div class="chips">
             <span class="chip">Сегодня: <span id="today"></span></span>
-            <span class="chip">Вид: месяц / неделя / список</span>
+            <span class="chip">Вид: 2 месяца / неделя / список</span>
           </div>
         </div>
 
@@ -272,32 +275,21 @@
       const ENDPOINT = '/api/wb-promo-details.php';
       const EXCLUDE_BY_NAME = ['Распродажа в счет долга'];
 
-      // Color palette (expand if needed). Soft but distinct.
+      // Palette for per-promo colors (deterministic by id)
       const COLOR_PALETTE = [
-        '#0ea5e9', // sky
-        '#22c55e', // green
-        '#f59e0b', // amber
-        '#ef4444', // red
-        '#a855f7', // violet
-        '#14b8a6', // teal
-        '#e11d48', // rose
-        '#84cc16', // lime
-        '#06b6d4', // cyan
-        '#f97316', // orange
-        '#8b5cf6', // indigo/violet
-        '#10b981', // emerald
+        '#0ea5e9', '#22c55e', '#f59e0b', '#ef4444',
+        '#a855f7', '#14b8a6', '#e11d48', '#84cc16',
+        '#06b6d4', '#f97316', '#8b5cf6', '#10b981',
       ];
       function colorForId(id) {
         const i = Math.abs(Number(id) || 0);
         return COLOR_PALETTE[i % COLOR_PALETTE.length];
       }
       function isDark(hex) {
-        // hex like #rrggbb
         const c = hex.replace('#', '');
         const r = parseInt(c.substring(0, 2), 16);
         const g = parseInt(c.substring(2, 4), 16);
         const b = parseInt(c.substring(4, 6), 16);
-        // perceived luminance
         const L = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
         return L < 0.55;
       }
@@ -323,12 +315,10 @@
       let filtered = [];
       let selectedId = null;
       let calendar;
-      let eventElsById = new Map(); // id -> array of DOM nodes for events
+      let eventElsById = new Map(); // id -> event DOM nodes
 
       todayEl.textContent = new Date().toLocaleDateString('ru-RU', {
-        year: 'numeric',
-        month: 'long',
-        day: '2-digit',
+        year: 'numeric', month: 'long', day: '2-digit',
       });
 
       function fmt(d) {
@@ -336,18 +326,13 @@
           ? new Date(d).toLocaleString('ru-RU', { year: 'numeric', month: 'short', day: '2-digit' })
           : '—';
       }
-
       function typeRu(type) {
         if (type === 'auto') return 'авто';
         if (type === 'regular') return 'регулярная';
         return '—';
       }
-      function typeClass(type) {
-        return type === 'auto' ? 'type-auto' : 'type-regular';
-      }
-      function statusPillText(active) {
-        return active ? 'Активна' : 'Запланирована';
-      }
+      function typeClass(type) { return type === 'auto' ? 'type-auto' : 'type-regular'; }
+      function statusPillText(active) { return active ? 'Активна' : 'Запланирована'; }
 
       function compactAdvantages(arr) {
         if (!Array.isArray(arr) || !arr.length) return '—';
@@ -356,7 +341,6 @@
         if (arr.length > 2) text += ` +${arr.length - 2}`;
         return text || '—';
       }
-
       function getBoostRange(ranging) {
         if (!Array.isArray(ranging) || !ranging.length) return null;
         let min = null, max = null;
@@ -381,7 +365,6 @@
         if (adv && adv !== '—') parts.push(adv);
         if (boost) parts.push(`бустинг: ${boost}`);
         const meta = parts.join(' • ');
-
         const container = document.createElement('div');
         container.innerHTML = `
           <div class="ev-title">${name} ${typeP}</div>
@@ -397,66 +380,25 @@
         el.style.borderStyle = 'solid';
         if (selected) {
           el.style.background = color;
-          el.style.color = isDark(color) ? '#ffffff' : '#000000';
+          const txt = isDark(color) ? '#ffffff' : '#000000';
+          el.style.color = txt;
+          el.querySelectorAll('*').forEach(n => n.style.color = txt);
         } else {
           el.style.background = 'transparent';
           el.style.color = '#000000';
+          el.querySelectorAll('*').forEach(n => n.style.color = '#000000');
         }
       }
-
       function registerEventEl(id, el) {
         if (!eventElsById.has(id)) eventElsById.set(id, []);
         eventElsById.get(id).push(el);
       }
-
-      function initCalendar(events) {
-        const el = document.getElementById('calendar');
-        if (calendar) { calendar.destroy(); eventElsById.clear(); }
-        calendar = new FullCalendar.Calendar(el, {
-          locale: 'ru',
-          initialView: 'dayGridMonth',
-          height: '100%',
-          headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,listWeek',
-          },
-          buttonText: { today: 'сегодня', month: 'месяц', week: 'неделя', list: 'список' },
-          events,
-          eventDisplay: 'block',
-
-          // Week view: hide time-of-day
-          slotMinTime: '00:00:00',
-          slotMaxTime: '24:00:00',
-          allDaySlot: true,
-          eventTimeFormat: false,
-
-          eventDidMount: (arg) => {
-            const p = arg.event.extendedProps.raw;
-            const color = colorForId(p.id);
-            const sel = selectedId === p.id;
-            styleEventElement(arg.el, color, sel);
-            registerEventEl(String(p.id), arg.el);
-          },
-          eventClick: (info) => {
-            const d = info.event.extendedProps.raw || {};
-            selectedId = d.id ?? null;
-            applySelectionStyles();
-            renderList(); // sync highlight
-            showDetails(d);
-          },
-          eventContent: buildEventContent,
-        });
-        calendar.render();
-
-        // Hide time grid labels in week view
-        const style = document.createElement('style');
-        style.textContent = `
-          .fc-timegrid-slot-label { display: none !important; }
-          .fc-timegrid-axis { display: none !important; }
-          .fc .fc-timegrid-slot { height: 0 !important; }
-        `;
-        el.appendChild(style);
+      function applySelectionStyles() {
+        for (const [id, nodes] of eventElsById.entries()) {
+          const color = colorForId(id);
+          const sel = String(selectedId) === String(id);
+          (nodes || []).forEach((el) => styleEventElement(el, color, sel));
+        }
       }
 
       function toEvents(items) {
@@ -477,7 +419,6 @@
         el.textContent = text;
         return el;
       }
-
       function renderChips() {
         chipsEl.innerHTML = '';
         chipsEl.appendChild(chip(`Показано: ${filtered.length}`));
@@ -493,12 +434,12 @@
           const color = colorForId(p.id);
           const sel = selectedId === p.id;
 
-          // Base card styles per color + selection
           div.className = 'item' + (sel ? ' active' : '');
           div.style.borderColor = color;
           if (sel) {
             div.style.background = color;
-            div.style.color = isDark(color) ? '#ffffff' : '#000000';
+            const txt = isDark(color) ? '#ffffff' : '#000000';
+            div.style.color = txt;
           } else {
             div.style.background = '#ffffff';
             div.style.color = '#000000';
@@ -512,7 +453,7 @@
             <div class="topline">
               <div class="title" ${textColorStyle}>${p.name || '(без названия)'}</div>
               <div class="pills">
-                <span class="pill ${statusClass}">${p.active ? 'Активна' : 'Запланирована'}</span>
+                <span class="pill ${statusClass}">${statusPillText(p.active)}</span>
                 <span class="pill ${typeClass(p.type)}">${typeRu(p.type)}</span>
               </div>
             </div>
@@ -530,23 +471,12 @@
         });
       }
 
-      function applySelectionStyles() {
-        // Update calendar event elements
-        for (const [id, nodes] of eventElsById.entries()) {
-          const color = colorForId(id);
-          const sel = String(selectedId) === String(id);
-          (nodes || []).forEach((el) => styleEventElement(el, color, sel));
-        }
-      }
-
       function showDetails(p) {
         if (!p) { detailsBox.hidden = true; return; }
         const adv = Array.isArray(p.advantages) ? p.advantages.filter(Boolean) : [];
         const boost = getBoostRange(p.ranging);
         const color = colorForId(p.id);
-        const dark = isDark(color);
 
-        // Title line with a colored left bar matching selection color
         dTitle.innerHTML = `${p.name || '(без названия)'} <span class="pill ${typeClass(p.type)}">${typeRu(p.type)}</span>`;
         dTitle.style.borderLeft = `6px solid ${color}`;
         dTitle.style.paddingLeft = '8px';
@@ -582,6 +512,104 @@
         }
       }
 
+      function startOfMonth(d) {
+        const x = new Date(d);
+        x.setUTCDate(1);
+        x.setUTCHours(0, 0, 0, 0);
+        return x;
+      }
+      function addMonths(d, n) {
+        const x = new Date(d);
+        x.setUTCMonth(x.getUTCMonth() + n);
+        return x;
+      }
+      function endOfPrevDay(d) {
+        const x = new Date(d);
+        x.setUTCDate(x.getUTCDate() - 1);
+        x.setUTCHours(23, 59, 59, 999);
+        return x;
+      }
+
+      function initCalendar(events) {
+        const el = document.getElementById('calendar');
+        if (calendar) { calendar.destroy(); eventElsById.clear(); }
+
+        // Two full months window starting from the first of current month
+        const now = new Date();
+        const from = startOfMonth(now);
+        const to = endOfPrevDay(addMonths(from, 2)); // end of next month
+
+        calendar = new FullCalendar.Calendar(el, {
+          locale: 'ru',
+          initialView: 'multiMonthHorizontal',
+          initialDate: from.toISOString(),
+          headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'multiMonthHorizontal,timeGridWeek,listWeek',
+          },
+          buttonText: {
+            today: 'сегодня',
+            multiMonthHorizontal: '2 месяца',
+            week: 'неделя',
+            list: 'список',
+          },
+
+          // Custom horizontal multi-month (timeline) view
+          views: {
+            multiMonthHorizontal: {
+              type: 'timeline',
+              duration: { days: 62 },    // ~two months
+              slotDuration: { days: 1 },
+              slotLabelFormat: [
+                { month: 'long', year: 'numeric' },    // top row
+                { weekday: 'short', day: 'numeric' },  // second row
+              ],
+              slotLabelInterval: { days: 1 },
+              slotMinWidth: 24,          // narrow columns
+              eventMinHeight: 18,
+              eventShortHeight: 18,
+            },
+          },
+
+          timeZone: 'UTC',
+          allDaySlot: true,
+          eventTimeFormat: false,
+
+          events,
+          eventDisplay: 'block',
+
+          eventDidMount: (arg) => {
+            const p = arg.event.extendedProps.raw;
+            const color = colorForId(p.id);
+            const sel = selectedId === p.id;
+            styleEventElement(arg.el, color, sel);
+            registerEventEl(String(p.id), arg.el);
+          },
+          eventClick: (info) => {
+            const d = info.event.extendedProps.raw || {};
+            selectedId = d.id ?? null;
+            applySelectionStyles();
+            renderList();
+            showDetails(d);
+          },
+          eventContent: buildEventContent,
+        });
+
+        calendar.render();
+
+        // Hide time rows in week view (if user switches to it)
+        const style = document.createElement('style');
+        style.textContent = `
+          .fc-timegrid-slot-label { display: none !important; }
+          .fc-timegrid-axis { display: none !important; }
+          .fc .fc-timegrid-slot { height: 0 !important; }
+        `;
+        el.appendChild(style);
+
+        calendar.gotoDate(from);
+      }
+
       function applyFilter() {
         const q = qEl.value.trim().toLowerCase();
         const t = typeEl.value;
@@ -601,7 +629,7 @@
         }
 
         renderChips();
-        initCalendar(toEvents(filtered)); // rebuild with fresh mapping
+        initCalendar(toEvents(filtered));  // rebuild timeline with current items
         renderList();
         showDetails(filtered.find((x) => x.id === selectedId));
       }
