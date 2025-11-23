@@ -2,10 +2,9 @@
 <html lang="ru">
   <head>
     <meta charset="utf-8" />
-    <title>Акции WB — детали и календарь</title>
+    <title>Акции WB — календарь и детали</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- FullCalendar -->
     <link
       href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css"
       rel="stylesheet"
@@ -34,6 +33,33 @@
         padding: 16px;
         overflow: auto;
       }
+      .row {
+        margin-bottom: 12px;
+      }
+      input,
+      select {
+        width: 100%;
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: 1px solid #293042;
+        background: #0f1320;
+        color: #e5e7eb;
+      }
+      .chips {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 8px 0 12px 0;
+      }
+      .chip {
+        padding: 3px 8px;
+        background: #1f2937;
+        border-radius: 999px;
+        font-size: 12px;
+        color: #94a3b8;
+      }
+
+      /* List */
       .list {
         display: grid;
         gap: 8px;
@@ -56,32 +82,6 @@
         color: #94a3b8;
         font-size: 12px;
       }
-      .row {
-        margin-bottom: 12px;
-      }
-      input,
-      select,
-      button {
-        width: 100%;
-        padding: 8px 10px;
-        border-radius: 8px;
-        border: 1px solid #293042;
-        background: #0f1320;
-        color: #e5e7eb;
-      }
-      .chips {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin: 8px 0 12px 0;
-      }
-      .chip {
-        padding: 3px 8px;
-        background: #1f2937;
-        border-radius: 999px;
-        font-size: 12px;
-        color: #94a3b8;
-      }
       .pill {
         font-size: 11px;
         padding: 2px 6px;
@@ -91,12 +91,16 @@
         margin-left: 8px;
         white-space: nowrap;
       }
+      .pill.auto {
+        border-color: #22c55e;
+        color: #86efac;
+      }
       .badge-active {
-        border-color: #16a34a;
+        border: 1px solid #16a34a;
         color: #86efac;
       }
 
-      /* Calendar panel */
+      /* Calendar */
       .calendar-wrap {
         display: grid;
         grid-template-rows: auto 1fr auto;
@@ -109,7 +113,9 @@
         border-radius: 10px;
         padding: 8px;
       }
-      /* Event appearance */
+      .fc .fc-toolbar-chunk button {
+        text-transform: none;
+      }
       .fc-event {
         font-size: 12px;
         line-height: 1.25;
@@ -132,7 +138,7 @@
         opacity: 0.95;
       }
 
-      /* Details under calendar */
+      /* Details */
       .details {
         background: #0f1320;
         border: 1px solid #23304a;
@@ -144,6 +150,7 @@
         color: #94a3b8;
         white-space: pre-wrap;
       }
+
       .err {
         color: #fecaca;
         background: #331a1a;
@@ -156,38 +163,41 @@
   </head>
   <body>
     <div class="wrap">
-      <!-- Left: List -->
+      <!-- ЛЕВАЯ ПАНЕЛЬ -->
       <aside class="panel">
-        <h2>Список акций</h2>
+        <h2 style="margin:0 0 8px;">Список акций</h2>
+
         <div class="row">
           <input id="q" type="text" placeholder="Поиск по названию/описанию..." />
         </div>
+
         <div class="row" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
           <select id="typeFilter">
             <option value="">Все типы</option>
-            <option value="regular">regular</option>
-            <option value="auto">auto</option>
+            <option value="regular">регулярная</option>
+            <option value="auto">авто</option>
           </select>
           <select id="sortBy">
             <option value="active">Активные вначале</option>
             <option value="startAsc">Дата начала ↑</option>
             <option value="startDesc">Дата начала ↓</option>
-            <option value="nameAsc">Название A→Я</option>
-            <option value="nameDesc">Название Я→A</option>
+            <option value="nameAsc">Название А→Я</option>
+            <option value="nameDesc">Название Я→А</option>
           </select>
         </div>
+
         <div class="chips" id="chips"></div>
         <div id="list" class="list"></div>
         <div id="error" class="err" hidden></div>
       </aside>
 
-      <!-- Right: Calendar -->
+      <!-- ПРАВАЯ ПАНЕЛЬ -->
       <section class="panel calendar-wrap">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
           <h2 style="margin:0;">Календарь акций</h2>
-          <div style="display:flex;gap:8px;align-items:center;">
+          <div class="chips">
             <span class="chip">Сегодня: <span id="today"></span></span>
-            <span class="chip">Вид: месяц/неделя/список</span>
+            <span class="chip">Вид: месяц / неделя / список</span>
           </div>
         </div>
 
@@ -200,7 +210,6 @@
           <div class="kv" id="d-adv"></div>
           <div class="kv" id="d-boost"></div>
           <div class="kv" id="d-desc"></div>
-          <div class="kv" id="d-stats"></div>
         </div>
       </section>
     </div>
@@ -209,7 +218,6 @@
       const ENDPOINT = '/api/wb-promo-details.php';
       const EXCLUDE_BY_NAME = ['Распродажа в счет долга'];
 
-      // DOM refs
       const listEl = document.getElementById('list');
       const detailsBox = document.getElementById('details');
       const dTitle = document.getElementById('d-title');
@@ -218,7 +226,6 @@
       const dAdv = document.getElementById('d-adv');
       const dBoost = document.getElementById('d-boost');
       const dDesc = document.getElementById('d-desc');
-      const dStats = document.getElementById('d-stats');
       const chipsEl = document.getElementById('chips');
       const errorEl = document.getElementById('error');
       const qEl = document.getElementById('q');
@@ -226,7 +233,6 @@
       const typeEl = document.getElementById('typeFilter');
       const todayEl = document.getElementById('today');
 
-      // State
       let all = [];
       let filtered = [];
       let selectedId = null;
@@ -248,6 +254,28 @@
           : '—';
       }
 
+      function typeRu(type) {
+        if (type === 'auto') return 'авто';
+        if (type === 'regular') return 'регулярная';
+        return '—';
+      }
+
+      function typePill(type) {
+        if (!type) return '';
+        const isAuto = type === 'auto';
+        const cls = isAuto ? 'pill auto' : 'pill';
+        const text = typeRu(type);
+        return `<span class="${cls}">${text}</span>`;
+      }
+
+      function compactAdvantages(arr) {
+        if (!Array.isArray(arr) || !arr.length) return '—';
+        const top = arr.filter(Boolean).slice(0, 2);
+        let text = top.join(', ');
+        if (arr.length > 2) text += ` +${arr.length - 2}`;
+        return text || '—';
+      }
+
       function getBoostRange(ranging) {
         if (!Array.isArray(ranging) || !ranging.length) return null;
         let min = null, max = null;
@@ -262,33 +290,16 @@
         return `${min ?? max}%`;
       }
 
-      function compactAdvantages(arr) {
-        if (!Array.isArray(arr) || !arr.length) return '—';
-        const top = arr.filter(Boolean).slice(0, 2);
-        let text = top.join(', ');
-        if (arr.length > 2) text += ` +${arr.length - 2}`;
-        return text || '—';
-      }
-
-      function typePill(type) {
-        if (!type) return '';
-        const color =
-          type === 'auto'
-            ? 'border:1px solid #22c55e;color:#86efac;'
-            : 'border:1px solid #7c3aed;color:#c4b5fd;';
-        return `<span class="pill" style="${color}">${type}</span>`;
-      }
-
       function buildEventContent(arg) {
         const e = arg.event.extendedProps.raw;
         const name = arg.event.title || '(без названия)';
         const pill = typePill(e.type);
         const adv = compactAdvantages(e.advantages);
         const boost = getBoostRange(e.ranging);
-        const metaParts = [];
-        if (adv && adv !== '—') metaParts.push(adv);
-        if (boost) metaParts.push(`бустинг: ${boost}`);
-        const meta = metaParts.join(' • ');
+        const parts = [];
+        if (adv && adv !== '—') parts.push(adv);
+        if (boost) parts.push(`бустинг: ${boost}`);
+        const meta = parts.join(' • ');
 
         const container = document.createElement('div');
         container.innerHTML = `
@@ -310,9 +321,10 @@
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,listWeek',
           },
+          buttonText: { today: 'сегодня', month: 'месяц', week: 'неделя', list: 'список' },
+          events,
           eventDisplay: 'block',
           eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
-          events,
           eventDidMount: (arg) => {
             const active = !!arg.event.extendedProps.active;
             arg.el.classList.add(active ? 'active' : 'inactive');
@@ -320,7 +332,7 @@
           eventClick: (info) => {
             const d = info.event.extendedProps.raw || {};
             selectedId = d.id ?? null;
-            renderList(); // sync highlight
+            renderList();
             showDetails(d);
           },
           eventContent: buildEventContent,
@@ -351,30 +363,28 @@
         chipsEl.innerHTML = '';
         chipsEl.appendChild(chip(`Показано: ${filtered.length}`));
         chipsEl.appendChild(chip(`Активных: ${filtered.filter((x) => x.active).length}`));
-        chipsEl.appendChild(chip(`regular: ${filtered.filter((x) => x.type === 'regular').length}`));
-        chipsEl.appendChild(chip(`auto: ${filtered.filter((x) => x.type === 'auto').length}`));
+        chipsEl.appendChild(chip(`регулярная: ${filtered.filter((x) => x.type === 'regular').length}`));
+        chipsEl.appendChild(chip(`авто: ${filtered.filter((x) => x.type === 'auto').length}`));
       }
 
       function renderList() {
         listEl.innerHTML = '';
         filtered.forEach((p) => {
-          const isActive = !!p.active;
           const div = document.createElement('div');
           div.className = 'item' + (p.id === selectedId ? ' active' : '');
           div.innerHTML = `
             <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
               <div class="title">${p.name || '(без названия)'}</div>
-              <span class="pill ${isActive ? 'badge-active' : ''}">${
-            isActive ? 'Активна' : 'Запланирована'
-          }</span>
+              <span class="pill ${p.active ? 'badge-active' : ''}">
+                ${p.active ? 'Активна' : 'Запланирована'}
+              </span>
             </div>
-            <div class="sub">${fmt(p.startDate)} — ${fmt(p.endDate)}</div>
+            <div class="sub">${fmt(p.startDate)} — ${fmt(p.endDate)} ${typePill(p.type)}</div>
           `;
           div.onclick = () => {
             selectedId = p.id;
             renderList();
             showDetails(p);
-            // scroll calendar to month containing start
             if (p.startDate && calendar) calendar.gotoDate(p.startDate);
           };
           listEl.appendChild(div);
@@ -387,39 +397,14 @@
           return;
         }
         const adv = Array.isArray(p.advantages) ? p.advantages.filter(Boolean) : [];
-        const rng = Array.isArray(p.ranging) ? p.ranging : [];
-        const boost = getBoostRange(rng);
+        const boost = getBoostRange(p.ranging);
 
         dTitle.innerHTML = `${p.name || '(без названия)'} ${typePill(p.type)}`;
         dWhen.textContent = `Период: ${fmt(p.startDate)} — ${fmt(p.endDate)}`;
-        dType.textContent = `Тип: ${p.type || '—'}`;
+        dType.textContent = `Тип: ${typeRu(p.type)}`;
         dAdv.textContent = `Преимущества: ${adv.length ? adv.join(', ') : '—'}`;
         dBoost.textContent = `Диапазон бустинга: ${boost || '—'}`;
         dDesc.textContent = `Описание: ${p.description || '—'}`;
-
-        const s1 =
-          p.inPromoActionLeftovers != null
-            ? `остатки в акции: ${p.inPromoActionLeftovers}`
-            : null;
-        const s2 =
-          p.inPromoActionTotal != null ? `всего в акции: ${p.inPromoActionTotal}` : null;
-        const s3 =
-          p.notInPromoActionLeftovers != null
-            ? `остатки вне акции: ${p.notInPromoActionLeftovers}`
-            : null;
-        const s4 =
-          p.notInPromoActionTotal != null
-            ? `всего вне акции: ${p.notInPromoActionTotal}`
-            : null;
-        const s5 =
-          p.participationPercentage != null
-            ? `участие: ${p.participationPercentage}%`
-            : null;
-
-        dStats.textContent =
-          ['Статистика:', s1, s2, s3, s4, s5].filter(Boolean).join(' | ') ||
-          'Статистика: —';
-
         detailsBox.hidden = false;
       }
 
@@ -455,14 +440,10 @@
         const t = typeEl.value;
 
         filtered = all.filter((p) => {
-          // исключить персональную акцию по имени
           if (EXCLUDE_BY_NAME.includes(p.name || '')) return false;
-
           if (t && p.type !== t) return false;
           if (!q) return true;
-          const hay = `${p.name || ''} ${p.description || ''} ${(p.advantages || []).join(
-            ' '
-          )}`;
+          const hay = `${p.name || ''} ${p.description || ''} ${(p.advantages || []).join(' ')}`;
           return hay.toLowerCase().includes(q);
         });
 
