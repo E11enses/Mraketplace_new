@@ -1,151 +1,511 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
   <head>
     <meta charset="utf-8" />
-    <title>WB Promotion Details</title>
+    <title>Акции WB — детали и календарь</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- FullCalendar -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+
     <style>
-      body { margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: #0f1115; color: #e5e7eb; }
-      .wrap { display: grid; grid-template-columns: 380px 1fr; gap: 16px; height: 100vh; padding: 16px; box-sizing: border-box; }
-      .panel { background: #161a22; border-radius: 12px; padding: 16px; overflow: auto; }
-      .row { margin-bottom: 12px; }
-      input { width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid #293042; background: #0f1320; color: #e5e7eb; }
-      .list { display: grid; gap: 8px; }
-      .item { background: #0f1320; border: 1px solid #23304a; border-radius: 10px; padding: 10px; cursor: pointer; }
-      .item.active { border-color: #16a34a; background: rgba(22,163,74,.1); }
-      .title { font-weight: 600; }
-      .sub { color: #94a3b8; font-size: 12px; }
-      .err { color: #fecaca; background: #331a1a; border: 1px solid #7f1d1d; padding: 10px; border-radius: 8px; font-size: 14px; }
-      .kv { margin: 6px 0; color: #94a3b8; white-space: pre-wrap; }
-      h2, h3 { margin: 0 0 10px; }
-      .chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
-      .chip { padding: 3px 8px; background: #1f2937; border-radius: 999px; font-size: 12px; color: #94a3b8; }
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial,
+          sans-serif;
+        background: #0f1115;
+        color: #e5e7eb;
+      }
+      .wrap {
+        display: grid;
+        grid-template-columns: 30% 70%;
+        gap: 16px;
+        height: 100vh;
+        padding: 16px;
+        box-sizing: border-box;
+      }
+      .panel {
+        background: #161a22;
+        border-radius: 12px;
+        padding: 16px;
+        overflow: auto;
+      }
+      .list {
+        display: grid;
+        gap: 8px;
+      }
+      .item {
+        background: #0f1320;
+        border: 1px solid #23304a;
+        border-radius: 10px;
+        padding: 10px;
+        cursor: pointer;
+      }
+      .item.active {
+        border-color: #16a34a;
+        background: rgba(22, 163, 74, 0.12);
+      }
+      .title {
+        font-weight: 600;
+      }
+      .sub {
+        color: #94a3b8;
+        font-size: 12px;
+      }
+      .row {
+        margin-bottom: 12px;
+      }
+      input,
+      select,
+      button {
+        width: 100%;
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: 1px solid #293042;
+        background: #0f1320;
+        color: #e5e7eb;
+      }
+      .chips {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 8px 0 12px 0;
+      }
+      .chip {
+        padding: 3px 8px;
+        background: #1f2937;
+        border-radius: 999px;
+        font-size: 12px;
+        color: #94a3b8;
+      }
+      .pill {
+        font-size: 11px;
+        padding: 2px 6px;
+        border-radius: 999px;
+        border: 1px solid #7c3aed;
+        color: #c4b5fd;
+        margin-left: 8px;
+        white-space: nowrap;
+      }
+      .badge-active {
+        border-color: #16a34a;
+        color: #86efac;
+      }
+
+      /* Calendar panel */
+      .calendar-wrap {
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        gap: 10px;
+        height: 100%;
+      }
+      #calendar {
+        background: #0f1320;
+        border: 1px solid #23304a;
+        border-radius: 10px;
+        padding: 8px;
+      }
+      /* Event appearance */
+      .fc-event {
+        font-size: 12px;
+        line-height: 1.25;
+        padding: 2px 4px;
+      }
+      .fc-event.active {
+        background: rgba(22, 163, 74, 0.15);
+        border-color: #16a34a;
+        color: #a7f3d0;
+      }
+      .fc-event.inactive {
+        background: rgba(124, 58, 237, 0.15);
+        border-color: #7c3aed;
+        color: #ddd6fe;
+      }
+      .ev-title {
+        font-weight: 600;
+      }
+      .ev-meta {
+        opacity: 0.95;
+      }
+
+      /* Details under calendar */
+      .details {
+        background: #0f1320;
+        border: 1px solid #23304a;
+        border-radius: 10px;
+        padding: 12px;
+      }
+      .kv {
+        margin: 6px 0;
+        color: #94a3b8;
+        white-space: pre-wrap;
+      }
+      .err {
+        color: #fecaca;
+        background: #331a1a;
+        border: 1px solid #7f1d1d;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 14px;
+      }
     </style>
   </head>
   <body>
     <div class="wrap">
+      <!-- Left: List -->
       <aside class="panel">
-        <h2>Promotions</h2>
+        <h2>Список акций</h2>
         <div class="row">
-          <input id="q" type="text" placeholder="Search by name/description..." />
+          <input id="q" type="text" placeholder="Поиск по названию/описанию..." />
         </div>
+        <div class="row" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <select id="typeFilter">
+            <option value="">Все типы</option>
+            <option value="regular">regular</option>
+            <option value="auto">auto</option>
+          </select>
+          <select id="sortBy">
+            <option value="active">Активные вначале</option>
+            <option value="startAsc">Дата начала ↑</option>
+            <option value="startDesc">Дата начала ↓</option>
+            <option value="nameAsc">Название A→Я</option>
+            <option value="nameDesc">Название Я→A</option>
+          </select>
+        </div>
+        <div class="chips" id="chips"></div>
         <div id="list" class="list"></div>
         <div id="error" class="err" hidden></div>
       </aside>
 
-      <main class="panel">
-        <h2>Details</h2>
-        <div class="chips" id="chips"></div>
-        <div id="details" class="kv">Loading…</div>
-      </main>
+      <!-- Right: Calendar -->
+      <section class="panel calendar-wrap">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+          <h2 style="margin:0;">Календарь акций</h2>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span class="chip">Сегодня: <span id="today"></span></span>
+            <span class="chip">Вид: месяц/неделя/список</span>
+          </div>
+        </div>
+
+        <div id="calendar"></div>
+
+        <div id="details" class="details" hidden>
+          <h3 id="d-title" style="margin:0 0 6px;"></h3>
+          <div class="kv" id="d-when"></div>
+          <div class="kv" id="d-type"></div>
+          <div class="kv" id="d-adv"></div>
+          <div class="kv" id="d-boost"></div>
+          <div class="kv" id="d-desc"></div>
+          <div class="kv" id="d-stats"></div>
+        </div>
+      </section>
     </div>
 
     <script>
       const ENDPOINT = '/api/wb-promo-details.php';
+      const EXCLUDE_BY_NAME = ['Распродажа в счет долга'];
 
+      // DOM refs
       const listEl = document.getElementById('list');
-      const detailsEl = document.getElementById('details');
+      const detailsBox = document.getElementById('details');
+      const dTitle = document.getElementById('d-title');
+      const dWhen = document.getElementById('d-when');
+      const dType = document.getElementById('d-type');
+      const dAdv = document.getElementById('d-adv');
+      const dBoost = document.getElementById('d-boost');
+      const dDesc = document.getElementById('d-desc');
+      const dStats = document.getElementById('d-stats');
       const chipsEl = document.getElementById('chips');
       const errorEl = document.getElementById('error');
       const qEl = document.getElementById('q');
+      const sortEl = document.getElementById('sortBy');
+      const typeEl = document.getElementById('typeFilter');
+      const todayEl = document.getElementById('today');
 
+      // State
       let all = [];
       let filtered = [];
       let selectedId = null;
+      let calendar;
+
+      todayEl.textContent = new Date().toLocaleDateString('ru-RU', {
+        year: 'numeric',
+        month: 'long',
+        day: '2-digit',
+      });
 
       function fmt(d) {
         return d
-          ? new Date(d).toLocaleString(undefined, { year: 'numeric', month: 'short', day: '2-digit' })
+          ? new Date(d).toLocaleString('ru-RU', {
+              year: 'numeric',
+              month: 'short',
+              day: '2-digit',
+            })
           : '—';
+      }
+
+      function getBoostRange(ranging) {
+        if (!Array.isArray(ranging) || !ranging.length) return null;
+        let min = null, max = null;
+        for (const r of ranging) {
+          const b = typeof r?.boost === 'number' ? r.boost : null;
+          if (b == null) continue;
+          if (min == null || b < min) min = b;
+          if (max == null || b > max) max = b;
+        }
+        if (min == null && max == null) return null;
+        if (min != null && max != null) return `${min}–${max}%`;
+        return `${min ?? max}%`;
+      }
+
+      function compactAdvantages(arr) {
+        if (!Array.isArray(arr) || !arr.length) return '—';
+        const top = arr.filter(Boolean).slice(0, 2);
+        let text = top.join(', ');
+        if (arr.length > 2) text += ` +${arr.length - 2}`;
+        return text || '—';
+      }
+
+      function typePill(type) {
+        if (!type) return '';
+        const color =
+          type === 'auto'
+            ? 'border:1px solid #22c55e;color:#86efac;'
+            : 'border:1px solid #7c3aed;color:#c4b5fd;';
+        return `<span class="pill" style="${color}">${type}</span>`;
+      }
+
+      function buildEventContent(arg) {
+        const e = arg.event.extendedProps.raw;
+        const name = arg.event.title || '(без названия)';
+        const pill = typePill(e.type);
+        const adv = compactAdvantages(e.advantages);
+        const boost = getBoostRange(e.ranging);
+        const metaParts = [];
+        if (adv && adv !== '—') metaParts.push(adv);
+        if (boost) metaParts.push(`бустинг: ${boost}`);
+        const meta = metaParts.join(' • ');
+
+        const container = document.createElement('div');
+        container.innerHTML = `
+          <div class="ev-title">${name} ${pill}</div>
+          <div class="ev-meta">${meta}</div>
+        `;
+        return { domNodes: [container] };
+      }
+
+      function initCalendar(events) {
+        const el = document.getElementById('calendar');
+        if (calendar) calendar.destroy();
+        calendar = new FullCalendar.Calendar(el, {
+          locale: 'ru',
+          initialView: 'dayGridMonth',
+          height: '100%',
+          headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,listWeek',
+          },
+          eventDisplay: 'block',
+          eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
+          events,
+          eventDidMount: (arg) => {
+            const active = !!arg.event.extendedProps.active;
+            arg.el.classList.add(active ? 'active' : 'inactive');
+          },
+          eventClick: (info) => {
+            const d = info.event.extendedProps.raw || {};
+            selectedId = d.id ?? null;
+            renderList(); // sync highlight
+            showDetails(d);
+          },
+          eventContent: buildEventContent,
+        });
+        calendar.render();
+      }
+
+      function toEvents(items) {
+        return items.map((p) => ({
+          id: String(p.id),
+          title: p.name || '(без названия)',
+          start: p.startDate || null,
+          end: p.endDate || null,
+          allDay: true,
+          active: !!p.active,
+          raw: p,
+        }));
+      }
+
+      function chip(text) {
+        const el = document.createElement('span');
+        el.className = 'chip';
+        el.textContent = text;
+        return el;
+      }
+
+      function renderChips() {
+        chipsEl.innerHTML = '';
+        chipsEl.appendChild(chip(`Показано: ${filtered.length}`));
+        chipsEl.appendChild(chip(`Активных: ${filtered.filter((x) => x.active).length}`));
+        chipsEl.appendChild(chip(`regular: ${filtered.filter((x) => x.type === 'regular').length}`));
+        chipsEl.appendChild(chip(`auto: ${filtered.filter((x) => x.type === 'auto').length}`));
       }
 
       function renderList() {
         listEl.innerHTML = '';
         filtered.forEach((p) => {
+          const isActive = !!p.active;
           const div = document.createElement('div');
           div.className = 'item' + (p.id === selectedId ? ' active' : '');
           div.innerHTML = `
-            <div class="title">${p.name || '(No name)'}</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+              <div class="title">${p.name || '(без названия)'}</div>
+              <span class="pill ${isActive ? 'badge-active' : ''}">${
+            isActive ? 'Активна' : 'Запланирована'
+          }</span>
+            </div>
             <div class="sub">${fmt(p.startDate)} — ${fmt(p.endDate)}</div>
           `;
-          div.onclick = () => { selectedId = p.id; renderList(); renderDetails(); };
+          div.onclick = () => {
+            selectedId = p.id;
+            renderList();
+            showDetails(p);
+            // scroll calendar to month containing start
+            if (p.startDate && calendar) calendar.gotoDate(p.startDate);
+          };
           listEl.appendChild(div);
         });
-        chipsEl.innerHTML = '';
-        const c1 = document.createElement('span');
-        c1.className = 'chip';
-        c1.textContent = `Shown: ${filtered.length}`;
-        chipsEl.appendChild(c1);
-        const c2 = document.createElement('span');
-        c2.className = 'chip';
-        c2.textContent = `Active: ${filtered.filter((x) => x.active).length}`;
-        chipsEl.appendChild(c2);
       }
 
-      function renderDetails() {
-        const p = filtered.find((x) => x.id === selectedId);
-        if (!p) { detailsEl.textContent = 'Select a promotion'; return; }
-
+      function showDetails(p) {
+        if (!p) {
+          detailsBox.hidden = true;
+          return;
+        }
         const adv = Array.isArray(p.advantages) ? p.advantages.filter(Boolean) : [];
         const rng = Array.isArray(p.ranging) ? p.ranging : [];
+        const boost = getBoostRange(rng);
 
-        detailsEl.innerHTML = `
-          <h3>${p.name || '(No name)'}</h3>
-          <div class="kv">When: ${fmt(p.startDate)} — ${fmt(p.endDate)}</div>
-          <div class="kv">Type: ${p.type || '—'}</div>
-          <div class="kv">Description: ${p.description || '—'}</div>
-          <div class="kv">Advantages: ${adv.length ? adv.join('; ') : '—'}</div>
-          <div class="kv">
-            Stats:
-            ${p.inPromoActionLeftovers != null ? ' in-stock in promo: ' + p.inPromoActionLeftovers : ''}
-            ${p.inPromoActionTotal != null ? ' | total in promo: ' + p.inPromoActionTotal : ''}
-            ${p.notInPromoActionLeftovers != null ? ' | in-stock not in promo: ' + p.notInPromoActionLeftovers : ''}
-            ${p.notInPromoActionTotal != null ? ' | total not in promo: ' + p.notInPromoActionTotal : ''}
-            ${p.participationPercentage != null ? ' | participation: ' + p.participationPercentage + '%' : ''}
-          </div>
-          <div class="kv">${p.type === 'auto' && p.exceptionProductsCount != null ? 'Excluded before start (auto): ' + p.exceptionProductsCount : ''}</div>
-          <div class="kv">Ranging: ${rng.length ? JSON.stringify(rng) : '—'}</div>
-        `;
+        dTitle.innerHTML = `${p.name || '(без названия)'} ${typePill(p.type)}`;
+        dWhen.textContent = `Период: ${fmt(p.startDate)} — ${fmt(p.endDate)}`;
+        dType.textContent = `Тип: ${p.type || '—'}`;
+        dAdv.textContent = `Преимущества: ${adv.length ? adv.join(', ') : '—'}`;
+        dBoost.textContent = `Диапазон бустинга: ${boost || '—'}`;
+        dDesc.textContent = `Описание: ${p.description || '—'}`;
+
+        const s1 =
+          p.inPromoActionLeftovers != null
+            ? `остатки в акции: ${p.inPromoActionLeftovers}`
+            : null;
+        const s2 =
+          p.inPromoActionTotal != null ? `всего в акции: ${p.inPromoActionTotal}` : null;
+        const s3 =
+          p.notInPromoActionLeftovers != null
+            ? `остатки вне акции: ${p.notInPromoActionLeftovers}`
+            : null;
+        const s4 =
+          p.notInPromoActionTotal != null
+            ? `всего вне акции: ${p.notInPromoActionTotal}`
+            : null;
+        const s5 =
+          p.participationPercentage != null
+            ? `участие: ${p.participationPercentage}%`
+            : null;
+
+        dStats.textContent =
+          ['Статистика:', s1, s2, s3, s4, s5].filter(Boolean).join(' | ') ||
+          'Статистика: —';
+
+        detailsBox.hidden = false;
+      }
+
+      function sortItems(items, mode) {
+        const copy = items.slice();
+        const cmpStr = (a, b) =>
+          String(a || '').localeCompare(String(b || ''), 'ru', { sensitivity: 'base' });
+        const cmpDate = (a, b) => String(a || '').localeCompare(String(b || ''));
+        switch (mode) {
+          case 'startAsc':
+            return copy.sort((a, b) => cmpDate(a.startDate, b.startDate));
+          case 'startDesc':
+            return copy.sort((a, b) => cmpDate(b.startDate, a.startDate));
+          case 'nameAsc':
+            return copy.sort((a, b) => cmpStr(a.name, b.name));
+          case 'nameDesc':
+            return copy.sort((a, b) => cmpStr(b.name, a.name));
+          case 'active':
+          default:
+            return copy.sort((a, b) => {
+              const aa = a.active ? 1 : 0,
+                bb = b.active ? 1 : 0;
+              if (aa !== bb) return bb - aa;
+              const d = cmpDate(a.startDate, b.startDate);
+              if (d !== 0) return d;
+              return cmpStr(a.name, b.name);
+            });
+        }
       }
 
       function applyFilter() {
         const q = qEl.value.trim().toLowerCase();
-        filtered = !q
-          ? all.slice()
-          : all.filter((p) => {
-              const hay = `${p.name || ''} ${p.description || ''} ${(p.advantages || []).join(' ')}`;
-              return hay.toLowerCase().includes(q);
-            });
-        if (filtered.length && !filtered.some((p) => p.id === selectedId)) {
+        const t = typeEl.value;
+
+        filtered = all.filter((p) => {
+          // исключить персональную акцию по имени
+          if (EXCLUDE_BY_NAME.includes(p.name || '')) return false;
+
+          if (t && p.type !== t) return false;
+          if (!q) return true;
+          const hay = `${p.name || ''} ${p.description || ''} ${(p.advantages || []).join(
+            ' '
+          )}`;
+          return hay.toLowerCase().includes(q);
+        });
+
+        filtered = sortItems(filtered, sortEl.value);
+
+        if (filtered.length && !filtered.some((x) => x.id === selectedId)) {
           selectedId = filtered[0].id;
         }
+
+        renderChips();
         renderList();
-        renderDetails();
+        initCalendar(toEvents(filtered));
+        showDetails(filtered.find((x) => x.id === selectedId));
       }
 
       async function load() {
         errorEl.hidden = true;
-        detailsEl.textContent = 'Loading…';
         try {
           const res = await fetch(ENDPOINT, { cache: 'no-store' });
           if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
           const data = await res.json();
-          if (!Array.isArray(data)) throw new Error('Invalid payload');
+          if (!Array.isArray(data)) throw new Error('Некорректный ответ сервера');
           all = data;
-          filtered = data.slice();
-          selectedId = filtered[0]?.id ?? null;
-          renderList();
-          renderDetails();
+          selectedId = null;
+          applyFilter();
         } catch (e) {
-          errorEl.textContent = 'Failed to load promotions: ' + e.message;
+          errorEl.textContent = 'Не удалось загрузить акции: ' + e.message;
           errorEl.hidden = false;
-          detailsEl.textContent = '—';
           console.error(e);
         }
       }
 
       qEl.addEventListener('input', debounce(applyFilter, 200));
-      function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+      sortEl.addEventListener('change', applyFilter);
+      typeEl.addEventListener('change', applyFilter);
+
+      function debounce(fn, ms) {
+        let t;
+        return (...a) => {
+          clearTimeout(t);
+          t = setTimeout(() => fn(...a), ms);
+        };
+      }
 
       load();
     </script>
