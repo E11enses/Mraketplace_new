@@ -27,6 +27,8 @@
     --status-planned-text: #3730a3;
   }
 
+  
+
   /* Global: prevent horizontal overflow */
     html, body { margin:0; padding:0; width:100%; max-width:100%; overflow-x:hidden; background:var(--bg); color:var(--text); font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; height:100%; }
   .wrap { display:grid; grid-template-columns:15% 85%; gap:12px; min-height:100vh; max-height:100vh; padding:12px; box-sizing:border-box; overflow:hidden; }
@@ -54,6 +56,24 @@
   .month-title{font-weight:700;}
   #calendar{background:#fff; border:1px solid var(--border); border-radius:12px; padding:6px; min-height:320px; overflow:auto; box-sizing:border-box;}
 
+   .back-to-site {
+      margin-top: 25px;
+      font-size: 16px;
+    }
+
+    .back-to-site a {
+      color: var(--accent);
+      text-decoration: none;
+      padding: 6px 6px;
+      border: 2px solid var(--accent);
+    }
+
+    .back-to-site a:hover {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    
   /* COMPACT DETAILS */
   .details {
     background:#fff; border:1px solid var(--border); border-radius:12px;
