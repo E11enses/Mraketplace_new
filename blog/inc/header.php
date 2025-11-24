@@ -109,7 +109,7 @@ natsort($categoriesForNav); // simple sort
     <!-- for simplicity, keep category menu static for now -->
     <div class="header__top">
       <div class="header__logo">
-        <a class="site-logo" href="index.php">
+        <a class="site-logo" href="/blog/index.php">
           <img src="/blog/images/logo.svg" alt="">
         </a>
       </div>
