@@ -472,6 +472,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"
         crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
@@ -727,9 +729,11 @@
             }); return rows;
         }
 
-        // New: robust export (clone each page into off-screen surface and render)
         async function exportPDF() {
-            if (!pages.length) { els.status.textContent = "Нет страниц для экспорта"; return; }
+            if (!pages.length) {
+                els.status.textContent = "Нет страниц для экспорта";
+                return;
+            }
             els.btnExport.disabled = true;
             const prev = els.btnExport.textContent;
             els.btnExport.textContent = "Генерация...";
@@ -737,31 +741,31 @@
 
             try {
                 const format = els.pageFormat.value.toLowerCase();
-                const supp = (pages[0]?.fields?.["Номер поставки"] || "").trim() || "без_номера";
+                const supp =
+                    (pages[0]?.fields?.["Номер поставки"] || "").trim() || "без_номера";
                 const filename = `Упаковочный лист поставка (${supp}).pdf`;
 
-                // Ensure DOM is up to date
                 renderPreview();
-                await new Promise(r => setTimeout(r, 50));
+                await new Promise((r) => setTimeout(r, 50));
 
-                // Prepare export surface
+                // Подготовка off-screen поверхности
                 const surface = els.exportSurface;
                 surface.innerHTML = "";
 
-                // mm size
                 const mmW = format === "a5" ? 148 : 210;
                 const mmH = format === "a5" ? 210 : 297;
 
-                // Clone each .page into surface with hard CSS reset (already in CSS)
+                // Клонируем страницы
                 const nodes = Array.from(document.querySelectorAll(".page"));
                 for (const node of nodes) {
                     const clone = node.cloneNode(true);
                     surface.appendChild(clone);
                 }
 
-                // Render canvas and compose PDF
-                const { jsPDF } = window.jspdf || {}; // from html2pdf bundle
-                const pdf = new (jsPDF || window.jspdf.jsPDF)({
+                // Инициализируем jsPDF из UMD
+                const JS = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+                if (!JS) throw new Error("jsPDF не загружен");
+                const pdf = new JS({
                     unit: "mm",
                     format: [mmW, mmH],
                     orientation: "portrait",
@@ -770,12 +774,15 @@
                 const mm2px = 3.7795275591;
                 const pxW = Math.round(mmW * mm2px);
                 const pxH = Math.round(mmH * mm2px);
-
                 const scale = 2;
-                const clones = Array.from(surface.querySelectorAll(".page"));
 
-                // Narrow barcode for export (as before)
-                clones.forEach(p => p.querySelectorAll(".passcode-barcode svg").forEach(s => s.classList.add("barcode-export-narrow")));
+                const clones = Array.from(surface.querySelectorAll(".page"));
+                // Сужаем штрихкоды на экспорт
+                clones.forEach((p) =>
+                    p
+                        .querySelectorAll(".passcode-barcode svg")
+                        .forEach((s) => s.classList.add("barcode-export-narrow"))
+                );
 
                 for (let i = 0; i < clones.length; i++) {
                     const canvas = await html2canvas(clones[i], {
