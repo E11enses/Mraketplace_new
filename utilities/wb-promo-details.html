@@ -1,62 +1,216 @@
-<!doctype html><html lang="ru">
-  <head>
-    <meta charset="utf-8" />
-    <title>Календарь акций на WB по месяцам</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link
-  href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css"
-  rel="stylesheet"
-/>
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+<!doctype html>
+<html lang="ru">
 
-<style>
-  :root {
-    --bg: #ffffff;
-    --panel: #ffffff;
-    --muted: #475569;
-    --text: #0f172a;
-    --border: #e5e7eb;
-    --chip: #f3f4f6;
+<head>
+  <meta charset="utf-8" />
+  <title>Календарь акций на WB по месяцам</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 
-    --status-active-bg: #eaf7ef;
-    --status-active-border: #16a34a;
-    --status-active-text: #06603e;
+  <style>
+    :root {
+      --bg: #ffffff;
+      --panel: #ffffff;
+      --muted: #475569;
+      --text: #0f172a;
+      --border: #e5e7eb;
+      --chip: #f3f4f6;
 
-    --status-planned-bg: #eef2ff;
-    --status-planned-border: #6366f1;
-    --status-planned-text: #3730a3;
-  }
+      --status-active-bg: #eaf7ef;
+      --status-active-border: #16a34a;
+      --status-active-text: #06603e;
 
-  
+      --status-planned-bg: #eef2ff;
+      --status-planned-border: #6366f1;
+      --status-planned-text: #3730a3;
+    }
 
-  /* Global: prevent horizontal overflow */
-    html, body { margin:0; padding:0; width:100%; max-width:100%; overflow-x:hidden; background:var(--bg); color:var(--text); font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; height:100%; }
-  .wrap { display:grid; grid-template-columns:15% 85%; gap:12px; min-height:100vh; max-height:100vh; padding:12px; box-sizing:border-box; overflow:hidden; }
-  .panel { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:12px; overflow:auto; box-sizing:border-box; }
-  .row { margin-bottom:10px; }
-  input,select{ width:100%; padding:9px 10px; border-radius:10px; border:1px solid var(--border); background:#fff; color:var(--text); font-size:14px; box-sizing:border-box; }
-  .chips{display:flex; gap:6px; flex-wrap:wrap; margin:6px 0 10px 0;}
-  .chip{padding:3px 8px; background:var(--chip); border:1px solid var(--border); border-radius:999px; font-size:12px; color:var(--muted); white-space:nowrap;}
-  .list{display:grid; gap:10px;}
-  .item{background:#fff; border:2px solid var(--border); border-radius:12px; padding:12px; cursor:pointer; transition:box-shadow .15s,border-color .15s,background .15s,color .15s; box-sizing:border-box;}
-  .item:hover{box-shadow:0 1px 6px rgba(0,0,0,.08);}
-  .title{font-weight:600; font-size:13px;}
-  .sub{color:var(--muted); font-size:12px; margin-top:4px;}
-  .topline{display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;}
-  .pills{display:inline-flex; gap:6px; align-items:center;}
-  .pill{padding:2px 8px; border-radius:999px; border:1px solid var(--border); font-size:11px; white-space:nowrap; background:#fff; color:var(--muted);}
-  .status-active{background:var(--status-active-bg); border-color:var(--status-active-border); color:var(--status-active-text);}
-  .status-planned{background:var(--status-planned-bg); border-color:var(--status-planned-border); color:var(--status-planned-text);}
 
-  .right{display:grid; grid-template-rows:auto auto 1fr; gap:10px; min-height:0; overflow:hidden;}
-  .header-row{display:flex; justify-content:space-between; align-items:center; gap:8px; box-sizing:border-box;}
-  .nav{display:inline-flex; gap:6px;}
-  .btn{padding:6px 10px; border:1px solid var(--border); border-radius:8px; background:#f8fafc; color:var(--text); cursor:pointer; user-select:none;}
-  .btn:hover{background:#eef2f7;}
-  .month-title{font-weight:700;}
-  #calendar{background:#fff; border:1px solid var(--border); border-radius:12px; padding:6px; min-height:320px; overflow:auto; box-sizing:border-box;}
 
-   .back-to-site {
+    /* Global: prevent horizontal overflow */
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      height: 100%;
+    }
+
+    .wrap {
+      display: grid;
+      grid-template-columns: 20% 80%;
+      gap: 12px;
+      min-height: 100vh;
+      max-height: 100vh;
+      padding: 12px;
+      box-sizing: border-box;
+      overflow: visible;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      overflow: visible;
+      box-sizing: border-box;
+    }
+
+    .row {
+      margin-bottom: 10px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 9px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin: 6px 0 10px 0;
+    }
+
+    .chip {
+      padding: 3px 8px;
+      background: var(--chip);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .item {
+      background: #fff;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      cursor: pointer;
+      transition: box-shadow .15s, border-color .15s, background .15s, color .15s;
+      box-sizing: border-box;
+    }
+
+    .item:hover {
+      box-shadow: 0 1px 6px rgba(0, 0, 0, .08);
+    }
+
+    .title {
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .topline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pills {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .pill {
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: 11px;
+      white-space: nowrap;
+      background: #fff;
+      color: var(--muted);
+    }
+
+    .status-active {
+      background: var(--status-active-bg);
+      border-color: var(--status-active-border);
+      color: var(--status-active-text);
+    }
+
+    .status-planned {
+      background: var(--status-planned-bg);
+      border-color: var(--status-planned-border);
+      color: var(--status-planned-text);
+    }
+
+    .right {
+      display: grid;
+      grid-template-rows: auto auto auto;
+      gap: 10px;
+      min-height: 0;
+      overflow: visible;
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      box-sizing: border-box;
+    }
+
+    .nav {
+      display: inline-flex;
+      gap: 6px;
+    }
+
+    .btn {
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #f8fafc;
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .btn:hover {
+      background: #eef2f7;
+    }
+
+    .month-title {
+      font-weight: 700;
+    }
+
+    #calendar {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 6px;
+      min-height: 320px;
+      overflow: visible;
+      box-sizing: border-box;
+    }
+
+    .back-to-site {
       margin-top: 25px;
       font-size: 16px;
     }
@@ -73,559 +227,690 @@
       color: var(--bg);
     }
 
-    
-  /* COMPACT DETAILS */
-  .details {
-    background:#fff; border:1px solid var(--border); border-radius:12px;
-    padding:12px; box-sizing:border-box;
-    display:grid; grid-template-rows:auto auto auto auto; gap:8px; /* name, dates, meta row, tags grid */
-  }
-  .d-name { font-size:16px; font-weight:700; padding-left:8px; border-left:6px solid #e5e7eb; }
-  .d-dates { color:var(--muted); }
-  .d-meta-row { display:flex; gap:16px; flex-wrap:wrap; }
-  .d-meta { color:var(--muted); }
-  .d-meta b { color:var(--text); margin-right:6px; }
 
-  .tags-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 8px;
-    align-items: start;
-  }
-  .tag{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border:1px solid var(--border); border-radius:999px; background:#f8fafc; color:#334155; font-size:12px; white-space:nowrap;}
-  .tag svg{width:14px; height:14px;}
+    /* COMPACT DETAILS */
+    .details {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      box-sizing: border-box;
+      display: grid;
+      grid-template-rows: auto auto auto auto;
+      gap: 8px;
+      /* name, dates, meta row, tags grid */
+    }
 
-  /* FullCalendar */
-  .fc .fc-toolbar{display:none;}
-  .fc-theme-standard td,.fc-theme-standard th{border-color:var(--border);}
-  .fc .fc-col-header-cell-cushion{font-size:12px; padding:2px 0;}
-  .fc-daygrid-event,.fc-timegrid-event{border-radius:10px; padding:8px 10px; font-size:13px; line-height:1.3; box-sizing:border-box;}
-  .fc-timegrid-slot,.fc-timegrid-slots,.fc-timegrid-axis{display:none!important;}
-  .fc-timegrid .fc-timegrid-body{display:none!important;}
-  .fc-timegrid .fc-timegrid-allday{display:block!important;}
-  .fc-daygrid-event .ev-wrap,.fc-timegrid-event .ev-wrap{display:-webkit-box; -webkit-box-orient:vertical; overflow:hidden; -webkit-line-clamp:3;}
-  .fc-daygrid-event .ev-title,.fc-timegrid-event .ev-title{font-weight:700; margin-bottom:2px;}
-  .fc .fc-event,.fc .fc-timegrid-event,.fc .fc-daygrid-event{color:inherit!important;}
-  .fc .fc-event,.fc .fc-event *{color:inherit;}
-  .fc-day-today{background:#f3f4f6!important;}
+    .d-name {
+      font-size: 16px;
+      font-weight: 700;
+      padding-left: 8px;
+      border-left: 6px solid #e5e7eb;
+    }
 
-  .err{color:#b91c1c; background:#fee2e2; border:1px solid #fecaca; padding:10px; border-radius:10px; font-size:14px; box-sizing:border-box;}
+    .d-dates {
+      color: var(--muted);
+    }
 
-  /* MOBILE: hide calendar; details fill and scroll; no horizontal overflow */
-  @media (max-width:960px){
-    .wrap{grid-template-columns:1fr; height:100vh; max-height:100vh;}
-    .wrap, .panel, .right, #calendar, .details{max-width:100%; overflow-x:hidden;}
-    #calendar{display:none!important;}
-    .right{grid-template-rows:auto 1fr; max-height:calc(100vh - 24px); overflow:hidden;}
-    .details{overflow:auto;}
-    
+    .d-meta-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .d-meta {
+      color: var(--muted);
+    }
+
+    .d-meta b {
+      color: var(--text);
+      margin-right: 6px;
+    }
+
+    .tags-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 8px;
+      align-items: start;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #f8fafc;
+      color: #334155;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .tag svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* FullCalendar */
+    .fc .fc-toolbar {
+      display: none;
+    }
+
+    .fc-theme-standard td,
+    .fc-theme-standard th {
+      border-color: var(--border);
+    }
+
+    .fc .fc-col-header-cell-cushion {
+      font-size: 12px;
+      padding: 2px 0;
+    }
+
+    .fc-daygrid-event,
+    .fc-timegrid-event {
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 13px;
+      line-height: 1.3;
+      box-sizing: border-box;
+    }
+
+    .fc-timegrid-slot,
+    .fc-timegrid-slots,
+    .fc-timegrid-axis {
+      display: none !important;
+    }
+
+    .fc-timegrid .fc-timegrid-body {
+      display: none !important;
+    }
+
+    .fc-timegrid .fc-timegrid-allday {
+      display: block !important;
+    }
+
+    .fc-daygrid-event .ev-wrap,
+    .fc-timegrid-event .ev-wrap {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      -webkit-line-clamp: 3;
+    }
+
+    .fc-daygrid-event .ev-title,
+    .fc-timegrid-event .ev-title {
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .fc .fc-event,
+    .fc .fc-timegrid-event,
+    .fc .fc-daygrid-event {
+      color: inherit !important;
+    }
+
+    .fc .fc-event,
+    .fc .fc-event * {
+      color: inherit;
+    }
+
+    .fc-day-today {
+      background: #f3f4f6 !important;
+    }
+
+    .err {
+      color: #b91c1c;
+      background: #fee2e2;
+      border: 1px solid #fecaca;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    /* MOBILE: hide calendar; details fill and scroll; no horizontal overflow */
+    @media (max-width:960px) {
+      .wrap {
+        grid-template-columns: 1fr;
+        height: 100vh;
+        max-height: 100vh;
+      }
+
+      .wrap,
+      .panel,
+      .right,
+      #calendar,
+      .details {
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+
+      #calendar {
+        display: none !important;
+      }
+
+      .right {
+        grid-template-rows: auto 1fr;
+        max-height: calc(100vh - 24px);
+        overflow: hidden;
+      }
+
+      .details {
+        overflow: auto;
+      }
+
       .d-name {
-      font-size: 14px;  
-      line-height: 1.2;
+        font-size: 14px;
+        line-height: 1.2;
       }
 
       .d-dates,
       .d-meta {
-        font-size: 12px;      /* was ~14px */
+        font-size: 12px;
+        /* was ~14px */
         line-height: 1.25;
-        }
+      }
 
       .d-dates b,
       .d-meta b {
-      font-size: 12px;      /* keep labels same size as text to avoid wrapping */
-      line-height: 1.25;
+        font-size: 12px;
+        /* keep labels same size as text to avoid wrapping */
+        line-height: 1.25;
       }
 
       /* Tighter spacing between labels row items */
       .d-meta-row {
-      gap: 10px;
+        gap: 10px;
       }
 
       /* Advantage chips a bit smaller */
 
       .tag {
-        font-size: 11px;      
-        padding: 4px 8px;     
+        font-size: 11px;
+        padding: 4px 8px;
       }
 
       /* Optional: smaller month title to save a line on small phones */
       .month-title {
-      font-size: 18px;
+        font-size: 18px;
       }
-  }
-</style>
+    }
+  </style>
 
 </head>
-  <body>
-    <div class="wrap">
-      <!-- LEFT -->
-      <aside class="panel">
-        <h3 style="margin:0 0 6px;">Список акций</h3>
-        <div class="row">
-          <input id="q" type="text" placeholder="Поиск по названию/описанию..." />
-        </div>
-        <div class="row" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-          <select id="typeFilter">
-            <option value="">Все типы</option>
-            <option value="regular">регулярная</option>
-            <option value="auto">авто</option>
-          </select>
-          <select id="sortBy">
-            <option value="active">Активные вначале</option>
-            <option value="startAsc">Дата начала ↑</option>
-            <option value="startDesc">Дата начала ↓</option>
-            <option value="nameAsc">Название А→Я</option>
-            <option value="nameDesc">Название Я→А</option>
-          </select>
-        </div>
-        <div class="chips" id="chips"></div>
-        <div id="list" class="list"></div>
-        <div id="error" class="err" hidden></div>
-      </aside>
-      <!-- RIGHT -->
-  <section class="right">
-    <div class="header-row">
-      <div class="nav">
-        <div id="btnPrev" class="btn" title="Предыдущий месяц">‹</div>
-        <div id="btnNext" class="btn" title="Следующий месяц">›</div>
+
+<body>
+  <div class="wrap">
+    <!-- LEFT -->
+    <aside class="panel">
+      <h3 style="margin:0 0 6px;">Список акций</h3>
+      <div class="row">
+        <input id="q" type="text" placeholder="Поиск по названию/описанию..." />
       </div>
-      <div id="monthTitle" class="month-title"></div>
-      <div style="width:80px"></div>
-    </div>
-
-    <!-- Integrated details -->
-    <div id="details" class="details">
-      <div class="details-left">
-        <div id="d-title" style="font-size:16px; font-weight:700;">Выберите акцию</div>
-        <div class="kv" id="d-when"><b>Период:</b> —</div>
-        <div class="kv" id="d-labels"><b>Метки:</b> —</div>
-        <div class="kv" id="d-boost"><b>Бустинг:</b> —</div>
+      <div class="row" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+        <select id="typeFilter">
+          <option value="">Все типы</option>
+          <option value="regular">регулярная</option>
+          <option value="auto">авто</option>
+        </select>
+        <select id="sortBy">
+          <option value="active">Активные вначале</option>
+          <option value="startAsc">Дата начала ↑</option>
+          <option value="startDesc">Дата начала ↓</option>
+          <option value="nameAsc">Название А→Я</option>
+          <option value="nameDesc">Название Я→А</option>
+        </select>
       </div>
-      <div class="details-right" id="d-adv-tags"></div>
-    </div>
+      <div class="chips" id="chips"></div>
+      <div id="list" class="list"></div>
+      <div id="error" class="err" hidden></div>
+    </aside>
+    <!-- RIGHT -->
+    <section class="right">
+      <div class="header-row">
+        <div class="nav">
+          <div id="btnPrev" class="btn" title="Предыдущий месяц">‹</div>
+          <div id="btnNext" class="btn" title="Следующий месяц">›</div>
+        </div>
+        <div id="monthTitle" class="month-title"></div>
+        <div style="width:80px"></div>
+      </div>
 
-    <div id="calendar"></div>
-  </section>
-</div>
+      <!-- Integrated details -->
+      <div id="details" class="details">
+        <div class="details-left">
+          <div id="d-title" style="font-size:16px; font-weight:700;">Выберите акцию</div>
+          <div class="kv" id="d-when"><b>Период:</b> —</div>
+          <div class="kv" id="d-labels"><b>Метки:</b> —</div>
+          <div class="kv" id="d-boost"><b>Бустинг:</b> —</div>
+        </div>
+        <div class="details-right" id="d-adv-tags"></div>
+      </div>
 
-<script>
-  const ENDPOINT = '/api/wb-promo-details.php';
-  const EXCLUDE_BY_NAME = ['Распродажа в счет долга'];
+      <div id="calendar"></div>
+    </section>
+  </div>
 
-  const PASTEL_PALETTE = [
-    '#7cc3ff', '#8bd8c1', '#ffd28a', '#ffa3a3',
-    '#c7b4f5', '#a0e0ff', '#f9a8d4', '#b2f2a7',
-    '#fbcfe8', '#fde68a', '#c4b5fd', '#86efac'
-  ];
+  <script>
+    const ENDPOINT = '/api/wb-promo-details.php';
+    const EXCLUDE_BY_NAME = ['Распродажа в счет долга'];
 
-  function colorForId(id) {
-    const i = Math.abs(Number(id) || 0);
-    return PASTEL_PALETTE[i % PASTEL_PALETTE.length];
-  }
-  function isDark(hex) {
-    const c = hex.replace('#','');
-    const r = parseInt(c.slice(0,2),16), g = parseInt(c.slice(2,4),16), b = parseInt(c.slice(4,6),16);
-    const L = (0.299*r + 0.587*g + 0.114*b)/255;
-    return L < 0.55;
-  }
-  function hexToRgb(hex) {
-    const c = hex.replace('#','');
-    return { r:parseInt(c.slice(0,2),16), g:parseInt(c.slice(2,4),16), b:parseInt(c.slice(4,6),16) };
-  }
-  function rgba(hex, a) {
-    const {r,g,b} = hexToRgb(hex);
-    return `rgba(${r}, ${g}, ${b}, ${a})`;
-  }
+    const PASTEL_PALETTE = [
+      '#7cc3ff', '#8bd8c1', '#ffd28a', '#ffa3a3',
+      '#c7b4f5', '#a0e0ff', '#f9a8d4', '#b2f2a7',
+      '#fbcfe8', '#fde68a', '#c4b5fd', '#86efac'
+    ];
 
-  const ADV_DICTIONARY = [
-    { key: /баннер|banner/i, label: 'Баннер', icon: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 4h18v4H3zM3 10h18v10H3z"/></svg>' },
-    { key: /пуш|push/i, label: 'Пуш‑уведомления', icon: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 22a2 2 0 0 0 2-2H10a2 2 0 0 0 2 2m6-6V11a6 6 0 1 0-12 0v5l-2 2v1h16v-1z"/></svg>' },
-    { key: /градусник|temperature|meter/i, label: 'Градусник', icon: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M15 14.76V5a3 3 0 1 0-6 0v9.76A4 4 0 1 0 15 14.76zM12 3a2 2 0 0 1 2 2v10a3 3 0 1 1-4 0V5a2 2 0 0 1 2-2z"/></svg>' },
-    { key: /красн(ые|ая) цен(а|ы)|red label/i, label: 'Красные ценники', icon: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 7h18v4H3zM3 13h12v4H3z"/></svg>' },
-    { key: /поднятие в поиске|буст/i, label: 'Поднятие в поиске', icon: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 12h3l3 8 4-16 3 8h5"/></svg>' },
-    { key: /плашка|ярк(ая|ие) плашк/i, label: 'Плашка на карточке', icon: '<svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10" rx="2" fill="currentColor"/></svg>' }
-  ];
+    function colorForId(id) {
+      const i = Math.abs(Number(id) || 0);
+      return PASTEL_PALETTE[i % PASTEL_PALETTE.length];
+    }
+    function isDark(hex) {
+      const c = hex.replace('#', '');
+      const r = parseInt(c.slice(0, 2), 16), g = parseInt(c.slice(2, 4), 16), b = parseInt(c.slice(4, 6), 16);
+      const L = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      return L < 0.55;
+    }
+    function hexToRgb(hex) {
+      const c = hex.replace('#', '');
+      return { r: parseInt(c.slice(0, 2), 16), g: parseInt(c.slice(2, 4), 16), b: parseInt(c.slice(4, 6), 16) };
+    }
+    function rgba(hex, a) {
+      const { r, g, b } = hexToRgb(hex);
+      return `rgba(${r}, ${g}, ${b}, ${a})`;
+    }
 
-  const listEl = document.getElementById('list');
-  const detailsBox = document.getElementById('details');
-  const dTitle = document.getElementById('d-title');
-  const dWhen = document.getElementById('d-when');
-  const dLabels = document.getElementById('d-labels');
-  const dBoost = document.getElementById('d-boost');
-  const dAdvTags = document.getElementById('d-adv-tags');
-  const chipsEl = document.getElementById('chips');
-  const errorEl = document.getElementById('error');
-  const qEl = document.getElementById('q');
-  const sortEl = document.getElementById('sortBy');
-  const typeEl = document.getElementById('typeFilter');
-  const todayEl = document.getElementById('today'); // not shown, used only for date text
-  const monthTitleEl = document.getElementById('monthTitle');
-  const btnPrev = document.getElementById('btnPrev');
-  const btnNext = document.getElementById('btnNext');
+    const ADV_DICTIONARY = [
+      { key: /баннер|banner/i, label: 'Баннер', icon: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 4h18v4H3zM3 10h18v10H3z"/></svg>' },
+      { key: /пуш|push/i, label: 'Пуш‑уведомления', icon: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 22a2 2 0 0 0 2-2H10a2 2 0 0 0 2 2m6-6V11a6 6 0 1 0-12 0v5l-2 2v1h16v-1z"/></svg>' },
+      { key: /градусник|temperature|meter/i, label: 'Градусник', icon: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M15 14.76V5a3 3 0 1 0-6 0v9.76A4 4 0 1 0 15 14.76zM12 3a2 2 0 0 1 2 2v10a3 3 0 1 1-4 0V5a2 2 0 0 1 2-2z"/></svg>' },
+      { key: /красн(ые|ая) цен(а|ы)|red label/i, label: 'Красные ценники', icon: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 7h18v4H3zM3 13h12v4H3z"/></svg>' },
+      { key: /поднятие в поиске|буст/i, label: 'Поднятие в поиске', icon: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 12h3l3 8 4-16 3 8h5"/></svg>' },
+      { key: /плашка|ярк(ая|ие) плашк/i, label: 'Плашка на карточке', icon: '<svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10" rx="2" fill="currentColor"/></svg>' }
+    ];
 
-  let all = [];
-  let filtered = [];
-  let selectedId = null;
-  let calendar;
-  let eventElsById = new Map();
+    const listEl = document.getElementById('list');
+    const detailsBox = document.getElementById('details');
+    const dTitle = document.getElementById('d-title');
+    const dWhen = document.getElementById('d-when');
+    const dLabels = document.getElementById('d-labels');
+    const dBoost = document.getElementById('d-boost');
+    const dAdvTags = document.getElementById('d-adv-tags');
+    const chipsEl = document.getElementById('chips');
+    const errorEl = document.getElementById('error');
+    const qEl = document.getElementById('q');
+    const sortEl = document.getElementById('sortBy');
+    const typeEl = document.getElementById('typeFilter');
+    const todayEl = document.getElementById('today'); // not shown, used only for date text
+    const monthTitleEl = document.getElementById('monthTitle');
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
 
-  // current visible month anchor (UTC, first day of month)
-  let currentMonthStart = firstOfMonthUTC(new Date());
+    let all = [];
+    let filtered = [];
+    let selectedId = null;
+    let calendar;
+    let eventElsById = new Map();
 
-  function firstOfMonthUTC(d) {
-    return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1));
-  }
-  function lastOfMonthUTC(d) {
-    return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0));
-  }
-  function endExclusiveUTC(d) {
-    return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + 1));
-  }
+    // current visible month anchor (UTC, first day of month)
+    let currentMonthStart = firstOfMonthUTC(new Date());
 
-  function fmt(d) {
-    return d
-      ? new Date(d).toLocaleString('ru-RU', { year: 'numeric', month: 'short', day: '2-digit' })
-      : '—';
-  }
-  function typeRu(t) {
-    return t === 'auto' ? 'авто' : t === 'regular' ? 'регулярная' : '—';
-  }
-  function statusRu(a) {
-    return a ? 'активна' : 'запланирована';
-  }
+    function firstOfMonthUTC(d) {
+      return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1));
+    }
+    function lastOfMonthUTC(d) {
+      return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0));
+    }
+    function endExclusiveUTC(d) {
+      return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + 1));
+    }
 
-  function renderAdvTags(advantages = []) {
-    dAdvTags.innerHTML = '';
-    const text = (advantages || []).join(' ').toLowerCase();
-    let matched = false;
-    ADV_DICTIONARY.forEach(({ key, label, icon }) => {
-      if (key.test(text)) {
-        matched = true;
+    function fmt(d) {
+      return d
+        ? new Date(d).toLocaleString('ru-RU', { year: 'numeric', month: 'short', day: '2-digit' })
+        : '—';
+    }
+    function typeRu(t) {
+      return t === 'auto' ? 'авто' : t === 'regular' ? 'регулярная' : '—';
+    }
+    function statusRu(a) {
+      return a ? 'активна' : 'запланирована';
+    }
+
+    function renderAdvTags(advantages = []) {
+      dAdvTags.innerHTML = '';
+      const text = (advantages || []).join(' ').toLowerCase();
+      let matched = false;
+      ADV_DICTIONARY.forEach(({ key, label, icon }) => {
+        if (key.test(text)) {
+          matched = true;
+          const tag = document.createElement('span');
+          tag.className = 'tag';
+          tag.innerHTML = `${icon}<span>${label}</span>`;
+          dAdvTags.appendChild(tag);
+        }
+      });
+      if (!matched) {
         const tag = document.createElement('span');
         tag.className = 'tag';
-        tag.innerHTML = `${icon}<span>${label}</span>`;
+        tag.innerHTML =
+          '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="currentColor"/></svg><span>Преимущества: —</span>';
         dAdvTags.appendChild(tag);
       }
-    });
-    if (!matched) {
-      const tag = document.createElement('span');
-      tag.className = 'tag';
-      tag.innerHTML =
-        '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="currentColor"/></svg><span>Преимущества: —</span>';
-      dAdvTags.appendChild(tag);
     }
-  }
 
-  function buildEventContent(arg) {
-    const e = arg.event.extendedProps.raw;
-    const name = arg.event.title || '(без названия)';
-    const labels = `[${typeRu(e.type)} • ${statusRu(e.active)}]`;
-    const boost = e.ranging ? getBoostRange(e.ranging) : null;
-    const boostLine = boost ? ` • бустинг: ${boost}` : '';
-    const container = document.createElement('div');
-    container.className = 'ev-wrap';
-    container.innerHTML = `
+    function buildEventContent(arg) {
+      const e = arg.event.extendedProps.raw;
+      const name = arg.event.title || '(без названия)';
+      const labels = `[${typeRu(e.type)} • ${statusRu(e.active)}]`;
+      const boost = e.ranging ? getBoostRange(e.ranging) : null;
+      const boostLine = boost ? ` • бустинг: ${boost}` : '';
+      const container = document.createElement('div');
+      container.className = 'ev-wrap';
+      container.innerHTML = `
       <div class="ev-title">${name}</div>
       <div class="ev-meta">${labels}${boostLine}</div>
     `;
-    return { domNodes: [container] };
-  }
-
-  function getBoostRange(ranging) {
-    if (!Array.isArray(ranging) || !ranging.length) return null;
-    let min = null,
-      max = null;
-    for (const r of ranging) {
-      const b = typeof r?.boost === 'number' ? r.boost : null;
-      if (b == null) continue;
-      if (min == null || b < min) min = b;
-      if (max == null || b > max) max = b;
+      return { domNodes: [container] };
     }
-    if (min == null && max == null) return null;
-    if (min != null && max != null) return `${min}–${max}%`;
-    return `${min ?? max}%`;
-  }
 
-  function styleEventElement(el, color, selected) {
-    el.style.borderColor = color;
-    el.style.borderWidth = '2px';
-    el.style.borderStyle = 'solid';
-    const bg = selected ? color : rgba(color, 0.28);
-    el.style.background = bg;
-    const txt = selected ? (isDark(color) ? '#ffffff' : '#000000') : '#000000';
-    el.style.color = txt;
-    el.querySelectorAll('*').forEach((n) => (n.style.color = txt));
-  }
-
-  function registerEventEl(id, el) {
-    if (!eventElsById.has(id)) eventElsById.set(id, []);
-    eventElsById.get(id).push(el);
-  }
-  function applySelectionStyles() {
-    for (const [id, nodes] of eventElsById.entries()) {
-      const color = colorForId(id);
-      const sel = String(selectedId) === String(id);
-      (nodes || []).forEach((el) => styleEventElement(el, color, sel));
+    function getBoostRange(ranging) {
+      if (!Array.isArray(ranging) || !ranging.length) return null;
+      let min = null,
+        max = null;
+      for (const r of ranging) {
+        const b = typeof r?.boost === 'number' ? r.boost : null;
+        if (b == null) continue;
+        if (min == null || b < min) min = b;
+        if (max == null || b > max) max = b;
+      }
+      if (min == null && max == null) return null;
+      if (min != null && max != null) return `${min}–${max}%`;
+      return `${min ?? max}%`;
     }
-  }
 
-  function toEvents(items) {
-    return items.map((p) => ({
-      id: String(p.id),
-      title: p.name || '(без названия)',
-      start: p.startDate || null,
-      end: p.endDate || null,
-      allDay: true,
-      active: !!p.active,
-      raw: p,
-    }));
-  }
+    function styleEventElement(el, color, selected) {
+      el.style.borderColor = color;
+      el.style.borderWidth = '2px';
+      el.style.borderStyle = 'solid';
+      const bg = selected ? color : rgba(color, 0.28);
+      el.style.background = bg;
+      const txt = selected ? (isDark(color) ? '#ffffff' : '#000000') : '#000000';
+      el.style.color = txt;
+      el.querySelectorAll('*').forEach((n) => (n.style.color = txt));
+    }
 
-  function chip(text) {
-    const el = document.createElement('span');
-    el.className = 'chip';
-    el.textContent = text;
-    return el;
-  }
-  function renderChips() {
-    chipsEl.innerHTML = '';
-    chipsEl.appendChild(chip(`Показано: ${filtered.length}`));
-    chipsEl.appendChild(chip(`Активных: ${filtered.filter((x) => x.active).length}`));
-    chipsEl.appendChild(chip(`регулярная: ${filtered.filter((x) => x.type === 'regular').length}`));
-    chipsEl.appendChild(chip(`авто: ${filtered.filter((x) => x.type === 'auto').length}`));
-  }
+    function registerEventEl(id, el) {
+      if (!eventElsById.has(id)) eventElsById.set(id, []);
+      eventElsById.get(id).push(el);
+    }
+    function applySelectionStyles() {
+      for (const [id, nodes] of eventElsById.entries()) {
+        const color = colorForId(id);
+        const sel = String(selectedId) === String(id);
+        (nodes || []).forEach((el) => styleEventElement(el, color, sel));
+      }
+    }
 
-  function renderList() {
-    listEl.innerHTML = '';
-    filtered.forEach((p) => {
-      const color = colorForId(p.id);
-      const sel = selectedId === p.id;
-      const div = document.createElement('div');
-      div.className = 'item' + (sel ? ' active' : '');
-      div.style.borderColor = color;
-      div.style.background = sel ? rgba(color, 0.25) : rgba(color, 0.12);
-      div.innerHTML = `
+    function toEvents(items) {
+      return items.map((p) => ({
+        id: String(p.id),
+        title: p.name || '(без названия)',
+        start: p.startDate || null,
+        end: p.endDate || null,
+        allDay: true,
+        active: !!p.active,
+        raw: p,
+      }));
+    }
+
+    function chip(text) {
+      const el = document.createElement('span');
+      el.className = 'chip';
+      el.textContent = text;
+      return el;
+    }
+    function renderChips() {
+      chipsEl.innerHTML = '';
+      chipsEl.appendChild(chip(`Показано: ${filtered.length}`));
+      chipsEl.appendChild(chip(`Активных: ${filtered.filter((x) => x.active).length}`));
+      chipsEl.appendChild(chip(`регулярная: ${filtered.filter((x) => x.type === 'regular').length}`));
+      chipsEl.appendChild(chip(`авто: ${filtered.filter((x) => x.type === 'auto').length}`));
+    }
+
+    function renderList() {
+      listEl.innerHTML = '';
+      filtered.forEach((p) => {
+        const color = colorForId(p.id);
+        const sel = selectedId === p.id;
+        const div = document.createElement('div');
+        div.className = 'item' + (sel ? ' active' : '');
+        div.style.borderColor = color;
+        div.style.background = sel ? rgba(color, 0.25) : rgba(color, 0.12);
+        div.innerHTML = `
         <div class="topline">
           <div class="title">${p.name || '(без названия)'}</div>
           <div class="pills">
             <span class="pill ${p.active ? 'status-active' : 'status-planned'}">${statusRu(p.active)}</span>
             <span class="pill" style="border-color:#cbd5e1;color:#64748b;background:#f8fafc">${typeRu(
-              p.type
-            )}</span>
+          p.type
+        )}</span>
           </div>
         </div>
         <div class="sub">${fmt(p.startDate)} — ${fmt(p.endDate)}</div>
       `;
-      div.onclick = () => {
-        selectedId = p.id;
-        applySelectionStyles();
-        renderList();
-        showDetails(p);
-      };
-      listEl.appendChild(div);
-    });
-  }
-
-  function showDetails(p) {
-    if (!p) {
-      dTitle.textContent = 'Выберите акцию';
-      dWhen.innerHTML = '<b>Период:</b> —';
-      dLabels.innerHTML = '<b>Метки:</b> —';
-      dBoost.innerHTML = '<b>Бустинг:</b> —';
-      dAdvTags.innerHTML = '';
-      return;
-    }
-    const color = colorForId(p.id);
-    dTitle.textContent = p.name || '(без названия)';
-    dTitle.style.borderLeft = `6px solid ${color}`;
-    dTitle.style.paddingLeft = '8px';
-
-    dWhen.innerHTML = `<b>Период:</b> ${fmt(p.startDate)} — ${fmt(p.endDate)}`;
-    dLabels.innerHTML = `<b>Метки:</b> ${typeRu(p.type)} • ${statusRu(p.active)}`;
-
-    const boost = getBoostRange(p.ranging);
-    dBoost.innerHTML = `<b>Бустинг:</b> ${boost || '—'}`;
-
-    renderAdvTags(p.advantages);
-  }
-
-  function sortItems(items, mode) {
-    const copy = items.slice();
-    const cmpStr = (a, b) => String(a || '').localeCompare(String(b || ''), 'ru', { sensitivity: 'base' });
-    const cmpDate = (a, b) => String(a || '').localeCompare(String(b || ''));
-    switch (mode) {
-      case 'startAsc':
-        return copy.sort((a, b) => cmpDate(a.startDate, b.startDate));
-      case 'startDesc':
-        return copy.sort((a, b) => cmpDate(b.startDate, a.startDate));
-      case 'nameAsc':
-        return copy.sort((a, b) => cmpStr(a.name, b.name));
-      case 'nameDesc':
-        return copy.sort((a, b) => cmpStr(b.name, a.name));
-      case 'active':
-      default:
-        return copy.sort((a, b) => {
-          const aa = a.active ? 1 : 0,
-            bb = b.active ? 1 : 0;
-          if (aa !== bb) return bb - aa;
-          const d = cmpDate(a.startDate, b.startDate);
-          if (d !== 0) return d;
-          return cmpStr(a.name, b.name);
-        });
-    }
-  }
-
-  function firstOfMonthUTC(d) {
-    return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1));
-  }
-  function lastOfMonthUTC(d) {
-    return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0));
-  }
-  function endExclusiveUTC(d) {
-    return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + 1));
-  }
-
-  function setMonthTitle(dateUTC) {
-    monthTitleEl.textContent = dateUTC.toLocaleString('ru-RU', { month: 'long', year: 'numeric' });
-  }
-
-  function initCalendar(events) {
-    const el = document.getElementById('calendar');
-    if (calendar) {
-      calendar.destroy();
-      eventElsById.clear();
+        div.onclick = () => {
+          selectedId = p.id;
+          applySelectionStyles();
+          renderList();
+          showDetails(p);
+        };
+        listEl.appendChild(div);
+      });
     }
 
-    setMonthTitle(currentMonthStart);
+    function showDetails(p) {
+      if (!p) {
+        dTitle.textContent = 'Выберите акцию';
+        dWhen.innerHTML = '<b>Период:</b> —';
+        dLabels.innerHTML = '<b>Метки:</b> —';
+        dBoost.innerHTML = '<b>Бустинг:</b> —';
+        dAdvTags.innerHTML = '';
+        return;
+      }
+      const color = colorForId(p.id);
+      dTitle.textContent = p.name || '(без названия)';
+      dTitle.style.borderLeft = `6px solid ${color}`;
+      dTitle.style.paddingLeft = '8px';
 
-    const last = lastOfMonthUTC(currentMonthStart);
-    const endExcl = endExclusiveUTC(last);
+      dWhen.innerHTML = `<b>Период:</b> ${fmt(p.startDate)} — ${fmt(p.endDate)}`;
+      dLabels.innerHTML = `<b>Метки:</b> ${typeRu(p.type)} • ${statusRu(p.active)}`;
 
-    calendar = new FullCalendar.Calendar(el, {
-      locale: 'ru',
-      timeZone: 'UTC',
-      initialView: 'timeGridMonthNarrow',
-      initialDate: currentMonthStart.toISOString(),
+      const boost = getBoostRange(p.ranging);
+      dBoost.innerHTML = `<b>Бустинг:</b> ${boost || '—'}`;
 
-      // We hide the toolbar via CSS; we control navigation manually
-      headerToolbar: false,
+      renderAdvTags(p.advantages);
+    }
 
-      views: {
-        timeGridMonthNarrow: {
-          type: 'timeGrid',
-          visibleRange: {
-            start: currentMonthStart.toISOString(),
-            end: endExcl.toISOString(),
+    function sortItems(items, mode) {
+      const copy = items.slice();
+      const cmpStr = (a, b) => String(a || '').localeCompare(String(b || ''), 'ru', { sensitivity: 'base' });
+      const cmpDate = (a, b) => String(a || '').localeCompare(String(b || ''));
+      switch (mode) {
+        case 'startAsc':
+          return copy.sort((a, b) => cmpDate(a.startDate, b.startDate));
+        case 'startDesc':
+          return copy.sort((a, b) => cmpDate(b.startDate, a.startDate));
+        case 'nameAsc':
+          return copy.sort((a, b) => cmpStr(a.name, b.name));
+        case 'nameDesc':
+          return copy.sort((a, b) => cmpStr(b.name, a.name));
+        case 'active':
+        default:
+          return copy.sort((a, b) => {
+            const aa = a.active ? 1 : 0,
+              bb = b.active ? 1 : 0;
+            if (aa !== bb) return bb - aa;
+            const d = cmpDate(a.startDate, b.startDate);
+            if (d !== 0) return d;
+            return cmpStr(a.name, b.name);
+          });
+      }
+    }
+
+    function firstOfMonthUTC(d) {
+      return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1));
+    }
+    function lastOfMonthUTC(d) {
+      return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0));
+    }
+    function endExclusiveUTC(d) {
+      return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + 1));
+    }
+
+    function setMonthTitle(dateUTC) {
+      monthTitleEl.textContent = dateUTC.toLocaleString('ru-RU', { month: 'long', year: 'numeric' });
+    }
+
+    function initCalendar(events) {
+      const el = document.getElementById('calendar');
+      if (calendar) {
+        calendar.destroy();
+        eventElsById.clear();
+      }
+
+      setMonthTitle(currentMonthStart);
+
+      const last = lastOfMonthUTC(currentMonthStart);
+      const endExcl = endExclusiveUTC(last);
+
+      calendar = new FullCalendar.Calendar(el, {
+        locale: 'ru',
+        timeZone: 'UTC',
+        initialView: 'timeGridMonthNarrow',
+        initialDate: currentMonthStart.toISOString(),
+
+        // We hide the toolbar via CSS; we control navigation manually
+        headerToolbar: false,
+
+        views: {
+          timeGridMonthNarrow: {
+            type: 'timeGrid',
+            visibleRange: {
+              start: currentMonthStart.toISOString(),
+              end: endExcl.toISOString(),
+            },
+            slotDuration: '24:00',
+            allDaySlot: true,
+            dayHeaderFormat: { weekday: 'short', day: 'numeric' },
           },
-          slotDuration: '24:00',
-          allDaySlot: true,
-          dayHeaderFormat: { weekday: 'short', day: 'numeric' },
         },
-      },
 
-      events,
-      eventDisplay: 'block',
-      eventTimeFormat: false,
-      dayMaxEvents: 10,
+        events,
+        eventDisplay: 'block',
+        eventTimeFormat: false,
+        dayMaxEvents: 10,
 
-      eventDidMount: (arg) => {
-        const p = arg.event.extendedProps.raw;
-        const color = colorForId(p.id);
-        const sel = selectedId === p.id;
-        styleEventElement(arg.el, color, sel);
-        registerEventEl(String(p.id), arg.el);
-      },
-      eventClick: (info) => {
-        const d = info.event.extendedProps.raw || {};
-        selectedId = d.id ?? null;
-        applySelectionStyles();
-        renderList();
-        showDetails(d);
-      },
-      eventContent: buildEventContent,
-    });
+        eventDidMount: (arg) => {
+          const p = arg.event.extendedProps.raw;
+          const color = colorForId(p.id);
+          const sel = selectedId === p.id;
+          styleEventElement(arg.el, color, sel);
+          registerEventEl(String(p.id), arg.el);
+        },
+        eventClick: (info) => {
+          const d = info.event.extendedProps.raw || {};
+          selectedId = d.id ?? null;
+          applySelectionStyles();
+          renderList();
+          showDetails(d);
+        },
+        eventContent: buildEventContent,
+      });
 
-    calendar.render();
-  }
-
-  // Manual navigation because visibleRange prevents default prev/next
-  btnPrev.addEventListener('click', () => {
-    currentMonthStart = new Date(Date.UTC(
-      currentMonthStart.getUTCFullYear(),
-      currentMonthStart.getUTCMonth() - 1,
-      1
-    ));
-    initCalendar(toEvents(filtered));
-  });
-  btnNext.addEventListener('click', () => {
-    currentMonthStart = new Date(Date.UTC(
-      currentMonthStart.getUTCFullYear(),
-      currentMonthStart.getUTCMonth() + 1,
-      1
-    ));
-    initCalendar(toEvents(filtered));
-  });
-
-  async function load() {
-    errorEl.hidden = true;
-    try {
-      const res = await fetch(ENDPOINT, { cache: 'no-store' });
-      if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-      const data = await res.json();
-      if (!Array.isArray(data)) throw new Error('Некорректный ответ сервера');
-      all = data;
-      selectedId = null;
-      applyFilter();
-    } catch (e) {
-      errorEl.textContent = 'Не удалось загрузить акции: ' + e.message;
-      errorEl.hidden = false;
-      console.error(e);
-    }
-  }
-
-  function applyFilter() {
-    const q = qEl.value.trim().toLowerCase();
-    const t = typeEl.value;
-
-    filtered = all.filter((p) => {
-      if (EXCLUDE_BY_NAME.includes(p.name || '')) return false;
-      if (t && p.type !== t) return false;
-      if (!q) return true;
-      const hay = `${p.name || ''} ${p.description || ''} ${(p.advantages || []).join(' ')}`;
-      return hay.toLowerCase().includes(q);
-    });
-
-    filtered = sortItems(filtered, sortEl.value);
-
-    if (filtered.length && !filtered.some((x) => x.id === selectedId)) {
-      selectedId = filtered[0].id;
+      calendar.render();
     }
 
-    renderChips();
-    initCalendar(toEvents(filtered));
-    renderList();
-    showDetails(filtered.find((x) => x.id === selectedId) || null);
-  }
+    // Manual navigation because visibleRange prevents default prev/next
+    btnPrev.addEventListener('click', () => {
+      currentMonthStart = new Date(Date.UTC(
+        currentMonthStart.getUTCFullYear(),
+        currentMonthStart.getUTCMonth() - 1,
+        1
+      ));
+      initCalendar(toEvents(filtered));
+    });
+    btnNext.addEventListener('click', () => {
+      currentMonthStart = new Date(Date.UTC(
+        currentMonthStart.getUTCFullYear(),
+        currentMonthStart.getUTCMonth() + 1,
+        1
+      ));
+      initCalendar(toEvents(filtered));
+    });
 
-  qEl.addEventListener('input', debounce(applyFilter, 200));
-  sortEl.addEventListener('change', applyFilter);
-  typeEl.addEventListener('change', applyFilter);
-  function debounce(fn, ms) {
-    let t;
-    return (...a) => {
-      clearTimeout(t);
-      t = setTimeout(() => fn(...a), ms);
-    };
-  }
+    async function load() {
+      errorEl.hidden = true;
+      try {
+        const res = await fetch(ENDPOINT, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        const data = await res.json();
+        if (!Array.isArray(data)) throw new Error('Некорректный ответ сервера');
+        all = data;
+        selectedId = null;
+        applyFilter();
+      } catch (e) {
+        errorEl.textContent = 'Не удалось загрузить акции: ' + e.message;
+        errorEl.hidden = false;
+        console.error(e);
+      }
+    }
 
-  // Initialize
-  (function init() {
-    // Today for chips (not a button anymore)
-    todayEl && (todayEl.textContent = new Date().toLocaleDateString('ru-RU', {
-      year: 'numeric', month: 'long', day: '2-digit'
-    }));
-    load();
-  })();
-</script>
+    function applyFilter() {
+      const q = qEl.value.trim().toLowerCase();
+      const t = typeEl.value;
+
+      filtered = all.filter((p) => {
+        if (EXCLUDE_BY_NAME.includes(p.name || '')) return false;
+        if (t && p.type !== t) return false;
+        if (!q) return true;
+        const hay = `${p.name || ''} ${p.description || ''} ${(p.advantages || []).join(' ')}`;
+        return hay.toLowerCase().includes(q);
+      });
+
+      filtered = sortItems(filtered, sortEl.value);
+
+      if (filtered.length && !filtered.some((x) => x.id === selectedId)) {
+        selectedId = filtered[0].id;
+      }
+
+      renderChips();
+      initCalendar(toEvents(filtered));
+      renderList();
+      showDetails(filtered.find((x) => x.id === selectedId) || null);
+    }
+
+    qEl.addEventListener('input', debounce(applyFilter, 200));
+    sortEl.addEventListener('change', applyFilter);
+    typeEl.addEventListener('change', applyFilter);
+    function debounce(fn, ms) {
+      let t;
+      return (...a) => {
+        clearTimeout(t);
+        t = setTimeout(() => fn(...a), ms);
+      };
+    }
+
+    // Initialize
+    (function init() {
+      // Today for chips (not a button anymore)
+      todayEl && (todayEl.textContent = new Date().toLocaleDateString('ru-RU', {
+        year: 'numeric', month: 'long', day: '2-digit'
+      }));
+      load();
+    })();
+  </script>
 </body>
+
 </html>
