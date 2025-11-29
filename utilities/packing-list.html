@@ -13,15 +13,13 @@
             --muted: #6b7280;
             --accent: #2563eb;
             --border: #e5e7eb;
-
             --page-width: 210mm;
             --page-height: 297mm;
             --page-padding: 18mm;
 
-            /* увеличенная типографика */
             --title-size: 28px;
-            --label-size: 16px;
-            --value-size: 19px;
+            --label-size: 17px;
+            --value-size: 21px;
             --line-gap-v: 14px;
             --line-height: 1.65;
         }
@@ -34,8 +32,7 @@
             margin: 0;
             background: var(--bg);
             color: var(--text);
-            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
-                Helvetica, Arial;
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
         }
 
         .header {
@@ -54,7 +51,6 @@
             line-height: 1.2;
         }
 
-        /* Топбар: селект + кнопки */
         .topbar {
             display: grid;
             grid-template-columns: 1fr auto;
@@ -107,7 +103,7 @@
         }
 
         button:disabled {
-            opacity: 0.6;
+            opacity: .6;
             cursor: not-allowed;
         }
 
@@ -144,7 +140,7 @@
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 12px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
         }
 
         .panel h3 {
@@ -223,7 +219,6 @@
             gap: 12px;
         }
 
-        /* Контейнер фиксированного предпросмотра */
         .preview-viewport {
             border: 1px solid var(--border);
             border-radius: 10px;
@@ -238,15 +233,11 @@
             padding: 4px;
         }
 
-        /* Страница PDF c устойчивой рамкой */
         .page {
             width: var(--page-width);
             min-height: var(--page-height);
             background: #fff;
-            border: 2px solid #d7dde5;
-            /* толще для стабильного рендера */
-            box-shadow: none;
-            padding: calc(var(--page-padding) - 2px);
+            padding: var(--page-padding);
             display: flex;
             flex-direction: column;
             gap: 16px;
@@ -261,7 +252,7 @@
         .doc-title {
             font-size: var(--title-size);
             font-weight: 800;
-            letter-spacing: 0.2px;
+            letter-spacing: .2px;
             text-transform: uppercase;
             line-height: 1.25;
         }
@@ -270,7 +261,6 @@
             border: 1px dashed var(--border);
             border-radius: 10px;
             padding: 18px;
-            /* больше воздуха */
         }
 
         .grid-fields {
@@ -305,7 +295,6 @@
             align-items: baseline;
         }
 
-        /* Штрихкод пропуска снизу по центру */
         .passcode-barcode {
             margin-top: auto;
             display: flex;
@@ -320,59 +309,18 @@
             height: 80px;
         }
 
-        /* Принудительное сужение для экспорта */
         .barcode-export-narrow {
             width: 45% !important;
             max-width: 280px !important;
         }
 
-        /* Репитер доп. строк */
-        .extra-repeater {
-            display: grid;
-            gap: 8px;
-        }
-
-        .extra-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr auto;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .extra-row input {
-            height: 40px;
-        }
-
-        .extra-row .btns {
-            display: flex;
-            gap: 6px;
-        }
-
-         .back-to-site {
-      margin-top: 25px;
-      font-size: 16px;
-    }
-
-    .back-to-site a {
-      color: var(--accent);
-      text-decoration: none;
-      padding: 6px 6px;
-      border: 2px solid var(--accent);
-    }
-
-    .back-to-site a:hover {
-      background: var(--accent);
-      color: var(--bg);
-    }
-
-        /* Адаптив */
-        @media (max-width: 1024px) {
+        @media (max-width:1024px) {
             .grid {
                 grid-template-columns: 1fr;
             }
         }
 
-        @media (max-width: 640px) {
+        @media (max-width:640px) {
             .header {
                 padding: 10px 12px;
             }
@@ -415,11 +363,29 @@
                 margin: 0 auto;
             }
 
-            /* включить подгон по ширине при необходимости */
             .preview-viewport.fit-width .page {
                 width: 100%;
                 min-width: 100%;
             }
+        }
+
+        /* Export surface (off-screen, fully borderless) */
+        #exportSurface {
+            position: fixed;
+            left: -99999px;
+            top: -99999px;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        #exportSurface,
+        #exportSurface * {
+            border: 0 !important;
+            box-shadow: none !important;
+            outline: 0 !important;
+            border-radius: 0 !important;
         }
     </style>
 </head>
@@ -433,12 +399,8 @@
                     <option value="A4" selected>A4</option>
                     <option value="A5">A5</option>
                 </select>
-                <button id="btnAddFilled" class="secondary" type="button">
-                    Добавить заполненный лист
-                </button>
-                <button id="btnAddEmpty" class="secondary" type="button">
-                    Добавить пустой лист
-                </button>
+                <button id="btnAddFilled" class="secondary" type="button">Добавить заполненный лист</button>
+                <button id="btnAddEmpty" class="secondary" type="button">Добавить пустой лист</button>
                 <button id="btnExport" type="button">Скачать PDF</button>
             </div>
             <div class="status-row">
@@ -447,7 +409,6 @@
             </div>
         </div>
     </header>
-
     <main class="container">
         <div class="grid">
             <section class="panel">
@@ -458,74 +419,40 @@
                 <div style="height:1px;background:var(--border);margin:8px 0;"></div>
 
                 <h3>Редактор листа</h3>
-                <div class="hint">Заполните поля — предпросмотр обновится</div>
+                <div class="hint">Заполните поля — предпросмотр справа обновится</div>
                 <form id="editor" class="form" autocomplete="off">
-                    <!-- 1 -->
-                    <div class="form-row">
-                        <label>Номер короба/паллеты</label>
-                        <input id="f_box" type="text" placeholder="прим.  1" />
-                    </div>
-                    <!-- 2 -->
-                    <div class="form-row">
-                        <label>Кол-во коробов/паллет в поставке</label>
-                        <input id="f_totalBoxes" type="text" placeholder="прим.  15" />
-                    </div>
-                    <!-- 3 -->
-                    <div class="form-row">
-                        <label>Кол-во коробов на данной паллете</label>
-                        <input id="f_boxesOnPallet" type="text" placeholder="прим.  16" />
-                    </div>
-                    <!-- 4 -->
-                    <div class="form-row">
-                        <label>Номер поставки</label>
-                        <input id="f_supply" type="text" placeholder="прим.  33032010" />
-                    </div>
-                    <!-- 5 -->
-                    <div class="form-row">
-                        <label>Склад назначения</label>
-                        <input id="f_dest" type="text" placeholder="прим.  Невинномысск" />
-                    </div>
-                    <!-- 6 -->
-                    <div class="form-row">
-                        <label>Тип поставки</label>
-                        <input id="f_type" type="text" placeholder="прим.  Короб или Паллета" />
-                    </div>
-                    <!-- 7 -->
-                    <div class="form-row">
-                        <label>Наименование юрлица</label>
-                        <input id="f_org" type="text" placeholder='прим.  ООО "ЭС КАК ДОЛЛАР"' />
-                    </div>
-                    <!-- 8 -->
-                    <div class="form-row">
-                        <label>Дата поставки</label>
-                        <input id="f_date" type="text" placeholder="прим.  31.12.2099" />
-                    </div>
+                    <div class="form-row"><label>Номер короба/паллеты</label><input id="f_box" type="text"
+                            placeholder="напр. BX-0001" /></div>
+                    <div class="form-row"><label>Кол-во коробов/паллет в поставке</label><input id="f_totalBoxes"
+                            type="text" placeholder="напр. 5" /></div>
+                    <div class="form-row"><label>Кол-во коробов на данной паллете</label><input id="f_boxesOnPallet"
+                            type="text" placeholder="напр. 2" /></div>
+                    <div class="form-row"><label>Номер поставки</label><input id="f_supply" type="text"
+                            placeholder="напр. SP-987654" /></div>
+                    <div class="form-row"><label>Склад назначения</label><input id="f_dest" type="text"
+                            placeholder="напр. Неведомый-01" /></div>
+                    <div class="form-row"><label>Тип поставки</label><input id="f_type" type="text"
+                            placeholder="напр. Короб" /></div>
+                    <div class="form-row"><label>Наименование юрлица</label><input id="f_org" type="text"
+                            placeholder='напр. ООО "Несуществующая Компания"' /></div>
+                    <div class="form-row"><label>Дата поставки</label><input id="f_date" type="text"
+                            placeholder="напр. 31.12.2099" /></div>
 
                     <div style="height:1px;background:var(--border);margin:8px 0;"></div>
 
-                    <div class="form-row">
-                        <label>Штрихкод Пропуска (Поставки)</label>
-                        <input id="f_passcode" type="text" placeholder="прим.  WB-GI-123456789" />
-                    </div>
+                    <div class="form-row"><label>Штрихкод Пропуска</label><input id="f_passcode" type="text"
+                            placeholder="напр. 123456789012" /></div>
 
                     <div style="height:1px;background:var(--border);margin:8px 0;"></div>
 
                     <h3 style="margin:0;">Дополнительные строки</h3>
                     <div class="hint">Добавляйте пары «Метка — Значение»</div>
                     <div id="extraList" class="extra-repeater"></div>
-                    <div>
-                        <button id="btnAddExtra" type="button" class="secondary">
-                            Добавить строку
-                        </button>
-                    </div>
+                    <div><button id="btnAddExtra" type="button" class="secondary">Добавить строку</button></div>
 
                     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;">
-                        <button id="btnApply" type="button" class="secondary">
-                            Сохранить изменения
-                        </button>
-                        <button id="btnDelete" type="button" class="danger">
-                            Удалить лист
-                        </button>
+                        <button id="btnApply" type="button" class="secondary">Сохранить изменения</button>
+                        <button id="btnDelete" type="button" class="danger">Удалить лист</button>
                     </div>
                 </form>
             </section>
@@ -541,10 +468,10 @@
         </div>
     </main>
 
-    <!-- JsBarcode -->
+    <div id="exportSurface"></div>
+
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"
         crossorigin="anonymous"></script>
-    <!-- html2pdf bundle (html2canvas + jsPDF) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
@@ -562,7 +489,6 @@
             btnDelete: document.getElementById("btnDelete"),
             status: document.getElementById("status"),
             updated: document.getElementById("updated"),
-            // form fields
             f_box: document.getElementById("f_box"),
             f_totalBoxes: document.getElementById("f_totalBoxes"),
             f_boxesOnPallet: document.getElementById("f_boxesOnPallet"),
@@ -573,6 +499,7 @@
             f_date: document.getElementById("f_date"),
             f_passcode: document.getElementById("f_passcode"),
             extraList: document.getElementById("extraList"),
+            exportSurface: document.getElementById("exportSurface"),
         };
 
         let pages = [];
@@ -580,9 +507,7 @@
 
         function nowHM() {
             const d = new Date();
-            return [d.getHours(), d.getMinutes(), d.getSeconds()]
-                .map((n) => String(n).padStart(2, "0"))
-                .join(":");
+            return [d.getHours(), d.getMinutes(), d.getSeconds()].map(n => String(n).padStart(2, "0")).join(":");
         }
 
         function setFormat(format) {
@@ -631,35 +556,29 @@
             const p0 = pages[0];
             const p = emptyPage();
             p.title = p0.title;
-            // копируем всё, кроме первых трех полей
             p.fields["Номер поставки"] = p0.fields["Номер поставки"];
             p.fields["Склад назначения"] = p0.fields["Склад назначения"];
             p.fields["Тип поставки"] = p0.fields["Тип поставки"];
             p.fields["Наименование юрлица"] = p0.fields["Наименование юрлица"];
             p.fields["Дата поставки"] = p0.fields["Дата поставки"];
             p.passcode = p0.passcode || "";
-            p.extraRows = (p0.extraRows || []).map((r) => ({ ...r }));
+            p.extraRows = (p0.extraRows || []).map(r => ({ ...r }));
             return p;
         }
 
         function addPageFilled() {
-            if (!pages.length) {
-                alert("Сначала заполните первый лист.");
-                return;
-            }
+            if (!pages.length) { alert("Сначала заполните первый лист."); return; }
             pages.push(makePagePrefilledFromFirst());
             activeIndex = pages.length - 1;
             syncUI();
             els.previewViewport.scrollIntoView({ behavior: "smooth", block: "start" });
         }
-
         function addPageEmpty() {
             pages.push(emptyPage());
             activeIndex = pages.length - 1;
             syncUI();
             els.previewViewport.scrollIntoView({ behavior: "smooth", block: "start" });
         }
-
         function deletePage() {
             if (activeIndex < 0) return;
             pages.splice(activeIndex, 1);
@@ -668,22 +587,13 @@
         }
 
         function loadEditorFromModel() {
-            const disableAll = (flag) => {
-                document
-                    .querySelectorAll("#editor input")
-                    .forEach((i) => (i.disabled = flag));
-            };
-            if (activeIndex < 0) {
-                disableAll(true);
-                els.extraList.innerHTML = "";
-                return;
-            }
+            const disableAll = (flag) => { document.querySelectorAll("#editor input").forEach(i => i.disabled = flag); };
+            if (activeIndex < 0) { disableAll(true); els.extraList.innerHTML = ""; return; }
             disableAll(false);
             const p = pages[activeIndex];
             els.f_box.value = p.fields["Номер короба/паллеты"] || "";
             els.f_totalBoxes.value = p.fields["Кол-во коробов/паллет в поставке"] || "";
-            els.f_boxesOnPallet.value =
-                p.fields["Кол-во коробов на данной паллете"] || "";
+            els.f_boxesOnPallet.value = p.fields["Кол-во коробов на данной паллете"] || "";
             els.f_supply.value = p.fields["Номер поставки"] || "";
             els.f_dest.value = p.fields["Склад назначения"] || "";
             els.f_type.value = p.fields["Тип поставки"] || "";
@@ -697,10 +607,8 @@
             if (activeIndex < 0) return;
             const p = pages[activeIndex];
             p.fields["Номер короба/паллеты"] = (els.f_box.value || "").trim();
-            p.fields["Кол-во коробов/паллет в поставке"] =
-                (els.f_totalBoxes.value || "").trim();
-            p.fields["Кол-во коробов на данной паллете"] =
-                (els.f_boxesOnPallet.value || "").trim();
+            p.fields["Кол-во коробов/паллет в поставке"] = (els.f_totalBoxes.value || "").trim();
+            p.fields["Кол-во коробов на данной паллете"] = (els.f_boxesOnPallet.value || "").trim();
             p.fields["Номер поставки"] = (els.f_supply.value || "").trim();
             p.fields["Склад назначения"] = (els.f_dest.value || "").trim();
             p.fields["Тип поставки"] = (els.f_type.value || "").trim();
@@ -711,287 +619,214 @@
         }
 
         function renderList() {
-            els.pagesList.innerHTML = pages
-                .map((p, i) => {
-                    const n = (p.fields["Номер короба/паллеты"] || "").trim() || i + 1;
-                    const supply = p.fields["Номер поставки"] || "—";
-                    return `
-            <div class="page-item ${i === activeIndex ? "active" : ""}" data-i="${i}">
-              <div class="item-title">${p.title}</div>
-              <div class="item-sub">№ ${escapeHtml(
-                        String(n)
-                    )} • Поставка: ${escapeHtml(supply)} • Склад: ${escapeHtml(
-                        p.fields["Склад назначения"] || "—"
-                    )}</div>
-            </div>
-          `;
-                })
-                .join("");
-            els.pagesList.querySelectorAll(".page-item").forEach((el) => {
-                el.addEventListener("click", () => {
-                    activeIndex = Number(el.getAttribute("data-i"));
-                    loadEditorFromModel();
-                    renderPreview();
-                    renderList();
-                });
+            els.pagesList.innerHTML = pages.map((p, i) => {
+                const n = (p.fields["Номер короба/паллеты"] || "").trim() || i + 1;
+                const supply = p.fields["Номер поставки"] || "—";
+                return `
+        <div class="page-item ${i === activeIndex ? "active" : ""}" data-i="${i}">
+          <div class="item-title">${p.title}</div>
+          <div class="item-sub">№ ${escapeHtml(String(n))} • Поставка: ${escapeHtml(supply)} • Склад: ${escapeHtml(p.fields["Склад назначения"] || "—")}</div>
+        </div>`;
+            }).join("");
+            els.pagesList.querySelectorAll(".page-item").forEach(el => {
+                el.addEventListener("click", () => { activeIndex = Number(el.getAttribute("data-i")); loadEditorFromModel(); renderPreview(); renderList(); });
             });
         }
 
         function renderPreview() {
             els.updated.textContent = "Предпросмотр: " + nowHM();
 
-            els.pagesPreview.innerHTML = pages
-                .map((p) => {
-                    const order = [
-                        "Номер короба/паллеты",
-                        "Кол-во коробов/паллет в поставке",
-                        "Кол-во коробов на данной паллете",
-                        "Номер поставки",
-                        "Склад назначения",
-                        "Тип поставки",
-                        "Наименование юрлица",
-                        "Дата поставки",
-                    ];
-                    const rowsHtml = order
-                        .map(
-                            (k) => `
-            <div class="label">${escapeHtml(k)}</div>
-            <div class="value">${escapeHtml(p.fields[k] || "") || "&nbsp;"}</div>
-          `
-                        )
-                        .join("");
+            els.pagesPreview.innerHTML = pages.map(p => {
+                const order = [
+                    "Номер короба/паллеты",
+                    "Кол-во коробов/паллет в поставке",
+                    "Кол-во коробов на данной паллете",
+                    "Номер поставки",
+                    "Склад назначения",
+                    "Тип поставки",
+                    "Наименование юрлица",
+                    "Дата поставки",
+                ];
+                const rowsHtml = order.map(k => `
+        <div class="label">${escapeHtml(k)}</div>
+        <div class="value">${escapeHtml(p.fields[k] || "") || "&nbsp;"}</div>
+      `).join("");
 
-                    const extras = p.extraRows || [];
-                    const extrasHtml = extras.length
-                        ? `
-            <div class="section-extra">
-              <div class="grid-extra">
-                ${extras
-                            .map(
-                                (r) => `
-                  <div class="label">${escapeHtml(r.label || "")}</div>
-                  <div class="value">${escapeHtml(r.value || "")}</div>
-                `
-                            )
-                            .join("")}
-              </div>
-            </div>`
-                        : "";
+                const extras = p.extraRows || [];
+                const extrasHtml = extras.length ? `
+        <div class="section-extra">
+          <div class="grid-extra">
+            ${extras.map(r => `
+              <div class="label">${escapeHtml(r.label || "")}</div>
+              <div class="value">${escapeHtml(r.value || "")}</div>
+            `).join("")}
+          </div>
+        </div>` : "";
 
-                    const pass = (p.passcode || "").trim();
-                    const passBarcode = pass
-                        ? `
-            <div class="passcode-barcode">
-              <svg class="passcode-svg" data-val="${escapeHtml(pass)}"></svg>
-            </div>`
-                        : "";
+                const pass = (p.passcode || "").trim();
+                const passBarcode = pass ? `
+        <div class="passcode-barcode">
+          <svg class="passcode-svg" data-val="${escapeHtml(pass)}"></svg>
+        </div>` : "";
 
-                    return `
-          <section class="page">
-            <div class="doc-title">${escapeHtml(p.title)}</div>
-            <div class="section">
-              <div class="grid-fields">
-                ${rowsHtml}
-              </div>
+                return `
+        <section class="page">
+          <div class="doc-title">${escapeHtml(p.title)}</div>
+          <div class="section">
+            <div class="grid-fields">
+              ${rowsHtml}
             </div>
-            ${extrasHtml}
-            ${passBarcode}
-          </section>
-        `;
-                })
-                .join("");
+          </div>
+          ${extrasHtml}
+          ${passBarcode}
+        </section>`;
+            }).join("");
 
-            // Рисуем штрихкоды
-            document.querySelectorAll(".passcode-svg").forEach((svg) => {
-                const val = svg.getAttribute("data-val");
-                if (!val) return;
+            document.querySelectorAll(".passcode-svg").forEach(svg => {
+                const val = svg.getAttribute("data-val"); if (!val) return;
                 try {
                     JsBarcode(svg, val, {
                         format: "CODE128",
                         lineColor: "#111827",
-                        width: 1.2, // уже
+                        width: 1.2,
                         height: 70,
                         displayValue: true,
                         fontSize: 14,
                         margin: 0,
                     });
-                } catch (e) {
-                    console.warn("Barcode error:", e);
-                }
+                } catch (e) { console.warn("Barcode error:", e); }
             });
         }
 
-        function escapeHtml(v) {
-            return String(v)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
+        function escapeHtml(v) { return String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
 
-        // Доп. строки
         function renderExtraRowsEditor(rows) {
-            els.extraList.innerHTML = rows.length
-                ? rows
-                    .map(
-                        (r, i) => `
-          <div class="extra-row" data-i="${i}">
-            <input type="text" class="extra-label" placeholder="Метка" value="${escapeHtml(
-                            r.label || ""
-                        )}" />
-            <input type="text" class="extra-value" placeholder="Значение" value="${escapeHtml(
-                            r.value || ""
-                        )}" />
-            <div class="btns">
-              <button type="button" class="secondary btn-del">Удалить</button>
-            </div>
-          </div>
-        `
-                    )
-                    .join("")
-                : `<div class="muted">Нет дополнительных строк</div>`;
+            els.extraList.innerHTML = rows.length ? rows.map((r, i) => `
+      <div class="extra-row" data-i="${i}">
+        <input type="text" class="extra-label" placeholder="Метка" value="${escapeHtml(r.label || "")}" />
+        <input type="text" class="extra-value" placeholder="Значение" value="${escapeHtml(r.value || "")}" />
+        <div class="btns"><button type="button" class="secondary btn-del">Удалить</button></div>
+      </div>`).join("") : `<div class="muted">Нет дополнительных строк</div>`;
 
-            els.extraList.querySelectorAll(".btn-del").forEach((btn) => {
-                btn.addEventListener("click", (e) => {
-                    const row = e.target.closest(".extra-row");
-                    const idx = Number(row.getAttribute("data-i"));
+            els.extraList.querySelectorAll(".btn-del").forEach(btn => {
+                btn.addEventListener("click", e => {
+                    const row = e.target.closest(".extra-row"); const idx = Number(row.getAttribute("data-i"));
                     pages[activeIndex].extraRows.splice(idx, 1);
-                    renderExtraRowsEditor(pages[activeIndex].extraRows);
-                    renderPreview();
+                    renderExtraRowsEditor(pages[activeIndex].extraRows); renderPreview();
                 });
             });
-            els.extraList
-                .querySelectorAll(".extra-label,.extra-value")
-                .forEach((inp) => {
-                    inp.addEventListener("input", () => {
-                        pages[activeIndex].extraRows = readExtraRowsEditor();
-                        renderPreview();
-                    });
-                });
+            els.extraList.querySelectorAll(".extra-label,.extra-value").forEach(inp => {
+                inp.addEventListener("input", () => { pages[activeIndex].extraRows = readExtraRowsEditor(); renderPreview(); });
+            });
         }
         function readExtraRowsEditor() {
-            const rows = [];
-            els.extraList.querySelectorAll(".extra-row").forEach((row) => {
+            const rows = []; els.extraList.querySelectorAll(".extra-row").forEach(row => {
                 const label = row.querySelector(".extra-label")?.value?.trim() || "";
                 const value = row.querySelector(".extra-value")?.value?.trim() || "";
                 if (label || value) rows.push({ label, value });
-            });
-            return rows;
+            }); return rows;
         }
 
+        // New: robust export (clone each page into off-screen surface and render)
         async function exportPDF() {
-            if (!pages.length) {
-                els.status.textContent = "Нет страниц для экспорта";
-                return;
-            }
+            if (!pages.length) { els.status.textContent = "Нет страниц для экспорта"; return; }
             els.btnExport.disabled = true;
             const prev = els.btnExport.textContent;
             els.btnExport.textContent = "Генерация...";
             els.status.textContent = "Генерация PDF...";
 
-            // временно отключим fit-width, если включен
-            const vp = els.previewViewport;
-            const usedFit = vp.classList.contains("fit-width");
-            if (usedFit) vp.classList.remove("fit-width");
-
             try {
                 const format = els.pageFormat.value.toLowerCase();
-                const supp =
-                    (pages[0]?.fields?.["Номер поставки"] || "").trim() || "без_номера";
+                const supp = (pages[0]?.fields?.["Номер поставки"] || "").trim() || "без_номера";
                 const filename = `Упаковочный лист поставка (${supp}).pdf`;
 
+                // Ensure DOM is up to date
                 renderPreview();
-                await new Promise((r) => setTimeout(r, 60));
+                await new Promise(r => setTimeout(r, 50));
 
-                // Принудительно сузим штрихкоды на момент экспорта
-                const exportSvgs = Array.from(
-                    document.querySelectorAll(".passcode-barcode svg")
-                );
-                exportSvgs.forEach((s) => s.classList.add("barcode-export-narrow"));
+                // Prepare export surface
+                const surface = els.exportSurface;
+                surface.innerHTML = "";
 
-                await html2pdf()
-                    .set({
-                        margin: 0,
-                        filename,
-                        image: { type: "jpeg", quality: 0.96 },
-                        html2canvas: {
-                            scale: 2,
-                            useCORS: true,
-                            backgroundColor: "#ffffff",
-                        },
-                        jsPDF: { unit: "mm", format, orientation: "portrait" },
-                        pagebreak: { mode: ["css", "legacy"] },
-                    })
-                    .from(els.pagesPreview)
-                    .save();
+                // mm size
+                const mmW = format === "a5" ? 148 : 210;
+                const mmH = format === "a5" ? 210 : 297;
 
-                // вернуть ширину
-                document
-                    .querySelectorAll(".passcode-barcode svg.barcode-export-narrow")
-                    .forEach((s) => s.classList.remove("barcode-export-narrow"));
+                // Clone each .page into surface with hard CSS reset (already in CSS)
+                const nodes = Array.from(document.querySelectorAll(".page"));
+                for (const node of nodes) {
+                    const clone = node.cloneNode(true);
+                    surface.appendChild(clone);
+                }
 
+                // Render canvas and compose PDF
+                const { jsPDF } = window.jspdf || {}; // from html2pdf bundle
+                const pdf = new (jsPDF || window.jspdf.jsPDF)({
+                    unit: "mm",
+                    format: [mmW, mmH],
+                    orientation: "portrait",
+                });
+
+                const mm2px = 3.7795275591;
+                const pxW = Math.round(mmW * mm2px);
+                const pxH = Math.round(mmH * mm2px);
+
+                const scale = 2;
+                const clones = Array.from(surface.querySelectorAll(".page"));
+
+                // Narrow barcode for export (as before)
+                clones.forEach(p => p.querySelectorAll(".passcode-barcode svg").forEach(s => s.classList.add("barcode-export-narrow")));
+
+                for (let i = 0; i < clones.length; i++) {
+                    const canvas = await html2canvas(clones[i], {
+                        backgroundColor: "#ffffff",
+                        scale,
+                        useCORS: true,
+                        scrollX: 0,
+                        scrollY: 0,
+                        width: pxW,
+                        height: pxH,
+                        windowWidth: pxW,
+                        windowHeight: pxH,
+                    });
+                    const img = canvas.toDataURL("image/jpeg", 0.96);
+                    if (i > 0) pdf.addPage([mmW, mmH], "portrait");
+                    pdf.addImage(img, "JPEG", 0, 0, mmW, mmH);
+                }
+
+                pdf.save(filename);
                 els.status.textContent = "PDF сохранён";
             } catch (e) {
                 console.error(e);
                 els.status.textContent = "Ошибка генерации PDF";
                 alert("Ошибка при генерации PDF: " + e.message);
             } finally {
-                if (usedFit) vp.classList.add("fit-width");
                 els.btnExport.disabled = false;
                 els.btnExport.textContent = prev;
+                els.exportSurface.innerHTML = "";
             }
         }
 
-        // Автоподгон по ширине на мобильных (только для превью)
         function updateViewportFit() {
             const isMobile = window.matchMedia("(max-width: 640px)").matches;
-            if (isMobile) {
-                els.previewViewport.classList.add("fit-width");
-            } else {
-                els.previewViewport.classList.remove("fit-width");
-            }
+            if (isMobile) els.previewViewport.classList.add("fit-width");
+            else els.previewViewport.classList.remove("fit-width");
         }
 
         // Bindings
-        els.btnAddFilled.addEventListener("click", addPageFilled);
-        els.btnAddEmpty.addEventListener("click", addPageEmpty);
-        els.btnDelete.addEventListener("click", () => {
-            if (activeIndex < 0) return;
-            if (confirm("Удалить текущий лист?")) deletePage();
+        document.getElementById("btnAddFilled").addEventListener("click", addPageFilled);
+        document.getElementById("btnAddEmpty").addEventListener("click", addPageEmpty);
+        document.getElementById("btnDelete").addEventListener("click", () => { if (activeIndex < 0) return; if (confirm("Удалить текущий лист?")) deletePage(); });
+        document.getElementById("btnApply").addEventListener("click", () => { saveEditorToModel(); syncUI(); els.status.textContent = "Изменения сохранены"; });
+        document.getElementById("btnAddExtra").addEventListener("click", () => { if (activeIndex < 0) return; pages[activeIndex].extraRows.push({ label: "", value: "" }); renderExtraRowsEditor(pages[activeIndex].extraRows); renderPreview(); });
+        document.getElementById("pageFormat").addEventListener("change", e => { setFormat(e.target.value); renderPreview(); });
+        document.getElementById("btnExport").addEventListener("click", exportPDF);
+        document.querySelectorAll("#editor input").forEach(inp => {
+            inp.addEventListener("input", () => { saveEditorToModel(); renderPreview(); });
         });
-        els.btnApply.addEventListener("click", () => {
-            saveEditorToModel();
-            syncUI();
-            els.status.textContent = "Изменения сохранены";
-        });
-        els.btnAddExtra.addEventListener("click", () => {
-            if (activeIndex < 0) return;
-            pages[activeIndex].extraRows.push({ label: "", value: "" });
-            renderExtraRowsEditor(pages[activeIndex].extraRows);
-            renderPreview();
-        });
-        els.pageFormat.addEventListener("change", (e) => {
-            setFormat(e.target.value);
-            renderPreview();
-        });
-        els.btnExport.addEventListener("click", exportPDF);
-
-        document.querySelectorAll("#editor input").forEach((inp) => {
-            inp.addEventListener("input", () => {
-                saveEditorToModel();
-                renderPreview();
-            });
-        });
-
         window.addEventListener("resize", updateViewportFit);
 
-        function syncUI() {
-            loadEditorFromModel();
-            renderList();
-            renderPreview();
-            updateViewportFit();
-        }
+        function syncUI() { loadEditorFromModel(); renderList(); renderPreview(); updateViewportFit(); }
 
         // INIT
         setFormat("A4");
