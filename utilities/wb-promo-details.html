@@ -44,13 +44,13 @@
 
     .wrap {
       display: grid;
-      grid-template-columns: 20% 80%;
+      grid-template-columns: 18% 82%;
       gap: 12px;
-      min-height: 100vh;
+      /* min-height: 100vh; */
       max-height: 100vh;
       padding: 12px;
       box-sizing: border-box;
-      overflow: visible;
+      overflow: auto;
     }
 
     .panel {
@@ -163,10 +163,10 @@
 
     .right {
       display: grid;
-      grid-template-rows: auto auto auto;
+      grid-template-rows: auto auto 1fr;
       gap: 10px;
       min-height: 0;
-      overflow: visible;
+      overflow: auto;
     }
 
     .header-row {
