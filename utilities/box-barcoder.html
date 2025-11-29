@@ -18,7 +18,7 @@
       --page-height: 297mm;
       --page-padding: 18mm;
 
-      /* увеличенная типографика */
+      /* типографика увеличена */
       --title-size: 28px;
       --label-size: 17px;
       --value-size: 21px;
@@ -54,7 +54,6 @@
       line-height: 1.2;
     }
 
-    /* Топбар: селект + кнопки */
     .topbar {
       display: grid;
       grid-template-columns: 1fr auto;
@@ -223,7 +222,7 @@
       gap: 12px;
     }
 
-    /* Контейнер фиксированного предпросмотра (рамка тут, не на странице) */
+    /* Рамка только у контейнера предпросмотра (в PDF не попадет) */
     .preview-viewport {
       border: 1px solid var(--border);
       border-radius: 10px;
@@ -238,7 +237,7 @@
       padding: 4px;
     }
 
-    /* Страница PDF без внешней рамки (важно для корректного рендера) */
+    /* Страница PDF: без внешней рамки и теней */
     .page {
       width: var(--page-width);
       min-height: var(--page-height);
@@ -316,32 +315,10 @@
       height: 80px;
     }
 
-    /* Принудительное сужение для экспорта */
+    /* Принудительно сузить на время экспорта */
     .barcode-export-narrow {
       width: 45% !important;
       max-width: 280px !important;
-    }
-
-    /* Репитер доп. строк */
-    .extra-repeater {
-      display: grid;
-      gap: 8px;
-    }
-
-    .extra-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr auto;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .extra-row input {
-      height: 40px;
-    }
-
-    .extra-row .btns {
-      display: flex;
-      gap: 6px;
     }
 
     /* Адаптив */
@@ -394,11 +371,17 @@
         margin: 0 auto;
       }
 
-      /* включить подгон по ширине при необходимости */
       .preview-viewport.fit-width .page {
         width: 100%;
         min-width: 100%;
       }
+    }
+
+    /* Экспортный режим — на всякий случай убираем тени/бордеры у вложенных
+         элементов в контейнере страниц (если где-то появятся) */
+    body.exporting .pages * {
+      box-shadow: none !important;
+      border-color: currentColor;
     }
   </style>
 </head>
@@ -439,42 +422,34 @@
         <h3>Редактор листа</h3>
         <div class="hint">Заполните поля — предпросмотр справа обновится</div>
         <form id="editor" class="form" autocomplete="off">
-          <!-- 1 -->
           <div class="form-row">
             <label>Номер короба/паллеты</label>
             <input id="f_box" type="text" placeholder="напр. BX-0001" />
           </div>
-          <!-- 2 -->
           <div class="form-row">
             <label>Кол-во коробов/паллет в поставке</label>
             <input id="f_totalBoxes" type="text" placeholder="напр. 5" />
           </div>
-          <!-- 3 -->
           <div class="form-row">
             <label>Кол-во коробов на данной паллете</label>
             <input id="f_boxesOnPallet" type="text" placeholder="напр. 2" />
           </div>
-          <!-- 4 -->
           <div class="form-row">
             <label>Номер поставки</label>
             <input id="f_supply" type="text" placeholder="напр. SP-987654" />
           </div>
-          <!-- 5 -->
           <div class="form-row">
             <label>Склад назначения</label>
             <input id="f_dest" type="text" placeholder="напр. Неведомый-01" />
           </div>
-          <!-- 6 -->
           <div class="form-row">
             <label>Тип поставки</label>
             <input id="f_type" type="text" placeholder="напр. Короб" />
           </div>
-          <!-- 7 -->
           <div class="form-row">
             <label>Наименование юрлица</label>
             <input id="f_org" type="text" placeholder='напр. ООО "Несуществующая Компания"' />
           </div>
-          <!-- 8 -->
           <div class="form-row">
             <label>Дата поставки</label>
             <input id="f_date" type="text" placeholder="напр. 31.12.2099" />
@@ -610,7 +585,6 @@
       const p0 = pages[0];
       const p = emptyPage();
       p.title = p0.title;
-      // копируем всё, кроме первых трех полей
       p.fields["Номер поставки"] = p0.fields["Номер поставки"];
       p.fields["Склад назначения"] = p0.fields["Склад назначения"];
       p.fields["Тип поставки"] = p0.fields["Тип поставки"];
@@ -780,7 +754,6 @@
         })
         .join("");
 
-      // Рисуем штрихкоды
       document.querySelectorAll(".passcode-svg").forEach((svg) => {
         const val = svg.getAttribute("data-val");
         if (!val) return;
@@ -788,7 +761,7 @@
           JsBarcode(svg, val, {
             format: "CODE128",
             lineColor: "#111827",
-            width: 1.2, /* уже */
+            width: 1.2,
             height: 70,
             displayValue: true,
             fontSize: 14,
@@ -809,7 +782,6 @@
         .replace(/'/g, "&#039;");
     }
 
-    // Доп. строки
     function renderExtraRowsEditor(rows) {
       els.extraList.innerHTML = rows.length
         ? rows
@@ -869,7 +841,6 @@
       els.btnExport.textContent = "Генерация...";
       els.status.textContent = "Генерация PDF...";
 
-      // временно отключим fit-width, если включен
       const vp = els.previewViewport;
       const usedFit = vp.classList.contains("fit-width");
       if (usedFit) vp.classList.remove("fit-width");
@@ -883,7 +854,8 @@
         renderPreview();
         await new Promise((r) => setTimeout(r, 60));
 
-        // Принудительно сузим штрихкоды на момент экспорта
+        document.body.classList.add("exporting");
+
         const exportSvgs = Array.from(
           document.querySelectorAll(".passcode-barcode svg")
         );
@@ -905,7 +877,6 @@
           .from(els.pagesPreview)
           .save();
 
-        // вернуть ширину
         document
           .querySelectorAll(".passcode-barcode svg.barcode-export-narrow")
           .forEach((s) => s.classList.remove("barcode-export-narrow"));
@@ -916,13 +887,13 @@
         els.status.textContent = "Ошибка генерации PDF";
         alert("Ошибка при генерации PDF: " + e.message);
       } finally {
+        document.body.classList.remove("exporting");
         if (usedFit) vp.classList.add("fit-width");
         els.btnExport.disabled = false;
         els.btnExport.textContent = prev;
       }
     }
 
-    // Автоподгон по ширине на мобильных (только для превью)
     function updateViewportFit() {
       const isMobile = window.matchMedia("(max-width: 640px)").matches;
       if (isMobile) {
@@ -932,7 +903,6 @@
       }
     }
 
-    // Bindings
     els.btnAddFilled.addEventListener("click", addPageFilled);
     els.btnAddEmpty.addEventListener("click", addPageEmpty);
     els.btnDelete.addEventListener("click", () => {
