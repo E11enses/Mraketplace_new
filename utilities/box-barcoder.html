@@ -3,31 +3,58 @@
 
 <head>
   <meta charset="utf-8" />
-  <title>Упаковочные листы — генератор (A4/A5)</title>
+  <title>
+    Генератор штрихкодов — мобильный, колонки, жирные 4 цифры, авто‑имя PDF
+  </title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- SheetJS (Excel) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" crossorigin="anonymous"></script>
+  <!-- JsBarcode -->
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"
+    crossorigin="anonymous"></script>
+  <!-- jsPDF UMD -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js" crossorigin="anonymous"></script>
+  <!-- html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"
+    referrerpolicy="no-referrer"></script>
+
   <style>
     :root {
-      --bg: #f6f7fb;
-      --card: #ffffff;
-      --text: #111827;
-      --muted: #6b7280;
-      --accent: #2563eb;
-      --border: #e5e7eb;
+      --bg: #0f1220;
+      --card: #171a2b;
+      --text: #e7e9f3;
+      --muted: #a6accd;
+      --accent: #7aa2f7;
+      --border: #2a2f4a;
 
-      --page-width: 210mm;
-      --page-height: 297mm;
-      --page-padding: 18mm;
+      /* LANDSCAPE page (mm) — default 75×120 */
+      --page-mm-w: 120;
+      --page-mm-h: 75;
 
-      /* типографика увеличена */
-      --title-size: 28px;
-      --label-size: 17px;
-      --value-size: 21px;
-      --line-gap-v: 14px;
-      --line-height: 1.65;
+      --preview-scale: 1;
+
+      /* Typography */
+      --title-font: 14px;
+      /* for 75x120 by default */
+      --extra-font: 11px;
+
+      /* Spacing (mm) */
+      --page-pad-mm: 3;
+      --gap-title-bar-mm: 4;
+      --gap-bar-contents-mm: 4;
+      --cols-gap-mm: 8;
+      /* wider gap for readability */
     }
 
     * {
       box-sizing: border-box;
+    }
+
+    html,
+    body {
+      overflow-x: hidden;
+      /* prevent tiny horizontal jitter */
     }
 
     body {
@@ -36,12 +63,14 @@
       color: var(--text);
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
         Helvetica, Arial;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     .header {
       padding: 12px 16px;
       border-bottom: 1px solid var(--border);
-      background: #ffffffcc;
+      background: #0f1220e6;
       backdrop-filter: saturate(150%) blur(6px);
       position: sticky;
       top: 0;
@@ -69,23 +98,36 @@
     }
 
     select,
-    button {
+    button,
+    input[type="file"],
+    input[type="text"] {
       height: 40px;
       border-radius: 10px;
       border: 1px solid var(--border);
       font-size: 14px;
     }
 
-    select {
-      background: #fff;
+    select,
+    input[type="file"] {
+      background: var(--card);
+      color: var(--text);
       padding: 0 12px;
-      min-width: 96px;
+    }
+
+    input[type="file"] {
+      padding: 8px 12px;
+    }
+
+    input[type="text"] {
+      background: #1e2235;
+      color: var(--text);
+      padding: 0 12px;
     }
 
     button {
-      background: linear-gradient(180deg, #3680ff, #2563eb);
+      background: linear-gradient(180deg, #3853a1, #2d3a8c);
       color: #fff;
-      border-color: #2563eb;
+      border-color: #2f448f;
       padding: 0 14px;
       font-weight: 700;
       cursor: pointer;
@@ -93,16 +135,22 @@
     }
 
     button.secondary {
-      background: #fff;
+      background: linear-gradient(180deg, #202542, #171a2b);
       color: var(--text);
       border: 1px solid var(--border);
       font-weight: 600;
     }
 
     button.danger {
-      background: #dc2626;
-      border-color: #dc2626;
+      background: #b91c1c;
+      border-color: #991b1b;
       color: #fff;
+    }
+
+    button.ghost {
+      background: #1e2235;
+      color: var(--muted);
+      border: 1px solid var(--border);
     }
 
     button:disabled {
@@ -119,22 +167,13 @@
       font-size: 14px;
     }
 
-    .page-updated {
-      color: var(--muted);
-      margin-left: auto;
-    }
-
-    .ok {
-      color: #059669;
-    }
-
     .container {
       padding: 12px 16px 16px;
     }
 
     .grid {
       display: grid;
-      grid-template-columns: minmax(320px, 420px) 1fr;
+      grid-template-columns: minmax(360px, 560px) 1fr;
       gap: 16px;
     }
 
@@ -143,12 +182,13 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 12px;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
     }
 
     .panel h3 {
       margin: 0 0 8px;
       font-size: 16px;
+      color: var(--muted);
     }
 
     .hint {
@@ -164,7 +204,7 @@
 
     .form-row {
       display: grid;
-      grid-template-columns: 180px 1fr;
+      grid-template-columns: 220px 1fr;
       gap: 8px;
       align-items: center;
     }
@@ -174,13 +214,27 @@
       color: var(--muted);
     }
 
-    .form-row input {
-      height: 40px;
+    .form-row input,
+    .form-row select,
+    .form-row textarea {
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 0 10px;
+      padding: 10px;
       font-size: 14px;
-      background: #fff;
+      background: #1e2235;
+      color: var(--text);
+    }
+
+    .form-row textarea {
+      min-height: 72px;
+      resize: vertical;
+    }
+
+    .row-inline {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
     }
 
     .list-pages {
@@ -195,16 +249,16 @@
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 8px;
-      background: #fff;
+      background: #1e2235;
       display: grid;
       gap: 6px;
       cursor: pointer;
     }
 
     .page-item.active {
-      border-color: #93c5fd;
-      box-shadow: inset 0 0 0 2px #93c5fd55;
-      background: #f0f7ff;
+      border-color: #7aa2f7;
+      box-shadow: inset 0 0 0 2px #7aa2f744;
+      background: #202542;
     }
 
     .item-title {
@@ -217,125 +271,180 @@
       font-size: 12px;
     }
 
-    .preview-wrap {
-      display: grid;
-      gap: 12px;
-    }
-
-    /* Рамка только у контейнера предпросмотра (в PDF не попадет) */
+    /* PREVIEW */
     .preview-viewport {
       border: 1px solid var(--border);
       border-radius: 10px;
-      background: #fff;
-      overflow: auto;
-      padding: 8px;
+      background: #0f1220;
+      padding: 12px;
+      height: calc(100vh - 260px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      /* avoid horizontal wiggle */
     }
 
     .pages {
       display: grid;
       gap: 16px;
-      padding: 4px;
+      overflow-x: hidden;
     }
 
-    /* Страница PDF: без внешней рамки и теней */
-    .page {
-      width: var(--page-width);
-      min-height: var(--page-height);
-      background: #fff;
-      padding: var(--page-padding);
+    .page-stage {
+      background: #0f1220;
+      overflow: hidden;
+      /* clip sub-pixel bleed */
+      border-radius: 8px;
+      border: 1px solid #22263a;
+      padding: 8px;
+      box-sizing: content-box;
+    }
+
+    .page-inner {
+      width: calc(var(--page-mm-w) * 1mm);
+      min-height: calc(var(--page-mm-h) * 1mm);
+      background: #ffffff;
+      color: #111827;
+      transform-origin: top left;
+      transform: scale(var(--preview-scale));
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      position: relative;
-      page-break-after: always;
+      padding: calc(var(--page-pad-mm) * 1mm);
     }
 
-    .page:last-child {
-      page-break-after: auto;
-    }
-
-    .doc-title {
-      font-size: var(--title-size);
-      font-weight: 800;
-      letter-spacing: 0.2px;
-      text-transform: uppercase;
-      line-height: 1.25;
-    }
-
-    .section {
-      border: 1px dashed var(--border);
-      border-radius: 10px;
-      padding: 18px;
-    }
-
-    .grid-fields {
-      display: grid;
-      grid-template-columns: 1.1fr 1fr;
-      gap: var(--line-gap-v) 16px;
-      align-items: baseline;
-    }
-
-    .label {
-      color: var(--muted);
-      font-size: var(--label-size);
-      line-height: var(--line-height);
-    }
-
-    .value {
-      font-size: var(--value-size);
+    .page-title {
+      font-size: var(--title-font);
       font-weight: 700;
-      line-height: var(--line-height);
+      text-align: center;
+      color: #111827;
+      margin-bottom: calc(var(--gap-title-bar-mm) * 1mm);
     }
 
-    .section-extra {
-      border: 1px dashed var(--border);
-      border-radius: 10px;
-      padding: 16px;
+    .label-figure {
+      margin: 0 0 calc(var(--gap-bar-contents-mm) * 1mm) 0;
+      overflow: hidden;
+      /* clip fractional paint */
     }
 
-    .grid-extra {
-      display: grid;
-      grid-template-columns: 1.1fr 1fr;
-      gap: var(--line-gap-v) 16px;
-      align-items: baseline;
+    .label-figure svg {
+      display: block;
+      width: 100%;
+      height: auto;
     }
 
-    /* Штрихкод пропуска снизу по центру */
-    .passcode-barcode {
-      margin-top: auto;
+    .box-contents {
+      white-space: normal;
+      word-wrap: break-word;
+      font-size: var(--extra-font);
+      line-height: 1.35;
+      color: #111827;
+      text-align: left;
+    }
+
+    .box-contents.centered {
+      text-align: center;
+    }
+
+    .box-contents.multicol {
+      column-gap: calc(var(--cols-gap-mm) * 1mm);
+      column-fill: balance;
+    }
+
+    /* Export surface (off-screen) */
+    #exportSurface {
+      position: absolute;
+      left: -99999px;
+      top: -99999px;
+      background: #fff;
+      padding: 0;
+      margin: 0;
+    }
+
+    .xpage {
+      width: calc(var(--page-mm-w) * 3.7795275591px);
+      min-height: calc(var(--page-mm-h) * 3.7795275591px);
+      background: #fff;
+      color: #111827;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      padding-top: 10mm;
+      flex-direction: column;
+      padding: calc(var(--page-pad-mm) * 3.7795275591px);
     }
 
-    .passcode-barcode svg {
-      width: 50%;
-      max-width: 320px;
-      height: 80px;
+    .xtitle {
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: calc(var(--gap-title-bar-mm) * 3.7795275591px);
     }
 
-    /* Принудительно сузить на время экспорта */
-    .barcode-export-narrow {
-      width: 45% !important;
-      max-width: 280px !important;
+    .xfigure {
+      margin: 0 0 calc(var(--gap-bar-contents-mm) * 3.7795275591px) 0;
+      overflow: hidden;
     }
 
-    /* Адаптив */
-    @media (max-width: 1024px) {
+    .xfigure svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .xcontents {
+      text-align: left;
+    }
+
+    .xcols {
+      margin: 0 auto;
+      max-width: 170mm;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: calc(var(--cols-gap-mm) * 1mm);
+    }
+
+    .bold-last4 {
+      font-weight: 800;
+    }
+
+    .back-to-site {
+      margin-top: 25px;
+      font-size: 16px;
+    }
+
+    .back-to-site a {
+      color: var(--accent);
+      text-decoration: none;
+      padding: 6px 6px;
+      border: 2px solid var(--accent);
+    }
+
+    .back-to-site a:hover {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    /* ---------- Mobile enhancements ---------- */
+
+    @media (max-width: 960px) {
       .grid {
         grid-template-columns: 1fr;
+      }
+
+      .panel {
+        padding: 10px;
       }
     }
 
     @media (max-width: 640px) {
+      :root {
+        --title-font: 13px;
+        --extra-font: 12px;
+        --cols-gap-mm: 8;
+      }
+
       .header {
         padding: 10px 12px;
       }
 
       h1 {
         font-size: 18px;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
       }
 
       .topbar {
@@ -345,67 +454,79 @@
 
       .controls {
         width: 100%;
+        gap: 8px;
       }
 
       .controls>* {
         flex: 1 1 auto;
       }
 
+      select,
+      button,
+      input[type="file"],
+      input[type="text"] {
+        height: 44px;
+        font-size: 15px;
+      }
+
       .form-row {
         grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .form-row input,
+      .form-row textarea {
+        height: 44px;
+        font-size: 15px;
+      }
+
+      .form-row textarea {
+        min-height: 84px;
+      }
+
+      .list-pages {
+        max-height: 30vh;
       }
 
       .preview-viewport {
-        height: calc(100vh - 210px);
-        min-height: 360px;
-        overflow: auto;
-        -webkit-overflow-scrolling: touch;
-        scroll-behavior: smooth;
-        background: #f8fafc;
+        padding: 8px;
+        height: auto;
+        max-height: none;
       }
 
-      .page {
-        transform: none !important;
-        width: var(--page-width);
-        min-height: var(--page-height);
-        margin: 0 auto;
+      .page-stage {
+        padding: 6px;
       }
-
-      .preview-viewport.fit-width .page {
-        width: 100%;
-        min-width: 100%;
-      }
-    }
-
-    /* Экспортный режим — на всякий случай убираем тени/бордеры у вложенных
-         элементов в контейнере страниц (если где-то появятся) */
-    body.exporting .pages * {
-      box-shadow: none !important;
-      border-color: currentColor;
     }
   </style>
 </head>
 
 <body>
   <header class="header">
-    <h1>Упаковочные листы — генератор PDF</h1>
+    <h1>Генератор штрихкодов</h1>
     <div class="topbar">
       <div class="controls">
-        <select id="pageFormat" aria-label="Формат">
-          <option value="A4" selected>A4</option>
-          <option value="A5">A5</option>
+        <!-- Order: 75×120 (default), 58×40, A5, A4 -->
+        <select id="pageFormat" aria-label="Размер страницы (альбомная ориентация)">
+          <option value="75x120" selected>75 × 120 мм</option>
+          <option value="58x40">58 × 40 мм</option>
+          <option value="A5">A5 (210 × 148 мм)</option>
+          <option value="A4">A4 (297 × 210 мм)</option>
         </select>
-        <button id="btnAddFilled" class="secondary" type="button">
-          Добавить заполненный лист
+
+        <input id="globalWarehouse" type="text" inputmode="text" autocapitalize="sentences" autocomplete="off"
+          autocorrect="off" placeholder="Склад + дата (прим.: Коледино 22.11)" />
+        <input id="entranceCode" type="text" inputmode="text" autocapitalize="characters" autocomplete="off"
+          autocorrect="off" placeholder="Код пропуска авто (прим.: WB-GI-1234567890)" />
+        <button id="btnGenEntrancePages" class="secondary" type="button">
+          Добавить страницы с пропуском
         </button>
-        <button id="btnAddEmpty" class="secondary" type="button">
-          Добавить пустой лист
+        <button id="btnClearEntrancePages" class="ghost" type="button" title="Удалить только страницы пропусков">
+          Очистить пропуски
         </button>
-        <button id="btnExport" type="button">Скачать PDF</button>
       </div>
       <div class="status-row">
         <div id="status" class="ok">Готово</div>
-        <div id="updated" class="page-updated">Предпросмотр: —:—:—</div>
       </div>
     </div>
   </header>
@@ -413,366 +534,201 @@
   <main class="container">
     <div class="grid">
       <section class="panel">
-        <h3>Список листов</h3>
-        <div class="hint">Выберите лист для редактирования</div>
-        <div id="pagesList" class="list-pages"></div>
+        <h3>Импорт из Excel (Wildberries)</h3>
+        <div class="hint">
+          A: «Баркод товара», B: «Кол-во», C: «ШК короба». Если строк ≤5 —
+          одна колонка (центр). Если ≥6 — две колонки, максимально ровные.
+          Последние 4 цифры кода товара выделяются жирным.
+        </div>
+        <div class="row-inline">
+          <input id="wbFile" type="file"
+            accept=".xlsx,.xls,.csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" />
+          <button id="btnImportWB" class="secondary" type="button">
+            Импорт из WB
+          </button>
+        </div>
 
-        <div style="height:1px;background:var(--border);margin:8px 0;"></div>
+        <div style="height:1px;background:var(--border);margin:10px 0;"></div>
 
-        <h3>Редактор листа</h3>
-        <div class="hint">Заполните поля — предпросмотр справа обновится</div>
+        <h3>Список этикеток</h3>
+        <div class="hint">Нажмите по этикетке для редактирования</div>
+        <div id="labelsList" class="list-pages"></div>
+
+        <div style="height:1px;background:var(--border);margin:10px 0;"></div>
+
+        <h3>Редактор этикетки</h3>
         <form id="editor" class="form" autocomplete="off">
           <div class="form-row">
-            <label>Номер короба/паллеты</label>
-            <input id="f_box" type="text" placeholder="напр. BX-0001" />
-          </div>
-          <div class="form-row">
-            <label>Кол-во коробов/паллет в поставке</label>
-            <input id="f_totalBoxes" type="text" placeholder="напр. 5" />
-          </div>
-          <div class="form-row">
-            <label>Кол-во коробов на данной паллете</label>
-            <input id="f_boxesOnPallet" type="text" placeholder="напр. 2" />
-          </div>
-          <div class="form-row">
-            <label>Номер поставки</label>
-            <input id="f_supply" type="text" placeholder="напр. SP-987654" />
-          </div>
-          <div class="form-row">
-            <label>Склад назначения</label>
-            <input id="f_dest" type="text" placeholder="напр. Неведомый-01" />
-          </div>
-          <div class="form-row">
-            <label>Тип поставки</label>
-            <input id="f_type" type="text" placeholder="напр. Короб" />
-          </div>
-          <div class="form-row">
-            <label>Наименование юрлица</label>
-            <input id="f_org" type="text" placeholder='напр. ООО "Несуществующая Компания"' />
-          </div>
-          <div class="form-row">
-            <label>Дата поставки</label>
-            <input id="f_date" type="text" placeholder="напр. 31.12.2099" />
+            <label>Номер ШК (Code128)</label>
+            <input id="i_text" type="text" inputmode="text" autocapitalize="off" autocomplete="off" autocorrect="off"
+              spellcheck="false" placeholder="например, WB_1478418584 или 5901234123457" />
           </div>
 
-          <div style="height:1px;background:var(--border);margin:8px 0;"></div>
-
           <div class="form-row">
-            <label>Штрихкод Пропуска</label>
-            <input id="f_passcode" type="text" placeholder="напр. 123456789012" />
+            <label>Содержимое коробки (из Excel)</label>
+            <textarea id="i_extra" placeholder="например: 2041903715071 × 10&#10;2045515308010 × 2"></textarea>
           </div>
 
-          <div style="height:1px;background:var(--border);margin:8px 0;"></div>
+          <div class="form-row">
+            <label>Размер штрихкода</label>
+            <div class="row-inline">
+              <input id="i_width" type="number" inputmode="numeric" min="1" max="10" value="2" />
+              <input id="i_height" type="number" inputmode="numeric" min="20" max="300" value="100" />
+              <span class="hint">ширина модуля и высота</span>
+            </div>
+          </div>
 
-          <h3 style="margin:0;">Дополнительные строки</h3>
-          <div class="hint">Добавляйте пары «Метка — Значение»</div>
-          <div id="extraList" class="extra-repeater"></div>
-          <div>
-            <button id="btnAddExtra" type="button" class="secondary">
-              Добавить строку
-            </button>
+          <div class="form-row">
+            <label>Размер шрифта содержимого</label>
+            <input id="i_fontSize" type="number" inputmode="numeric" min="8" max="48" value="11" />
           </div>
 
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;">
             <button id="btnApply" type="button" class="secondary">
               Сохранить изменения
             </button>
+            <button id="btnAddEmpty" type="button" class="secondary">
+              Добавить пустую этикетку
+            </button>
             <button id="btnDelete" type="button" class="danger">
-              Удалить лист
+              Удалить этикетку
             </button>
           </div>
         </form>
+
+        <div style="height:1px;background:var(--border);margin:10px 0;"></div>
+
+        <div class="row-inline">
+          <button id="btnExport" type="button">Скачать PDF</button>
+        </div>
       </section>
 
       <section class="panel">
         <h3>Предпросмотр</h3>
-        <div class="preview-wrap">
-          <div id="previewViewport" class="preview-viewport">
-            <div id="pagesPreview" class="pages"></div>
-          </div>
+        <div id="previewViewport" class="preview-viewport">
+          <div id="pagesPreview" class="pages"></div>
         </div>
       </section>
     </div>
   </main>
 
-  <!-- JsBarcode -->
-  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"
-    crossorigin="anonymous"></script>
-  <!-- html2pdf bundle (html2canvas + jsPDF) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" crossorigin="anonymous"
-    referrerpolicy="no-referrer"></script>
+  <!-- Export surface (off-screen) -->
+  <div id="exportSurface"></div>
 
   <script>
+    function getJsPDF() {
+      if (window.jspdf && window.jspdf.jsPDF) return window.jspdf.jsPDF;
+      if (window.jsPDF) return window.jsPDF;
+      throw new Error("jsPDF library is not available");
+    }
+    function safeFilePart(s) {
+      return (s || "")
+        .trim()
+        .replace(/[\\/:*?"<>|\u0000-\u001f]/g, "_")
+        .replace(/\s+/g, " ")
+        .slice(0, 120);
+    }
+
     const els = {
-      pagesList: document.getElementById("pagesList"),
+      labelsList: document.getElementById("labelsList"),
       pagesPreview: document.getElementById("pagesPreview"),
       previewViewport: document.getElementById("previewViewport"),
       pageFormat: document.getElementById("pageFormat"),
-      btnAddFilled: document.getElementById("btnAddFilled"),
+      wbFile: document.getElementById("wbFile"),
+      btnImportWB: document.getElementById("btnImportWB"),
       btnAddEmpty: document.getElementById("btnAddEmpty"),
-      btnAddExtra: document.getElementById("btnAddExtra"),
       btnExport: document.getElementById("btnExport"),
       btnApply: document.getElementById("btnApply"),
       btnDelete: document.getElementById("btnDelete"),
+      btnGenEntrancePages: document.getElementById("btnGenEntrancePages"),
+      btnClearEntrancePages: document.getElementById("btnClearEntrancePages"),
+      globalWarehouse: document.getElementById("globalWarehouse"),
+      entranceCode: document.getElementById("entranceCode"),
       status: document.getElementById("status"),
-      updated: document.getElementById("updated"),
-      // form fields
-      f_box: document.getElementById("f_box"),
-      f_totalBoxes: document.getElementById("f_totalBoxes"),
-      f_boxesOnPallet: document.getElementById("f_boxesOnPallet"),
-      f_supply: document.getElementById("f_supply"),
-      f_dest: document.getElementById("f_dest"),
-      f_type: document.getElementById("f_type"),
-      f_org: document.getElementById("f_org"),
-      f_date: document.getElementById("f_date"),
-      f_passcode: document.getElementById("f_passcode"),
-      extraList: document.getElementById("extraList"),
+      i_text: document.getElementById("i_text"),
+      i_extra: document.getElementById("i_extra"),
+      i_width: document.getElementById("i_width"),
+      i_height: document.getElementById("i_height"),
+      i_fontSize: document.getElementById("i_fontSize"),
+      exportSurface: document.getElementById("exportSurface"),
     };
 
-    let pages = [];
+    const CONST = { quietZone: 15 };
+
+    let labels = [];
     let activeIndex = -1;
+    let entrancePages = [];
 
-    function nowHM() {
-      const d = new Date();
-      return [d.getHours(), d.getMinutes(), d.getSeconds()]
-        .map((n) => String(n).padStart(2, "0"))
-        .join(":");
-    }
-
-    function setFormat(format) {
+    function setFormatLandscape(key) {
       const root = document.documentElement.style;
-      if (format === "A5") {
-        root.setProperty("--page-width", "148mm");
-        root.setProperty("--page-height", "210mm");
-        root.setProperty("--page-padding", "14mm");
-        root.setProperty("--title-size", "22px");
-        root.setProperty("--label-size", "15px");
-        root.setProperty("--value-size", "18px");
-        root.setProperty("--line-gap-v", "10px");
-        root.setProperty("--line-height", "1.6");
-      } else {
-        root.setProperty("--page-width", "210mm");
-        root.setProperty("--page-height", "297mm");
-        root.setProperty("--page-padding", "18mm");
-        root.setProperty("--title-size", "28px");
-        root.setProperty("--label-size", "17px");
-        root.setProperty("--value-size", "21px");
-        root.setProperty("--line-gap-v", "14px");
-        root.setProperty("--line-height", "1.65");
+      switch (key) {
+        case "A5":
+          root.setProperty("--page-mm-w", "210");
+          root.setProperty("--page-mm-h", "148");
+          root.setProperty("--title-font", "16px");
+          root.setProperty("--extra-font", "12px");
+          break;
+        case "75x120":
+          root.setProperty("--page-mm-w", "120");
+          root.setProperty("--page-mm-h", "75");
+          root.setProperty("--title-font", "14px");
+          root.setProperty("--extra-font", "11px");
+          break;
+        case "58x40":
+          root.setProperty("--page-mm-w", "58");
+          root.setProperty("--page-mm-h", "40");
+          root.setProperty("--title-font", "12px");
+          root.setProperty("--extra-font", "10px");
+          break;
+        case "A4":
+        default:
+          root.setProperty("--page-mm-w", "297");
+          root.setProperty("--page-mm-h", "210");
+          root.setProperty("--title-font", "18px");
+          root.setProperty("--extra-font", "12px");
+          break;
       }
+      requestAnimationFrame(updatePreviewScale);
     }
 
-    function emptyPage() {
+    function updatePreviewScale() {
+      const sample = document.querySelector(".page-inner");
+      if (!sample) return;
+
+      // reset scale
+      document.documentElement.style.setProperty("--preview-scale", "1");
+
+      const stage = sample.closest(".page-stage");
+      if (!stage) return;
+
+      const stageRect = stage.getBoundingClientRect();
+      const pageRect = sample.getBoundingClientRect();
+
+      // guard a few px to eliminate fractional overflows
+      const guard = 6;
+      const availW = Math.max(100, stageRect.width - guard);
+
+      let scale = Math.min(1, availW / pageRect.width);
+
+      // trim to 3 decimals to avoid 1-2 px rounding overflows
+      scale = Math.max(0, Math.floor(scale * 1000) / 1000);
+
+      document.documentElement.style.setProperty(
+        "--preview-scale",
+        String(scale)
+      );
+    }
+
+    function emptyLabel() {
       return {
-        title: "УПАКОВОЧНЫЙ ЛИСТ",
-        fields: {
-          "Номер короба/паллеты": "",
-          "Кол-во коробов/паллет в поставке": "",
-          "Кол-во коробов на данной паллете": "",
-          "Номер поставки": "",
-          "Склад назначения": "",
-          "Тип поставки": "",
-          "Наименование юрлица": "",
-          "Дата поставки": "",
-        },
-        passcode: "",
-        extraRows: [],
+        text: "",
+        extraText: "",
+        options: { width: 2, height: 100, fontSize: 11 },
       };
     }
-
-    function makePagePrefilledFromFirst() {
-      if (!pages.length) return emptyPage();
-      const p0 = pages[0];
-      const p = emptyPage();
-      p.title = p0.title;
-      p.fields["Номер поставки"] = p0.fields["Номер поставки"];
-      p.fields["Склад назначения"] = p0.fields["Склад назначения"];
-      p.fields["Тип поставки"] = p0.fields["Тип поставки"];
-      p.fields["Наименование юрлица"] = p0.fields["Наименование юрлица"];
-      p.fields["Дата поставки"] = p0.fields["Дата поставки"];
-      p.passcode = p0.passcode || "";
-      p.extraRows = (p0.extraRows || []).map((r) => ({ ...r }));
-      return p;
+    function validateInput(t) {
+      return t.length > 0;
     }
-
-    function addPageFilled() {
-      if (!pages.length) {
-        alert("Сначала заполните первый лист.");
-        return;
-      }
-      pages.push(makePagePrefilledFromFirst());
-      activeIndex = pages.length - 1;
-      syncUI();
-      els.previewViewport.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-
-    function addPageEmpty() {
-      pages.push(emptyPage());
-      activeIndex = pages.length - 1;
-      syncUI();
-      els.previewViewport.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-
-    function deletePage() {
-      if (activeIndex < 0) return;
-      pages.splice(activeIndex, 1);
-      activeIndex = pages.length ? Math.min(activeIndex, pages.length - 1) : -1;
-      syncUI();
-    }
-
-    function loadEditorFromModel() {
-      const disableAll = (flag) => {
-        document
-          .querySelectorAll("#editor input")
-          .forEach((i) => (i.disabled = flag));
-      };
-      if (activeIndex < 0) {
-        disableAll(true);
-        els.extraList.innerHTML = "";
-        return;
-      }
-      disableAll(false);
-      const p = pages[activeIndex];
-      els.f_box.value = p.fields["Номер короба/паллеты"] || "";
-      els.f_totalBoxes.value = p.fields["Кол-во коробов/паллет в поставке"] || "";
-      els.f_boxesOnPallet.value =
-        p.fields["Кол-во коробов на данной паллете"] || "";
-      els.f_supply.value = p.fields["Номер поставки"] || "";
-      els.f_dest.value = p.fields["Склад назначения"] || "";
-      els.f_type.value = p.fields["Тип поставки"] || "";
-      els.f_org.value = p.fields["Наименование юрлица"] || "";
-      els.f_date.value = p.fields["Дата поставки"] || "";
-      els.f_passcode.value = p.passcode || "";
-      renderExtraRowsEditor(p.extraRows || []);
-    }
-
-    function saveEditorToModel() {
-      if (activeIndex < 0) return;
-      const p = pages[activeIndex];
-      p.fields["Номер короба/паллеты"] = (els.f_box.value || "").trim();
-      p.fields["Кол-во коробов/паллет в поставке"] =
-        (els.f_totalBoxes.value || "").trim();
-      p.fields["Кол-во коробов на данной паллете"] =
-        (els.f_boxesOnPallet.value || "").trim();
-      p.fields["Номер поставки"] = (els.f_supply.value || "").trim();
-      p.fields["Склад назначения"] = (els.f_dest.value || "").trim();
-      p.fields["Тип поставки"] = (els.f_type.value || "").trim();
-      p.fields["Наименование юрлица"] = (els.f_org.value || "").trim();
-      p.fields["Дата поставки"] = (els.f_date.value || "").trim();
-      p.passcode = (els.f_passcode.value || "").trim();
-      p.extraRows = readExtraRowsEditor();
-    }
-
-    function renderList() {
-      els.pagesList.innerHTML = pages
-        .map((p, i) => {
-          const n = (p.fields["Номер короба/паллеты"] || "").trim() || i + 1;
-          const supply = p.fields["Номер поставки"] || "—";
-          return `
-            <div class="page-item ${i === activeIndex ? "active" : ""}" data-i="${i}">
-              <div class="item-title">${p.title}</div>
-              <div class="item-sub">№ ${escapeHtml(
-            String(n)
-          )} • Поставка: ${escapeHtml(supply)} • Склад: ${escapeHtml(
-            p.fields["Склад назначения"] || "—"
-          )}</div>
-            </div>
-          `;
-        })
-        .join("");
-      els.pagesList.querySelectorAll(".page-item").forEach((el) => {
-        el.addEventListener("click", () => {
-          activeIndex = Number(el.getAttribute("data-i"));
-          loadEditorFromModel();
-          renderPreview();
-          renderList();
-        });
-      });
-    }
-
-    function renderPreview() {
-      els.updated.textContent = "Предпросмотр: " + nowHM();
-
-      els.pagesPreview.innerHTML = pages
-        .map((p) => {
-          const order = [
-            "Номер короба/паллеты",
-            "Кол-во коробов/паллет в поставке",
-            "Кол-во коробов на данной паллете",
-            "Номер поставки",
-            "Склад назначения",
-            "Тип поставки",
-            "Наименование юрлица",
-            "Дата поставки",
-          ];
-          const rowsHtml = order
-            .map(
-              (k) => `
-            <div class="label">${escapeHtml(k)}</div>
-            <div class="value">${escapeHtml(p.fields[k] || "") || "&nbsp;"}</div>
-          `
-            )
-            .join("");
-
-          const extras = p.extraRows || [];
-          const extrasHtml = extras.length
-            ? `
-            <div class="section-extra">
-              <div class="grid-extra">
-                ${extras
-              .map(
-                (r) => `
-                  <div class="label">${escapeHtml(r.label || "")}</div>
-                  <div class="value">${escapeHtml(r.value || "")}</div>
-                `
-              )
-              .join("")}
-              </div>
-            </div>`
-            : "";
-
-          const pass = (p.passcode || "").trim();
-          const passBarcode = pass
-            ? `
-            <div class="passcode-barcode">
-              <svg class="passcode-svg" data-val="${escapeHtml(pass)}"></svg>
-            </div>`
-            : "";
-
-          return `
-          <section class="page">
-            <div class="doc-title">${escapeHtml(p.title)}</div>
-            <div class="section">
-              <div class="grid-fields">
-                ${rowsHtml}
-              </div>
-            </div>
-            ${extrasHtml}
-            ${passBarcode}
-          </section>
-        `;
-        })
-        .join("");
-
-      document.querySelectorAll(".passcode-svg").forEach((svg) => {
-        const val = svg.getAttribute("data-val");
-        if (!val) return;
-        try {
-          JsBarcode(svg, val, {
-            format: "CODE128",
-            lineColor: "#111827",
-            width: 1.2,
-            height: 70,
-            displayValue: true,
-            fontSize: 14,
-            margin: 0,
-          });
-        } catch (e) {
-          console.warn("Barcode error:", e);
-        }
-      });
-    }
-
     function escapeHtml(v) {
       return String(v)
         .replace(/&/g, "&amp;")
@@ -782,169 +738,484 @@
         .replace(/'/g, "&#039;");
     }
 
-    function renderExtraRowsEditor(rows) {
-      els.extraList.innerHTML = rows.length
-        ? rows
-          .map(
-            (r, i) => `
-          <div class="extra-row" data-i="${i}">
-            <input type="text" class="extra-label" placeholder="Метка" value="${escapeHtml(
-              r.label || ""
-            )}" />
-            <input type="text" class="extra-value" placeholder="Значение" value="${escapeHtml(
-              r.value || ""
-            )}" />
-            <div class="btns">
-              <button type="button" class="secondary btn-del">Удалить</button>
-            </div>
-          </div>
-        `
-          )
-          .join("")
-        : `<div class="muted">Нет дополнительных строк</div>`;
-
-      els.extraList.querySelectorAll(".btn-del").forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-          const row = e.target.closest(".extra-row");
-          const idx = Number(row.getAttribute("data-i"));
-          pages[activeIndex].extraRows.splice(idx, 1);
-          renderExtraRowsEditor(pages[activeIndex].extraRows);
-          renderPreview();
+    function renderList() {
+      els.labelsList.innerHTML = labels
+        .map(
+          (l, i) => `
+          <div class="page-item ${i === activeIndex ? "active" : ""}" data-i="${i}">
+            <div class="item-title">${escapeHtml((l.text || "").trim() || `Этикетка ${i + 1}`)
+            }</div>
+            <div class="item-sub">${l.options.width}×${l.options.height
+            } • цифры видимы</div>
+          </div>`
+        )
+        .join("");
+      els.labelsList.querySelectorAll(".page-item").forEach((el) => {
+        el.addEventListener("click", () => {
+          activeIndex = Number(el.getAttribute("data-i"));
+          syncUI();
         });
       });
-      els.extraList
-        .querySelectorAll(".extra-label,.extra-value")
-        .forEach((inp) => {
-          inp.addEventListener("input", () => {
-            pages[activeIndex].extraRows = readExtraRowsEditor();
-            renderPreview();
-          });
-        });
-    }
-    function readExtraRowsEditor() {
-      const rows = [];
-      els.extraList.querySelectorAll(".extra-row").forEach((row) => {
-        const label = row.querySelector(".extra-label")?.value?.trim() || "";
-        const value = row.querySelector(".extra-value")?.value?.trim() || "";
-        if (label || value) rows.push({ label, value });
-      });
-      return rows;
     }
 
-    async function exportPDF() {
-      if (!pages.length) {
-        els.status.textContent = "Нет страниц для экспорта";
+    function renderLineWithBoldLast4(line) {
+      const m = line.match(/^(.*?)(?:\s*[×x]\s*)(.+)$/);
+      let code = line,
+        qty = "";
+      if (m) {
+        code = m[1];
+        qty = m[2];
+      }
+      const codeTrim = code.trim();
+      const mDigits = codeTrim.match(/(\d{1,4})\s*$/);
+      let html = "";
+      if (mDigits) {
+        const idx = codeTrim.lastIndexOf(mDigits[1]);
+        const head = codeTrim.slice(0, idx);
+        const tailBold = mDigits[1];
+        html = `${escapeHtml(head)}<span class="bold-last4">${escapeHtml(
+          tailBold
+        )}</span>`;
+      } else {
+        html = escapeHtml(codeTrim);
+      }
+      if (qty) return `${html} × ${escapeHtml(qty.trim())}`;
+      return html;
+    }
+
+    function loadEditorFromModel() {
+      const dis = (f) =>
+        [
+          els.i_text,
+          els.i_extra,
+          els.i_width,
+          els.i_height,
+          els.i_fontSize,
+        ].forEach((i) => (i.disabled = f));
+      if (activeIndex < 0) {
+        dis(true);
         return;
       }
+      dis(false);
+      const l = labels[activeIndex],
+        o = l.options;
+      els.i_text.value = l.text || "";
+      els.i_extra.value = l.extraText || "";
+      els.i_width.value = o.width;
+      els.i_height.value = o.height;
+      els.i_fontSize.value = o.fontSize;
+    }
+    function saveEditorToModel() {
+      if (activeIndex < 0) return;
+      const l = labels[activeIndex],
+        o = l.options;
+      l.text = (els.i_text.value || "").trim();
+      l.extraText = (els.i_extra.value || "").trim();
+      o.width = Math.min(10, Math.max(1, parseInt(els.i_width.value || "2", 10)));
+      o.height = Math.min(300, Math.max(20, parseInt(els.i_height.value || "100", 10)));
+      o.fontSize = Math.min(48, Math.max(8, parseInt(els.i_fontSize.value || "11", 10)));
+    }
+
+    function renderPreview() {
+      const all = [...labels, ...entrancePages];
+      els.pagesPreview.innerHTML = all
+        .map(
+          () => `
+          <div class="page-stage">
+            <section class="page-inner">
+              <div class="page-title"></div>
+              <figure class="label-figure"><svg class="barcode-svg"></svg></figure>
+              <div class="box-contents"></div>
+            </section>
+          </div>`
+        )
+        .join("");
+
+      const title = (els.globalWarehouse.value || "").trim();
+
+      document.querySelectorAll(".page-stage").forEach((stageEl, idx) => {
+        const inner = stageEl.querySelector(".page-inner");
+        inner.querySelector(".page-title").textContent = title;
+
+        const item = all[idx];
+
+        // Barcode
+        const svg = inner.querySelector(".barcode-svg");
+        if (item && validateInput(item.text)) {
+          try {
+            JsBarcode(svg, item.text, {
+              format: "CODE128",
+              lineColor: "#000000",
+              background: "#FFFFFF",
+              width: item.options.width,
+              height: item.options.height,
+              margin: CONST.quietZone,
+              displayValue: true,
+              fontOptions: "bold",
+              font: "monospace",
+              textMargin: 6,
+            });
+          } catch (e) {
+            console.warn("Barcode error:", e);
+          }
+        }
+
+        // Contents: ≤5 → single centered; ≥6 → two columns
+        const cont = inner.querySelector(".box-contents");
+        const lines = (item.extraText || "").split(/\r?\n/).filter(Boolean);
+        cont.style.fontSize = `${item.options.fontSize}px`;
+        cont.innerHTML = "";
+
+        if (lines.length <= 5) {
+          cont.classList.remove("multicol");
+          cont.classList.add("centered");
+          cont.style.columnCount = "1";
+          for (const ln of lines) {
+            const d = document.createElement("div");
+            d.innerHTML = renderLineWithBoldLast4(ln);
+            cont.appendChild(d);
+          }
+        } else {
+          cont.classList.add("multicol");
+          cont.classList.remove("centered");
+          cont.style.columnCount = "2";
+          for (const ln of lines) {
+            const d = document.createElement("div");
+            d.innerHTML = renderLineWithBoldLast4(ln);
+            cont.appendChild(d);
+          }
+        }
+      });
+
+      requestAnimationFrame(updatePreviewScale);
+    }
+
+    // Export with same rules + centered two-column grid + smart filename
+    async function exportPDF() {
+      const total = labels.length + entrancePages.length;
+      if (!total) {
+        els.status.textContent = "Нет этикеток для экспорта";
+        return;
+      }
+
       els.btnExport.disabled = true;
       const prev = els.btnExport.textContent;
       els.btnExport.textContent = "Генерация...";
       els.status.textContent = "Генерация PDF...";
 
-      const vp = els.previewViewport;
-      const usedFit = vp.classList.contains("fit-width");
-      if (usedFit) vp.classList.remove("fit-width");
-
       try {
-        const format = els.pageFormat.value.toLowerCase();
-        const supp =
-          (pages[0]?.fields?.["Номер поставки"] || "").trim() || "без_номера";
-        const filename = `Упаковочный лист поставка (${supp}).pdf`;
-
+        const fmt = els.pageFormat.value;
+        setFormatLandscape(fmt);
         renderPreview();
         await new Promise((r) => setTimeout(r, 60));
 
-        document.body.classList.add("exporting");
-
-        const exportSvgs = Array.from(
-          document.querySelectorAll(".passcode-barcode svg")
+        const JS = getJsPDF();
+        const mm2px = 3.7795275591;
+        const mmW = parseFloat(
+          getComputedStyle(document.documentElement).getPropertyValue(
+            "--page-mm-w"
+          )
         );
-        exportSvgs.forEach((s) => s.classList.add("barcode-export-narrow"));
+        const mmH = parseFloat(
+          getComputedStyle(document.documentElement).getPropertyValue(
+            "--page-mm-h"
+          )
+        );
+        const pxW = Math.round(mmW * mm2px);
+        const pxH = Math.round(mmH * mm2px);
+        const scale = fmt === "58x40" || fmt === "75x120" ? 3 : 2;
 
-        await html2pdf()
-          .set({
-            margin: 0,
-            filename,
-            image: { type: "jpeg", quality: 0.96 },
-            html2canvas: {
-              scale: 2,
-              useCORS: true,
-              backgroundColor: "#ffffff",
-            },
-            jsPDF: { unit: "mm", format, orientation: "portrait" },
-            pagebreak: { mode: ["css", "legacy"] },
-          })
-          .from(els.pagesPreview)
-          .save();
+        const surface = els.exportSurface;
+        surface.innerHTML = "";
+        surface.style.width = pxW + "px";
+        surface.style.height = pxH + "px";
 
-        document
-          .querySelectorAll(".passcode-barcode svg.barcode-export-narrow")
-          .forEach((s) => s.classList.remove("barcode-export-narrow"));
+        const pages = [...labels, ...entrancePages];
+        const titleText = (els.globalWarehouse.value || "").trim();
 
+        for (const item of pages) {
+          const page = document.createElement("section");
+          page.className = "xpage";
+          page.style.width = pxW + "px";
+          page.style.minHeight = pxH + "px";
+
+          const title = document.createElement("div");
+          title.className = "xtitle";
+          title.style.fontSize = getComputedStyle(
+            document.documentElement
+          ).getPropertyValue("--title-font");
+          title.textContent = titleText;
+          page.appendChild(title);
+
+          const fig = document.createElement("figure");
+          fig.className = "xfigure";
+          const svg = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "svg"
+          );
+          fig.appendChild(svg);
+          page.appendChild(fig);
+
+          const cont = document.createElement("div");
+          cont.className = "xcontents";
+          cont.style.fontSize = `${item.options.fontSize}px`;
+
+          const lines = (item.extraText || "").split(/\r?\n/).filter(Boolean);
+
+          if (lines.length <= 5) {
+            cont.style.textAlign = "center";
+            const wrap = document.createElement("div");
+            wrap.style.whiteSpace = "pre-wrap";
+            for (const ln of lines) {
+              const div = document.createElement("div");
+              div.innerHTML = renderLineWithBoldLast4(ln);
+              wrap.appendChild(div);
+            }
+            cont.appendChild(wrap);
+          } else {
+            const n = lines.length;
+            const leftCount = Math.floor(n / 2);
+            const rightCount = n - leftCount;
+
+            const grid = document.createElement("div");
+            grid.className = "xcols";
+
+            const left = document.createElement("div");
+            left.style.whiteSpace = "pre-wrap";
+            for (const ln of lines.slice(0, leftCount)) {
+              const div = document.createElement("div");
+              div.innerHTML = renderLineWithBoldLast4(ln);
+              left.appendChild(div);
+            }
+
+            const right = document.createElement("div");
+            right.style.whiteSpace = "pre-wrap";
+            for (const ln of lines.slice(leftCount)) {
+              const div = document.createElement("div");
+              div.innerHTML = renderLineWithBoldLast4(ln);
+              right.appendChild(div);
+            }
+
+            grid.appendChild(left);
+            grid.appendChild(right);
+            cont.appendChild(grid);
+          }
+
+          page.appendChild(cont);
+          surface.appendChild(page);
+
+          if (validateInput(item.text)) {
+            JsBarcode(svg, item.text, {
+              format: "CODE128",
+              lineColor: "#000000",
+              background: "#FFFFFF",
+              width: item.options.width,
+              height: item.options.height,
+              margin: CONST.quietZone,
+              displayValue: true,
+              fontOptions: "bold",
+              font: "monospace",
+              textMargin: 6,
+            });
+          }
+        }
+
+        // Smart filename: Warehouse + count of boxes (labels only)
+        const boxesCount = labels.length;
+        const whRaw = els.globalWarehouse.value || "";
+        const wh = safeFilePart(whRaw) || "Без_склада_и_даты";
+        const filename = `${wh} — коробов ${boxesCount}.pdf`;
+
+        const pdf = new JS({
+          unit: "mm",
+          format: [mmW, mmH],
+          orientation: "landscape",
+        });
+
+        const nodes = surface.querySelectorAll(".xpage");
+        for (let i = 0; i < nodes.length; i++) {
+          const canvas = await html2canvas(nodes[i], {
+            backgroundColor: "#ffffff",
+            scale,
+            useCORS: true,
+            scrollX: 0,
+            scrollY: 0,
+          });
+          const dataURL = canvas.toDataURL("image/jpeg", 0.98);
+          if (i > 0) pdf.addPage([mmW, mmH], "landscape");
+          pdf.addImage(dataURL, "JPEG", 0, 0, mmW, mmH);
+        }
+
+        pdf.save(filename);
         els.status.textContent = "PDF сохранён";
       } catch (e) {
         console.error(e);
         els.status.textContent = "Ошибка генерации PDF";
         alert("Ошибка при генерации PDF: " + e.message);
       } finally {
-        document.body.classList.remove("exporting");
-        if (usedFit) vp.classList.add("fit-width");
         els.btnExport.disabled = false;
-        els.btnExport.textContent = prev;
+        els.btnExport.textContent = "Скачать PDF";
+        els.exportSurface.innerHTML = "";
       }
     }
 
-    function updateViewportFit() {
-      const isMobile = window.matchMedia("(max-width: 640px)").matches;
-      if (isMobile) {
-        els.previewViewport.classList.add("fit-width");
+    // WB Import (A: item, B: qty, C: box)
+    async function importWBFile(file) {
+      if (!window.XLSX) throw new Error("XLSX library is not available");
+      els.status.textContent = "Чтение файла...";
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf, { type: "array" });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false });
+      if (!rows || rows.length < 2) {
+        els.status.textContent = "Файл пуст или без данных.";
+        return;
+      }
+      const groups = new Map();
+      for (const r of rows.slice(1)) {
+        if (!r || r.length === 0) continue;
+        const A = String(r[0] || "").trim();
+        const B = String(r[1] || "").trim();
+        const C = String(r[2] || "").trim();
+        if (!C) continue;
+        if (!groups.has(C)) groups.set(C, []);
+        if (A || B) groups.get(C).push(`${A} × ${(+B || 1)}`);
+      }
+      if (!groups.size) {
+        els.status.textContent =
+          "Не найдено данных по столбцу «ШК короба» (C).";
       } else {
-        els.previewViewport.classList.remove("fit-width");
+        labels = [];
+        for (const [box, lines] of groups.entries()) {
+          labels.push({
+            text: box,
+            extraText: lines.join("\n"),
+            options: { width: 2, height: 100, fontSize: 11 },
+          });
+        }
+        activeIndex = labels.length ? 0 : -1;
+        entrancePages = []; // reset pass pages after import
+        syncUI();
+        els.status.textContent = `Импортировано этикеток: ${labels.length}`;
       }
     }
 
-    els.btnAddFilled.addEventListener("click", addPageFilled);
-    els.btnAddEmpty.addEventListener("click", addPageEmpty);
+    function generateEntrancePages() {
+      const code = (els.entranceCode.value || "").trim();
+      if (!code) {
+        alert("Введите код пропуска авто (формат: WB-GI-1234567890).");
+        return;
+      }
+      const count = labels.length;
+      if (!count) {
+        alert("Сначала импортируйте этикетки или добавьте хотя бы одну.");
+        return;
+      }
+      entrancePages = [];
+      for (let i = 0; i < count; i++) {
+        entrancePages.push({
+          _type: "entrance",
+          text: code,
+          extraText: "",
+          options: { width: 2, height: 100, fontSize: 14 },
+        });
+      }
+      renderPreview();
+      els.status.textContent = `Добавлено страниц с пропуском: ${entrancePages.length}`;
+    }
+
+    // Clear only entrance code pages
+    function clearEntrancePages() {
+      if (!entrancePages.length) {
+        els.status.textContent = "Нет страниц пропусков для удаления";
+        return;
+      }
+      entrancePages = [];
+      renderPreview();
+      els.status.textContent = "Страницы пропусков удалены";
+    }
+
+    // Bindings
+    els.btnImportWB.addEventListener("click", async () => {
+      const f = els.wbFile.files?.[0];
+      if (!f) {
+        alert("Выберите Excel-файл (WB) перед импортом.");
+        return;
+      }
+      try {
+        await importWBFile(f);
+      } catch (e) {
+        console.error(e);
+        alert("Ошибка чтения файла: " + e.message);
+        els.status.textContent = "Ошибка чтения файла";
+      }
+    });
+
+    els.btnAddEmpty.addEventListener("click", () => {
+      labels.push(emptyLabel());
+      activeIndex = labels.length - 1;
+      syncUI();
+      setTimeout(() => els.i_text?.focus(), 50);
+    });
+
     els.btnDelete.addEventListener("click", () => {
       if (activeIndex < 0) return;
-      if (confirm("Удалить текущий лист?")) deletePage();
+      if (!confirm("Удалить текущую этикетку?")) return;
+      labels.splice(activeIndex, 1);
+      activeIndex = labels.length ? Math.min(activeIndex, labels.length - 1) : -1;
+      syncUI();
     });
+
     els.btnApply.addEventListener("click", () => {
       saveEditorToModel();
       syncUI();
       els.status.textContent = "Изменения сохранены";
     });
-    els.btnAddExtra.addEventListener("click", () => {
-      if (activeIndex < 0) return;
-      pages[activeIndex].extraRows.push({ label: "", value: "" });
-      renderExtraRowsEditor(pages[activeIndex].extraRows);
-      renderPreview();
-    });
+
     els.pageFormat.addEventListener("change", (e) => {
-      setFormat(e.target.value);
+      setFormatLandscape(e.target.value);
       renderPreview();
     });
+
+    els.btnGenEntrancePages.addEventListener("click", generateEntrancePages);
+    els.btnClearEntrancePages.addEventListener("click", clearEntrancePages);
+
+    els.globalWarehouse.addEventListener("input", renderPreview);
+
     els.btnExport.addEventListener("click", exportPDF);
 
-    document.querySelectorAll("#editor input").forEach((inp) => {
-      inp.addEventListener("input", () => {
-        saveEditorToModel();
-        renderPreview();
+    document
+      .querySelectorAll("#editor input, #editor textarea, #editor select")
+      .forEach((inp) => {
+        inp.addEventListener("input", () => {
+          saveEditorToModel();
+          renderPreview();
+        });
       });
-    });
 
-    window.addEventListener("resize", updateViewportFit);
+    // Throttled resize/orientation scaling
+    (function () {
+      let rafId = null;
+      function onResize() {
+        if (rafId) return;
+        rafId = requestAnimationFrame(() => {
+          rafId = null;
+          updatePreviewScale();
+        });
+      }
+      window.addEventListener("resize", onResize);
+      window.addEventListener("orientationchange", onResize);
+    })();
 
     function syncUI() {
       loadEditorFromModel();
       renderList();
       renderPreview();
-      updateViewportFit();
     }
 
-    // INIT
-    setFormat("A4");
-    pages.push(emptyPage());
+    // INIT — default 75×120
+    setFormatLandscape("75x120");
+    labels.push(emptyLabel());
     activeIndex = 0;
     syncUI();
   </script>
