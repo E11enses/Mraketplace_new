@@ -3,231 +3,45 @@
 
 <head>
     <meta charset="UTF-8" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Прайс — Фулфилмент и услуги | МРАКЕТПЛЕЙСЫ</title>
     <meta name="description"
-        content="Актуальный прайс на фулфилмент, приемку, упаковку, отгрузку и хранение. Москва. Звоните +7 916 240 44 26" />
+        content="Актуальный прайс на фулфилмент: забор, приемка, упаковка, отгрузка и хранение в Москве. Звоните +7 916 240 44 26." />
+    <meta name="robots" content="index,follow" />
     <link rel="canonical" href="https://mraketplace.ru/pricing.html" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ru_RU" />
+    <meta property="og:site_name" content="МРАКЕТПЛЕЙСЫ" />
     <meta property="og:title" content="Прайс — МРАКЕТПЛЕЙСЫ" />
     <meta property="og:description"
-        content="Прайс-лист на услуги: забор товара, приемка, упаковка, отгрузка, хранение." />
+        content="Прайс-лист на услуги фулфилмента: логистика, приемка, упаковка, отгрузка, хранение." />
     <meta property="og:url" content="https://mraketplace.ru/pricing.html" />
-    <meta property="og:site_name" content="МРАКЕТПЛЕЙСЫ" />
-    <meta property="og:image" content="https://mraketplace.ru/images/og-preview.jpg" />
 
-    <!-- JSON-LD -->
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "ProductCatalog",
-        "name": "Прайс-лист услуг фулфилмента",
-        "url": "https://mraketplace.ru/pricing.html",
-        "provider": {
-          "@type": "LocalBusiness",
-          "name": "МРАКЕТПЛЕЙСЫ",
-          "telephone": "+7 916 240 44 26",
-          "address": {
-            "@type": "PostalAddress",
-            "addressLocality": "Москва",
-            "addressCountry": "RU"
-          }
-        }
-      }
-    </script>
+    <!-- IMPORTANT: make sure this file exists, is public, ~1200x630, <500 KB -->
+    <meta property="og:image" content="https://mraketplace.ru/images/og-price.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Прайс-лист услуг фулфилмента" />
 
-    <!-- Favicon (same as main site) -->
-    <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Прайс — МРАКЕТПЛЕЙСЫ" />
+    <meta name="twitter:description" content="Актуальные цены на услуги фулфилмента в Москве." />
+    <meta name="twitter:image" content="https://mraketplace.ru/images/og-price.jpg" />
+
+    <!-- Favicons -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
     <link rel="manifest" href="/favicon/site.webmanifest" />
 
-    <!-- Site CSS -->
-    <link href="tooplate-minimal-white-style.css" rel="stylesheet" />
-
-    <!-- Minimal local tweaks for this page (non-invasive) -->
-    <style>
-        .pricing {
-            padding: 120px 20px;
-            background: #fff;
-        }
-
-        .pricing .container {
-            max-width: 1100px;
-        }
-
-        .pricing-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .pricing-header h1 {
-            font-size: 48px;
-            font-weight: 100;
-            letter-spacing: -1px;
-            margin-bottom: 10px;
-        }
-
-        .pricing-sub {
-            font-size: 14px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: #555;
-        }
-
-        .price-toolbar {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 12px;
-            align-items: center;
-            margin: 20px 0 30px;
-        }
-
-        .price-search {
-            border: 1px solid #000;
-            padding: 10px 12px;
-            font-size: 14px;
-            width: 100%;
-        }
-
-        .price-downloads {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-outline {
-            border: 1px solid #000;
-            background: #fff;
-            color: #000;
-            text-decoration: none;
-            padding: 10px 12px;
-            font: 700 12px/1 Inter, system-ui;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .btn-outline:hover {
-            background: #000;
-            color: #fff;
-            transition: all 0.3s ease;
-        }
-
-        details.price-group {
-            border: 1px solid #e3e3e3;
-            margin-bottom: 16px;
-            background: #fff;
-        }
-
-        details.price-group[open] {
-            border-color: #000;
-        }
-
-        summary.price-group__head {
-            cursor: pointer;
-            list-style: none;
-            padding: 16px 18px;
-            display: grid;
-            grid-template-columns: 1fr auto;
-            align-items: center;
-        }
-
-        .price-group__title {
-            font: 800 18px/1.3 Inter, system-ui;
-            letter-spacing: -0.2px;
-        }
-
-        .price-group__hint {
-            font: 600 11px/1 Inter, system-ui;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-        }
-
-        .price-table {
-            width: 100%;
-            border-top: 1px solid #e3e3e3;
-            border-collapse: collapse;
-        }
-
-        .price-table thead th {
-            text-align: left;
-            font: 700 12px/1.2 Inter, system-ui;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            padding: 12px 16px;
-            background: #fafafa;
-            border-bottom: 1px solid #e3e3e3;
-        }
-
-        .price-table tbody td {
-            padding: 12px 16px;
-            border-bottom: 1px solid #f0f0f0;
-            vertical-align: top;
-            font: 500 14px/1.5 Inter, system-ui;
-        }
-
-        .price-note {
-            color: #666;
-            font: 500 12px/1.4 Inter, system-ui;
-        }
-
-        .muted {
-            color: #666;
-        }
-
-        .price-badge {
-            display: inline-block;
-            border: 1px solid #ddd;
-            padding: 2px 6px;
-            font: 700 10px/1 Inter, system-ui;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            color: #333;
-        }
-
-        .calc-block {
-            margin-top: 50px;
-            padding: 24px;
-            border: 1px dashed #000;
-            background: #fff;
-        }
-
-        .calc-block h3 {
-            font-size: 24px;
-            font-weight: 300;
-            margin-bottom: 12px;
-            letter-spacing: -0.5px;
-        }
-
-        .calc-block p {
-            color: #666;
-        }
-
-        .price-meta {
-            margin-top: 14px;
-            color: #6b6b6b;
-            font: 500 12px/1.4 Inter, system-ui;
-        }
-
-        .links {
-            text-decoration: underline dotted;
-        }
-
-        @media (max-width: 768px) {
-            .pricing-header h1 {
-                font-size: 36px;
-            }
-
-            .price-toolbar {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <!-- Styles -->
+    <link href="/tooplate-minimal-white-style.css" rel="stylesheet" />
 </head>
 
 <body>
