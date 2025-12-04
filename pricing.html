@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Прайс — Фулфилмент и услуги | МРАКЕТПЛЕЙСЫ</title>
+    <meta name="description"
+        content="Актуальный прайс на фулфилмент, приемку, упаковку, отгрузку и хранение. Москва. Звоните +7 916 240 44 26" />
+    <link rel="canonical" href="https://mraketplace.ru/pricing.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:title" content="Прайс — МРАКЕТПЛЕЙСЫ" />
+    <meta property="og:description"
+        content="Прайс-лист на услуги: забор товара, приемка, упаковка, отгрузка, хранение." />
+    <meta property="og:url" content="https://mraketplace.ru/pricing.html" />
+    <meta property="og:site_name" content="МРАКЕТПЛЕЙСЫ" />
+    <meta property="og:image" content="https://mraketplace.ru/images/og-preview.jpg" />
+
+    <!-- JSON-LD -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "ProductCatalog",
+        "name": "Прайс-лист услуг фулфилмента",
+        "url": "https://mraketplace.ru/pricing.html",
+        "provider": {
+          "@type": "LocalBusiness",
+          "name": "МРАКЕТПЛЕЙСЫ",
+          "telephone": "+7 916 240 44 26",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Москва",
+            "addressCountry": "RU"
+          }
+        }
+      }
+    </script>
+
+    <!-- Favicon (same as main site) -->
+    <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
+    <link rel="manifest" href="/favicon/site.webmanifest" />
+
+    <!-- Site CSS -->
+    <link href="tooplate-minimal-white-style.css" rel="stylesheet" />
+
+    <!-- Minimal local tweaks for this page (non-invasive) -->
+    <style>
+        .pricing {
+            padding: 120px 20px;
+            background: #fff;
+        }
+
+        .pricing .container {
+            max-width: 1100px;
+        }
+
+        .pricing-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .pricing-header h1 {
+            font-size: 48px;
+            font-weight: 100;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+        }
+
+        .pricing-sub {
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #555;
+        }
+
+        .price-toolbar {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            align-items: center;
+            margin: 20px 0 30px;
+        }
+
+        .price-search {
+            border: 1px solid #000;
+            padding: 10px 12px;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .price-downloads {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-outline {
+            border: 1px solid #000;
+            background: #fff;
+            color: #000;
+            text-decoration: none;
+            padding: 10px 12px;
+            font: 700 12px/1 Inter, system-ui;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .btn-outline:hover {
+            background: #000;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        details.price-group {
+            border: 1px solid #e3e3e3;
+            margin-bottom: 16px;
+            background: #fff;
+        }
+
+        details.price-group[open] {
+            border-color: #000;
+        }
+
+        summary.price-group__head {
+            cursor: pointer;
+            list-style: none;
+            padding: 16px 18px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+        }
+
+        .price-group__title {
+            font: 800 18px/1.3 Inter, system-ui;
+            letter-spacing: -0.2px;
+        }
+
+        .price-group__hint {
+            font: 600 11px/1 Inter, system-ui;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .price-table {
+            width: 100%;
+            border-top: 1px solid #e3e3e3;
+            border-collapse: collapse;
+        }
+
+        .price-table thead th {
+            text-align: left;
+            font: 700 12px/1.2 Inter, system-ui;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            padding: 12px 16px;
+            background: #fafafa;
+            border-bottom: 1px solid #e3e3e3;
+        }
+
+        .price-table tbody td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: top;
+            font: 500 14px/1.5 Inter, system-ui;
+        }
+
+        .price-note {
+            color: #666;
+            font: 500 12px/1.4 Inter, system-ui;
+        }
+
+        .muted {
+            color: #666;
+        }
+
+        .price-badge {
+            display: inline-block;
+            border: 1px solid #ddd;
+            padding: 2px 6px;
+            font: 700 10px/1 Inter, system-ui;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #333;
+        }
+
+        .calc-block {
+            margin-top: 50px;
+            padding: 24px;
+            border: 1px dashed #000;
+            background: #fff;
+        }
+
+        .calc-block h3 {
+            font-size: 24px;
+            font-weight: 300;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .calc-block p {
+            color: #666;
+        }
+
+        .price-meta {
+            margin-top: 14px;
+            color: #6b6b6b;
+            font: 500 12px/1.4 Inter, system-ui;
+        }
+
+        .links {
+            text-decoration: underline dotted;
+        }
+
+        @media (max-width: 768px) {
+            .pricing-header h1 {
+                font-size: 36px;
+            }
+
+            .price-toolbar {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation (reuse your existing nav structure/classes) -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">МРАКЕТПЛЕЙСЫ</a>
+            <div class="menu-toggle" id="menuToggle">
+                <span></span><span></span><span></span>
+            </div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="/#home" class="nav-link">ГЛАВНАЯ</a></li>
+                <li><a href="/#about" class="nav-link">О НАС</a></li>
+                <li><a href="/#services" class="nav-link">УСЛУГИ</a></li>
+                <li><a href="/utilities/utilities.html" class="nav-link">ИНСТРУМЕНТЫ</a></li>
+                <li><a href="/blog/" class="nav-link">БЛОГ</a></li>
+                <li><a href="/#contact" class="nav-link">КОНТАКТЫ</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="pricing">
+        <div class="container">
+            <div class="pricing-header fade-in visible">
+                <h1>Прайс‑лист услуг</h1>
+                <div class="pricing-sub">
+                    Фулфилмент МРАКЕТПЛЕЙСЫ
+                </div>
+                <div class="price-meta">
+                    Telegram:
+                    <a class="links" href="https://t.me/mraketplace_manager">@mraketplace_manager</a>
+                    • Тел: <a class="links" href="tel:+79162404426">+7 916 240 44 26</a> •
+                    Склады: Проезд Загорского, 7к1; Орлово‑Давыдовский пер., 1
+                </div>
+            </div>
+
+            <div class="price-toolbar">
+                <input id="priceSearch" class="price-search" type="search" placeholder="Поиск по услугам и примечаниям…"
+                    aria-label="Поиск по прайс-листу" />
+                <div class="price-downloads">
+                    <a class="btn-outline" href="/price.pdf" download>Скачать PDF</a>
+                    <a class="btn-outline" href="#calc">Калькулятор</a>
+                </div>
+            </div>
+
+            <div id="priceList" class="fade-in visible">
+                <!-- 1. Забор товара -->
+                <details class="price-group">
+                    <summary class="price-group__head">
+                        <span class="price-group__title">1. Забор товара со складов в Москве</span>
+                        <span class="price-group__hint">Логистика</span>
+                    </summary>
+                    <table class="price-table" data-group="pickup">
+                        <thead>
+                            <tr>
+                                <th>Наименование услуги</th>
+                                <th>Цена</th>
+                                <th>Примечание</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-name="Въезд на территорию" data-price="от 2000"
+                                data-note="Южные Ворота, Садовод, ТЯК, ДЛ, склад клиента">
+                                <td>Въезд на территорию (Южные Ворота, Садовод, ТЯК, ДЛ, склад клиента)</td>
+                                <td>от 2000 руб</td>
+                                <td class="price-note">В соответствии с тарифами склада на дату</td>
+                            </tr>
+                            <tr data-name="Погрузка на территории склада, за короб" data-price="от 150"
+                                data-note="По тарифу склада">
+                                <td>Погрузка на территории склада, за короб</td>
+                                <td>от 150 руб</td>
+                                <td class="price-note">По тарифу склада</td>
+                            </tr>
+                            <tr data-name="Погрузка на территории склада, за палету" data-price="от 1500"
+                                data-note="По тарифу склада">
+                                <td>Погрузка на территории склада, за палету</td>
+                                <td>от 1500 руб</td>
+                                <td class="price-note">По тарифу склада</td>
+                            </tr>
+                            <tr data-name="Доставка груза на фулфилмент, за куб" data-price="от 1800"
+                                data-note="При доставке со склада клиента - под расчет">
+                                <td>Доставка груза на фулфилмент, за куб</td>
+                                <td>от 1800 руб</td>
+                                <td class="price-note">При доставке со склада клиента — под расчет</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </details>
+
+                <!-- 2. Приемка -->
+                <details class="price-group">
+                    <summary class="price-group__head">
+                        <span class="price-group__title">2. Приемка товара на фулфилменте</span>
+                        <span class="price-group__hint">Склад</span>
+                    </summary>
+                    <table class="price-table" data-group="inbound">
+                        <thead>
+                            <tr>
+                                <th>Наименование услуги</th>
+                                <th>Цена</th>
+                                <th>Примечание</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-name="Снятие и утилизация обрешетки с короба" data-price="250">
+                                <td>Снятие и утилизация обрешетки с короба</td>
+                                <td>250 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Распалечивание" data-price="500">
+                                <td>Распалечивание</td>
+                                <td>500 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Ручная разгрузка короба" data-price="70" data-note="до 60×50×40, до 25 кг">
+                                <td>Ручная разгрузка короба (до 60×50×40, до 25 кг)</td>
+                                <td>70 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Ручная разгрузка габаритного короба" data-price="90"
+                                data-note="до 100×80×80, до 50 кг">
+                                <td>Ручная разгрузка габаритного короба (до 100×80×80, до 50 кг)</td>
+                                <td>90 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Ручная разгрузка мешков, тюков" data-price="120" data-note="до 75 кг">
+                                <td>Ручная разгрузка мешков, тюков (до 75 кг)</td>
+                                <td>120 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Разгрузка паллеты" data-price="750" data-note="до 500 кг">
+                                <td>Разгрузка паллеты (до 500 кг)</td>
+                                <td>750 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </details>
+
+                <!-- 3. Обработка товара -->
+                <details class="price-group">
+                    <summary class="price-group__head">
+                        <span class="price-group__title">3. Обработка товара</span>
+                        <span class="price-group__hint">Операции</span>
+                    </summary>
+                    <table class="price-table" data-group="processing">
+                        <thead>
+                            <tr>
+                                <th>Наименование услуги</th>
+                                <th>Цена</th>
+                                <th>Примечание</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-name="Приемка (штучная)" data-price="3">
+                                <td>Приемка</td>
+                                <td>3 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Проверка на брак общая, визуальная" data-price="4">
+                                <td>Проверка на брак — общая, визуальная</td>
+                                <td>4 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Проверка на брак детальная" data-price="от 6"
+                                data-note="контроль комплектации/комплектности">
+                                <td>Проверка на брак — детальная (контроль комплектации)</td>
+                                <td>от 6 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Проверка на брак электроники" data-price="от 20">
+                                <td>Проверка на брак электроники</td>
+                                <td>от 20 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Снятие заводской упаковки" data-price="от 3">
+                                <td>Снятие заводской упаковки</td>
+                                <td>от 3 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Сборка комплектов до 5 ед." data-price="5">
+                                <td>Сборка комплектов (до 5 ед.)</td>
+                                <td>5 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Сборка комплектов до 20 ед." data-price="15">
+                                <td>Сборка комплектов (до 20 ед.)</td>
+                                <td>15 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Россыпь сыпучего товара" data-price="от 20"
+                                data-note="в индивидуальную тару">
+                                <td>Россыпь сыпучего товара в индивидуальную тару</td>
+                                <td>от 20 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </details>
+
+                <!-- 4. Упаковка -->
+                <details class="price-group">
+                    <summary class="price-group__head">
+                        <span class="price-group__title">4. Упаковка товара</span>
+                        <span class="price-group__hint">Маркировка, материалы</span>
+                    </summary>
+
+                    <!-- 4.1 Маркировка -->
+                    <table class="price-table" data-group="pack-labels" aria-label="4.1 Маркировка">
+                        <thead>
+                            <tr>
+                                <th>Маркировка</th>
+                                <th>Цена</th>
+                                <th>Примечание</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-name="Маркировка 40×30" data-price="3" data-note="услуга и материал включены">
+                                <td>Маркировка товара этикеткой 40×30 мм</td>
+                                <td>3 руб</td>
+                                <td class="price-note">Включены услуга и материал</td>
+                            </tr>
+                            <tr data-name="Маркировка 58×40" data-price="5" data-note="услуга и материал включены">
+                                <td>Маркировка товара этикеткой 58×40 мм</td>
+                                <td>5 руб</td>
+                                <td class="price-note">Включены услуга и материал</td>
+                            </tr>
+                            <tr data-name="Маркировка 75×120" data-price="7" data-note="услуга и материал включены">
+                                <td>Маркировка товара этикеткой 75×120 мм</td>
+                                <td>7 руб</td>
+                                <td class="price-note">Включены услуга и материал</td>
+                            </tr>
+                            <tr data-name="Дизайн штрихкода" data-price="от 1000" data-note="термотрансфер">
+                                <td>Разработка индивидуального дизайна штрихкода</td>
+                                <td>от 1000 руб</td>
+                                <td class="price-note">Под печать на термотрансферном принтере</td>
+                            </tr>
+                            <tr data-name="Маркировка КИЗ" data-price="5">
+                                <td>Маркировка КИЗ</td>
+                                <td>5 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Нанесение клиентской маркировки" data-price="от 5">
+                                <td>Нанесение клиентской маркировки (наклейки, шильдики и т.п.)</td>
+                                <td>от 5 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- 4.2 Индивидуальная упаковка -->
+                    <table class="price-table" data-group="pack-individual" aria-label="4.2 Индивидуальная упаковка">
+                        <thead>
+                            <tr>
+                                <th>Индивидуальная упаковка</th>
+                                <th>Цена</th>
+                                <th>Примечание</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-name="БОПП-пакет" data-price="5" data-note="материалы считаются отдельно">
+                                <td>Упаковка в БОПП‑пакет</td>
+                                <td>5 руб</td>
+                                <td class="price-note">Цена может варьироваться от веса/габаритов/категории</td>
+                            </tr>
+                            <tr data-name="Курьерский пакет" data-price="5">
+                                <td>Упаковка в курьерский пакет</td>
+                                <td>5 руб</td>
+                                <td class="price-note">Цена может варьироваться от веса/габаритов/категории</td>
+                            </tr>
+                            <tr data-name="Зиплок" data-price="5">
+                                <td>Упаковка в зиплок‑пакет</td>
+                                <td>5 руб</td>
+                                <td class="price-note">Цена может варьироваться от веса/габаритов/категории</td>
+                            </tr>
+                            <tr data-name="Слайдер" data-price="5">
+                                <td>Упаковка в слайдер‑пакет</td>
+                                <td>5 руб</td>
+                                <td class="price-note">Цена может варьироваться от веса/габаритов/категории</td>
+                            </tr>
+                            <tr data-name="ВПП пакет клапан" data-price="7">
+                                <td>ВПП‑пакет с клеевым клапаном</td>
+                                <td>7 руб</td>
+                                <td class="price-note">Цена может варьироваться от веса/габаритов/категории</td>
+                            </tr>
+                            <tr data-name="ВПП пакет без клапана" data-price="6">
+                                <td>ВПП‑пакет без клеевого клапана</td>
+                                <td>6 руб</td>
+                                <td class="price-note">Цена может варьироваться от веса/габаритов/категории</td>
+                            </tr>
+                            <tr data-name="ВПП пленка" data-price="от 14">
+                                <td>Упаковка в ВПП‑пленку</td>
+                                <td>от 14 руб</td>
+                                <td class="price-note">Цена может варьироваться от веса/габаритов/категории</td>
+                            </tr>
+                            <tr data-name="Стрейч-пленка" data-price="от 10">
+                                <td>Упаковка в стрейч‑пленку</td>
+                                <td>от 10 руб</td>
+                                <td class="price-note">Цена может варьироваться от веса/габаритов/категории</td>
+                            </tr>
+                            <tr data-name="Самосборный гофрокороб" data-price="от 8">
+                                <td>Упаковка в самосборный гофрокороб (со сборкой)</td>
+                                <td>от 8 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Четырехклапанный гофрокороб" data-price="от 10">
+                                <td>Упаковка в четырехклапанный гофрокороб (со сборкой и скотчем)</td>
+                                <td>от 10 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Тубус" data-price="от 12">
+                                <td>Упаковка в тубус</td>
+                                <td>от 12 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Заклеивание прозрачным скотчем" data-price="от 2">
+                                <td>Заклеивание прозрачным скотчем</td>
+                                <td>от 2 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- 4.3 Доп. услуги на одежду -->
+                    <table class="price-table" data-group="pack-apparel" aria-label="4.3 Доп. услуги на одежду">
+                        <thead>
+                            <tr>
+                                <th>Одежда — доп. услуги</th>
+                                <th>Цена</th>
+                                <th>Примечание</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-name="Снятие бирки производителя" data-price="от 5">
+                                <td>Снятие бирки производителя</td>
+                                <td>от 5 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Крепление бирки и биркодержателя" data-price="от 5">
+                                <td>Крепление бирки и биркодержателя</td>
+                                <td>от 5 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Изготовление бирки по заказу" data-price="от 1000">
+                                <td>Изготовление бирки по заказу клиента</td>
+                                <td>от 1000 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Определение точного размера изделия" data-price="от 125">
+                                <td>Определение точного размера изделия</td>
+                                <td>от 125 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Детальный осмотр и устранение мелкого брака" data-price="от 20">
+                                <td>Детальный осмотр и устранение мелкого брака</td>
+                                <td>от 20 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- 4.4 Прочие -->
+                    <table class="price-table" data-group="pack-misc" aria-label="4.4 Прочие услуги">
+                        <thead>
+                            <tr>
+                                <th>Прочие услуги (индивидуальное изделие)</th>
+                                <th>Цена</th>
+                                <th>Примечание</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-name="Вложение вкладыша" data-price="от 3"
+                                data-note="инструкции, купоны, батарейки, стикеры">
+                                <td>Вложение вкладыша (инструкции, купоны, батарейки, стикерпаки и т.д.)</td>
+                                <td>от 3 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Вложение подарка" data-price="от 7">
+                                <td>Вложение подарка для клиента</td>
+                                <td>от 7 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Скотч Осторожно хрупко" data-price="от 3">
+                                <td>Заклеивание скотчем «Осторожно хрупко»</td>
+                                <td>от 3 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Спецзнаки" data-price="от 10" data-note="стекло, горючее, UN 3090 и т.д.">
+                                <td>Нанесение специальных знаков (стекло, горючее, UN 3090, и т.д.)</td>
+                                <td>от 10 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Видеофиксация сборки" data-price="от 35">
+                                <td>Видеофиксация сборки</td>
+                                <td>от 35 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </details>
+
+                <!-- 5. Подготовка отгрузки -->
+                <details class="price-group">
+                    <summary class="price-group__head">
+                        <span class="price-group__title">5. Подготовка отгрузки</span>
+                        <span class="price-group__hint">Упаковка, FBO</span>
+                    </summary>
+                    <table class="price-table" data-group="ship-prep">
+                        <thead>
+                            <tr>
+                                <th>Наименование услуги</th>
+                                <th>Цена</th>
+                                <th>Примечание</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-name="Формирование транспортного короба" data-price="170"
+                                data-note="включая 60×40×40, пятислойный">
+                                <td>Формирование трансп. короба (включая пятислойный короб 60×40×40)</td>
+                                <td>170 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Заполнение пустот" data-price="от 30">
+                                <td>Заполнение пустого пространства в трансп. коробе</td>
+                                <td>от 30 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Паллетирование" data-price="750" data-note="палета и материалы включены">
+                                <td>Паллетирование (включая палету и упаковочные материалы)</td>
+                                <td>750 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Маркировка короба/палеты FBO" data-price="25">
+                                <td>Маркировка короба/палеты для поставки FBO</td>
+                                <td>25 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Печать и наклейка УЛ" data-price="25">
+                                <td>Печать и наклейка упаковочного листа</td>
+                                <td>25 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Отгрузка короба силами клиента" data-price="70">
+                                <td>Отгрузка короба со склада при поставке силами клиента</td>
+                                <td>70 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Отгрузка палеты силами клиента" data-price="750">
+                                <td>Отгрузка палеты со склада при поставке силами клиента</td>
+                                <td>750 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                            <tr data-name="Создание заявки на поставку" data-price="500" data-note="в ЛК клиента">
+                                <td>Создание заявки на поставку в ЛК клиента</td>
+                                <td>500 руб</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </details>
+
+                <!-- 6. Отгрузки, короба -->
+                <details class="price-group">
+                    <summary class="price-group__head">
+                        <span class="price-group__title">6. Отгрузки — короба</span>
+                        <span class="price-group__hint">Маршруты</span>
+                    </summary>
+                    <table class="price-table" data-group="ship-boxes">
+                        <thead>
+                            <tr>
+                                <th>Направление</th>
+                                <th>Цена</th>
+                                <th>Примечание</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-name="Москва" data-price="400" data-note="ежедневно">
+                                <td>Доставка по Москве</td>
+                                <td>400 руб</td>
+                                <td class="price-note">Отгрузки каждый день</td>
+                            </tr>
+                            <tr data-name="Коледино/Подольск/Гривно" data-price="450" data-note="ежедневно">
+                                <td>Доставка в Коледино / Подольски / Гривно</td>
+                                <td>450 руб</td>
+                                <td class="price-note">Отгрузки каждый день</td>
+                            </tr>
+                            <tr data-name="Электросталь/Обухово/Жуковский" data-price="550" data-note="ежедневно">
+                                <td>Доставка в Электросталь / Обухово / Жуковский</td>
+                                <td>550 руб</td>
+                                <td class="price-note">Отгрузки каждый день</td>
+                            </tr>
+                            <tr data-name="Алексин (Тула)" data-price="650" data-note="ежедневно">
+                                <td>Доставка в Алексин (Тула)</td>
+                                <td>650 руб</td>
+                                <td class="price-note">Отгрузки каждый день</td>
+                            </tr>
+                            <tr data-name="Казань" data-price="750" data-note="за 2 дня">
+                                <td>Доставка в Казань</td>
+                                <td>750 руб</td>
+                                <td class="price-note">Отгрузки за 2 дня до поставки</td>
+                            </tr>
+                            <tr data-name="Краснодар/Невинномысск" data-price="1000" data-note="за 5 дней">
+                                <td>Доставка в Краснодар / Невинномысск</td>
+                                <td>1000 руб</td>
+                                <td class="price-note">Отгрузки за 5 дней до поставки</td>
+                            </tr>
+                            <tr data-name="Рязань/Владимир" data-price="750" data-note="за 2 дня">
+                                <td>Доставка в Рязань / Владимир</td>
+                                <td>750 руб</td>
+                                <td class="price-note">Отгрузки за 2 дня до поставки</td>
+                            </tr>
+                            <tr data-name="Другие склады" data-price="по запросу">
+                                <td>Доставка на др. склады</td>
+                                <td>по запросу</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </details>
+
+                <!-- 7. Отгрузки, палеты -->
+                <details class="price-group">
+                    <summary class="price-group__head">
+                        <span class="price-group__title">7. Отгрузки — палеты</span>
+                        <span class="price-group__hint">Маршруты</span>
+                    </summary>
+                    <table class="price-table" data-group="ship-pallets">
+                        <thead>
+                            <tr>
+                                <th>Направление</th>
+                                <th>Цена</th>
+                                <th>Примечание</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-name="Москва" data-price="3500" data-note="ежедневно">
+                                <td>Доставка по Москве</td>
+                                <td>3500 руб</td>
+                                <td class="price-note">Отгрузки каждый день</td>
+                            </tr>
+                            <tr data-name="Коледино/Подольск/Гривно" data-price="4000" data-note="ежедневно">
+                                <td>Доставка в Коледино / Подольски / Гривно</td>
+                                <td>4000 руб</td>
+                                <td class="price-note">Отгрузки каждый день</td>
+                            </tr>
+                            <tr data-name="Электросталь/Обухово/Жуковский" data-price="5000" data-note="ежедневно">
+                                <td>Доставка в Электросталь / Обухово / Жуковский</td>
+                                <td>5000 руб</td>
+                                <td class="price-note">Отгрузки каждый день</td>
+                            </tr>
+                            <tr data-name="Алексин (Тула)" data-price="6000" data-note="ежедневно">
+                                <td>Доставка в Алексин (Тула)</td>
+                                <td>6000 руб</td>
+                                <td class="price-note">Отгрузки каждый день</td>
+                            </tr>
+                            <tr data-name="Казань" data-price="7000" data-note="за 2 дня">
+                                <td>Доставка в Казань</td>
+                                <td>7000 руб</td>
+                                <td class="price-note">Отгрузки за 2 дня до поставки</td>
+                            </tr>
+                            <tr data-name="Краснодар/Невинномысск" data-price="10000" data-note="за 5 дней">
+                                <td>Доставка в Краснодар / Невинномысск</td>
+                                <td>10000 руб</td>
+                                <td class="price-note">Отгрузки за 5 дней до поставки</td>
+                            </tr>
+                            <tr data-name="Рязань/Владимир" data-price="7500" data-note="за 2 дня">
+                                <td>Доставка в Рязань / Владимир</td>
+                                <td>7500 руб</td>
+                                <td class="price-note">Отгрузки за 2 дня до поставки</td>
+                            </tr>
+                            <tr data-name="Другие склады" data-price="по запросу">
+                                <td>Доставка на др. склады</td>
+                                <td>по запросу</td>
+                                <td class="price-note">—</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </details>
+
+                <!-- 8. Хранение -->
+                <details class="price-group">
+                    <summary class="price-group__head">
+                        <span class="price-group__title">8. Хранение</span>
+                        <span class="price-group__hint">Тарифы</span>
+                    </summary>
+                    <table class="price-table" data-group="storage">
+                        <thead>
+                            <tr>
+                                <th>Наименование</th>
+                                <th>Цена</th>
+                                <th>Примечание</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-name="Тариф на хранение" data-price="0.25" data-note="за 1 литр в день">
+                                <td>Тариф на хранение, за 1 литр в день</td>
+                                <td>0,25 руб</td>
+                                <td class="price-note">Действует система скидок при объемах</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </details>
+            </div>
+            <div class="price-meta" style="margin-top: 16px">
+                Примечание: цены «от …» зависят от категории, габаритов и сложности работ.
+                Финальная стоимость подтверждается менеджером.
+            </div>
+
+            <div id="calc" class="calc-block">
+                <h3>Калькулятор услуг (скоро)</h3>
+                <p>
+                    Здесь появится калькулятор. Вы сможете рассчитать примерную стоимость
+                    обработки вашего товара на нашем фулфилменте.
+                </p>
+                <div class="price-meta">
+                    Поддержка: <a class="links" href="mailto:info@mraketplace.ru">info@mraketplace.ru</a>
+                    • Telegram:
+                    <a class="links" href="https://t.me/m/yDxRZjA-OTdi">написать нам</a>
+                </div>
+            </div>
+
+
+        </div>
+    </section>
+    <!-- Section 5: Contact -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <div class="contact-grid fade-in">
+                <div class="contact-info">
+                    <h2>Коннект</h2>
+                    <div class="info-item">
+                        <h4>Email</h4>
+                        <p class="links"><a class="links" href="mailto:info@mraketplace.ru">info@mraketplace.ru⤴</a>
+                        </p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Phone</h4>
+                        <p class="links"><a class="links" href="tel:+79162404426">+7 916 240 44 26</a></p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Гео</h4>
+                        <p>Москва</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Whatsapp</h4>
+                        <p class="links"><a class="links" href="https://wa.me/message/LAERCUXKXQNKC1">Написать нам в
+                                WA</a></p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Telegram</h4>
+                        <p class="links"><a class="links" href="https://t.me/m/yDxRZjA-OTdi">Написать нам в
+                                Telegram</a>
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="contact-divider"></div>
+
+                <div class="contact-form">
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <input type="text" name="name" placeholder=" " required>
+                            <label>Ваше имя</label>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" name="email" placeholder=" ">
+                            <label>Ваша почта или телеграм</label>
+                        </div>
+                        <div class="form-group">
+                            <textarea name="message" rows="4" placeholder=" " required></textarea>
+                            <label>Ваше сообщение</label>
+                        </div>
+                        <button type="submit" class="submit-btn">Отправить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2021-2025 МРАКЕТПЛЕЙСЫ</p>
+        <p>Все права защищены.</p>
+        <p>ИП Куракин Егор Дмитриевич • ИНН 773167683579</p>
+        <ul>
+            <li><a href="/privacy.html">Политика Конфиденциальности</a></li>
+            <li><a href="/terms.html">Условия Использования</a></li>
+            <li><a href="/locations.html">Адреса Филиалов</a></li>
+        </ul>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="tooplate-minimal-script.js"></script>
+
+    <script>
+        // Mobile menu toggle (reuse if not in tooplate script)
+        (function () {
+            var t = document.getElementById("menuToggle");
+            var l = document.getElementById("navLinks");
+            if (t && l) {
+                t.addEventListener("click", function () {
+                    t.classList.toggle("active");
+                    l.classList.toggle("active");
+                });
+            }
+        })();
+
+        // Simple search filter across all price rows
+        (function () {
+            var input = document.getElementById("priceSearch");
+            if (!input) return;
+            input.addEventListener("input", function () {
+                var q = input.value.trim().toLowerCase();
+                var groups = document.querySelectorAll("table.price-table tbody");
+                groups.forEach(function (tbody) {
+                    var rows = tbody.querySelectorAll("tr");
+                    var anyVisible = false;
+                    rows.forEach(function (tr) {
+                        var name =
+                            (tr.getAttribute("data-name") || tr.cells[0].innerText || "")
+                                .toLowerCase();
+                        var note =
+                            (tr.getAttribute("data-note") || tr.cells[2]?.innerText || "")
+                                .toLowerCase();
+                        var price =
+                            (tr.getAttribute("data-price") || tr.cells[1]?.innerText || "")
+                                .toLowerCase();
+                        var show = !q || name.includes(q) || note.includes(q) || price.includes(q);
+                        tr.style.display = show ? "" : "none";
+                        if (show) anyVisible = true;
+                    });
+                    // Auto-close empty groups, open groups with matches
+                    var details = tbody.closest("details.price-group");
+                    if (details) {
+                        if (anyVisible && !details.open) details.open = true;
+                        if (!anyVisible && details.open && input.value) details.open = false;
+                    }
+                });
+            });
+        })();
+    </script>
+</body>
+
+</html>
