@@ -17,16 +17,13 @@
             --row-alt: #fbfdff;
             --num: #0f172a;
             --wrap-w: 98vw;
-            /* overall width clamp */
             --vh-desktop: 80vh;
 
-            /* Grid column fractions (desktop defaults)
-       We have 12 columns: [name, category, 10 numeric].
-       Below splits 45% to the two text columns (26% + 19%) and
-       the remaining 55% equally to 10 numeric columns.
-       Tweak name/category if you want (e.g., 28% / 17%). */
-            --col-name: 26%;
-            --col-cat: 19%;
+            /* Desktop grid fractions */
+            --col-name: 28%;
+            --col-cat: 22%;
+            /* numeric columns: wider than before and with a min */
+            --num-min: 110px;
             --col-num: calc((100% - var(--col-name) - var(--col-cat)) / 10);
         }
 
@@ -40,7 +37,8 @@
             margin: 0;
             background: var(--bg);
             color: var(--text);
-            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+                Helvetica, Arial;
             overflow-x: hidden;
         }
 
@@ -51,7 +49,7 @@
             backdrop-filter: saturate(150%) blur(6px);
             position: sticky;
             top: 0;
-            z-index: 10;
+            z-index: 20;
         }
 
         h1 {
@@ -145,11 +143,13 @@
             background: #fff;
             max-width: var(--wrap-w);
             margin: 0 auto;
+            position: relative;
         }
 
         .table-wrap {
             height: var(--vh-desktop);
             overflow: auto;
+            /* vertical + horizontal scroll host */
         }
 
         table {
@@ -158,11 +158,12 @@
             border-spacing: 0;
         }
 
+        /* Sticky header row only (not columns) */
         thead th {
-            position: sticky;
-            top: 0;
-            z-index: 1;
+            height: 48px;
             background: #f9fafb;
+            text-align: center;
+            vertical-align: middle;
         }
 
         th,
@@ -180,26 +181,27 @@
         tbody tr {
             display: grid;
             grid-template-columns:
-                var(--col-name)
-                /* name */
-                var(--col-cat)
-                /* category */
-                /* 10 numeric columns */
-                var(--col-num) var(--col-num) var(--col-num) var(--col-num) var(--col-num) var(--col-num) var(--col-num) var(--col-num) var(--col-num) var(--col-num);
+                var(--col-name) var(--col-cat) repeat(10, minmax(var(--num-min), var(--col-num)));
             align-items: center;
         }
 
         /* Align numeric cells to the right, text cells to the left */
-        thead th:nth-child(n+3),
-        tbody td:nth-child(n+3) {
+        thead th:nth-child(n + 3),
+        tbody td:nth-child(n + 3) {
             text-align: right;
             color: var(--num);
             font-variant-numeric: tabular-nums;
         }
 
-        thead th:nth-child(-n+2),
-        tbody td:nth-child(-n+2) {
+        thead th:nth-child(-n + 2),
+        tbody td:nth-child(-n + 2) {
             text-align: left;
+        }
+
+        /* Name/Category wrap allowed to free horizontal space */
+        thead th:nth-child(-n + 2),
+        tbody td:nth-child(-n + 2) {
+            white-space: normal;
         }
 
         tbody tr:nth-child(2n) td {
@@ -234,25 +236,111 @@
             content: "▼";
         }
 
+        /* Two-line numeric headers: allow wrapping and center them */
+        thead th.num {
+            white-space: normal;
+            line-height: 1.15;
+            text-align: right;
+            /* keep alignment consistent with numbers */
+        }
+
+        thead th.num .h2 {
+            display: inline-block;
+        }
+
+        thead th.num .br {
+            display: block;
+        }
+
+        /* 1) Remove bottom borders from body cells; keep header borders */
+        tbody td {
+            border-bottom: none;
+            position: relative;
+        }
+
+        /* 2) Draw a uniform row separator using a pseudo-element that spans full width */
+        tbody tr {
+            position: relative;
+        }
+
+        tbody tr::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 1px;
+            background: var(--border-soft);
+            pointer-events: none;
+            transform: translateZ(0);
+            /* avoids blurring on some devices */
+        }
+
+        /* 3) Preserve zebra striping without gaps even with variable cell heights */
+        tbody tr:nth-child(2n) td {
+            background: var(--row-alt);
+        }
+
+        /* Optional: keep header’s bottom border slightly stronger for separation */
+        thead th {
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* Optional: when using virtual spacers, make their row separators invisible */
+        tbody tr[style*="height"]::after {
+            background: transparent;
+        }
+
+
         /* Responsiveness */
         @media (max-width: 1200px) {
             :root {
-                /* Give a bit more to text columns when space is tighter */
-                --col-name: 28%;
-                --col-cat: 20%;
+                --col-name: 30%;
+                --col-cat: 24%;
                 --col-num: calc((100% - var(--col-name) - var(--col-cat)) / 10);
+                --num-min: 120px;
             }
         }
 
+        /* Mobile: no sticky columns; horizontal scroll; keep header sticky */
         @media (max-width: 899px) {
+            :root {
+                --col-name: 54%;
+                --col-cat: 34%;
+                --col-num: calc((100% - var(--col-name) - var(--col-cat)) / 10);
+                --vh-desktop: 70vh;
+                --num-min: 120px;
+                /* helps keep at least 2–3 numeric columns visible */
+            }
 
             th,
             td {
                 padding: 8px 10px;
             }
 
-            .filters {
-                grid-template-columns: 1fr;
+            /* Numeric columns single-line and slightly smaller */
+            thead th:nth-child(n + 3),
+            tbody td:nth-child(n + 3) {
+                white-space: nowrap;
+                font-size: 13px;
+            }
+
+            .table-wrap {
+                -webkit-overflow-scrolling: touch;
+                overscroll-behavior: contain;
+            }
+        }
+
+        @media (max-width: 360px) {
+
+            thead th:nth-child(n + 3),
+            tbody td:nth-child(n + 3) {
+                font-size: 12px;
+            }
+
+            th,
+            td {
+                padding: 6px 6px;
             }
         }
     </style>
@@ -260,10 +348,12 @@
 
 <body>
     <header class="header">
-        <a style="text-decoration: none; color:black;" href="/utilities/utilities.html">⬅︎ Все инструменты</a>
+        <a style="text-decoration: none; color: black" href="/utilities/utilities.html">⬅︎ Все инструменты</a>
         <h1>Комиссии по товарным категориям на Ozon</h1>
         <div class="topbar">
-            <div class="search-wrap"><input id="q" type="text" placeholder="поиск: товар" /></div>
+            <div class="search-wrap">
+                <input id="q" type="text" placeholder="поиск: товар" />
+            </div>
             <button id="btnReload">Обновить</button>
         </div>
         <div class="filters">
@@ -279,33 +369,53 @@
             <div id="updated" class="updated">Обновлено: —:—:—</div>
         </div>
     </header>
+
     <main class="container">
         <div class="panel">
             <div class="table-outer">
-                <div class="table-wrap">
+                <div class="table-wrap" id="scrollHost">
                     <table id="grid">
                         <thead>
                             <tr>
-                                <th data-key="subjectName" data-sort="text">
+                                <th data-key="subjectName" data-sort="text" title="Товар">
                                     <span class="th-sort">Товар <span class="arrow"></span></span>
                                 </th>
-                                <th data-key="category" data-sort="text">
+                                <th data-key="category" data-sort="text" title="Категория">
                                     <span class="th-sort">Категория <span class="arrow"></span></span>
                                 </th>
-                                <th data-key="fbo0_100" data-sort="num" title="FBO до 100 руб.">FBO ≤100</th>
-                                <th data-key="fbo100_300" data-sort="num" title="FBO свыше 100 до 300 руб.">FBO 100–300
+
+                                <!-- Two-line headers; keep native title tooltips -->
+                                <th class="num" data-key="fbo0_100" data-sort="num" title="FBO до 100 руб.">
+                                    <span class="h2">FBO<span class="br"></span>≤100</span>
                                 </th>
-                                <th data-key="fbo300_500" data-sort="num" title="FBO свыше 300 до 500 руб.">FBO 300–500
+                                <th class="num" data-key="fbo100_300" data-sort="num" title="FBO свыше 100 до 300 руб.">
+                                    <span class="h2">FBO<span class="br"></span>100–300</span>
                                 </th>
-                                <th data-key="fbo500_1500" data-sort="num" title="FBO свыше 500 до 1500 руб.">FBO
-                                    500–1500</th>
-                                <th data-key="fbo1500plus" data-sort="num" title="FBO свыше 1500 руб.">FBO 1500+</th>
-                                <th data-key="fboFresh" data-sort="num" title="FBO Fresh">FBO Fresh</th>
-                                <th data-key="fbs0_100" data-sort="num" title="FBS до 100 руб.">FBS ≤100</th>
-                                <th data-key="fbs100_300" data-sort="num" title="FBS свыше 100 до 300 руб.">FBS 100–300
+                                <th class="num" data-key="fbo300_500" data-sort="num" title="FBO свыше 300 до 500 руб.">
+                                    <span class="h2">FBO<span class="br"></span>300–500</span>
                                 </th>
-                                <th data-key="fbs300plus" data-sort="num" title="FBS свыше 300 руб.">FBS 300+</th>
-                                <th data-key="rfbs" data-sort="num" title="RFBS">RFBS</th>
+                                <th class="num" data-key="fbo500_1500" data-sort="num"
+                                    title="FBO свыше 500 до 1500 руб.">
+                                    <span class="h2">FBO<span class="br"></span>500–1500</span>
+                                </th>
+                                <th class="num" data-key="fbo1500plus" data-sort="num" title="FBO свыше 1500 руб.">
+                                    <span class="h2">FBO<span class="br"></span>1500+</span>
+                                </th>
+                                <th class="num" data-key="fboFresh" data-sort="num" title="FBO Fresh">
+                                    <span class="h2">FBO<span class="br"></span>Fresh</span>
+                                </th>
+                                <th class="num" data-key="fbs0_100" data-sort="num" title="FBS до 100 руб.">
+                                    <span class="h2">FBS<span class="br"></span>≤100</span>
+                                </th>
+                                <th class="num" data-key="fbs100_300" data-sort="num" title="FBS свыше 100 до 300 руб.">
+                                    <span class="h2">FBS<span class="br"></span>100–300</span>
+                                </th>
+                                <th class="num" data-key="fbs300plus" data-sort="num" title="FBS свыше 300 руб.">
+                                    <span class="h2">FBS<span class="br"></span>300+</span>
+                                </th>
+                                <th class="num" data-key="rfbs" data-sort="num" title="RFBS">
+                                    <span class="h2">RFBS</span>
+                                </th>
                             </tr>
                         </thead>
                         <tbody id="tbody">
@@ -321,148 +431,251 @@
 
     <script>
         const els = {
-            q: document.getElementById('q'),
-            btnReload: document.getElementById('btnReload'),
-            status: document.getElementById('status'),
-            updated: document.getElementById('updated'),
-            tbody: document.getElementById('tbody'),
-            fCategory: document.getElementById('fCategory'),
-            table: document.getElementById('grid'),
+            q: document.getElementById("q"),
+            btnReload: document.getElementById("btnReload"),
+            status: document.getElementById("status"),
+            updated: document.getElementById("updated"),
+            tbody: document.getElementById("tbody"),
+            fCategory: document.getElementById("fCategory"),
+            table: document.getElementById("grid"),
+            scrollHost: document.getElementById("scrollHost"),
         };
 
         let raw = [];
         let filtered = [];
-        const coll = new Intl.Collator('ru');
+        const coll = new Intl.Collator("ru");
         let sortState =
-            JSON.parse(localStorage.getItem('ozon_comm_sort') || 'null') ||
-            { key: 'subjectName', dir: 'asc' };
+            JSON.parse(localStorage.getItem("ozon_comm_sort") || "null") || {
+                key: "subjectName",
+                dir: "asc",
+            };
+
+        // Virtualization controls
+        const USE_VIRTUAL = true;
+        const ROW_HEIGHT = 56; // slightly larger to account for wrapped headers and row padding
+        const OVERSCAN = 8;
+
+        let vState = { start: 0, end: 0, total: 0, topPad: 0, bottomPad: 0 };
 
         function fmtTimeNow() {
             const d = new Date();
-            const pad = (n) => String(n).padStart(2, '0');
-            return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+            const pad = (n) => String(n).padStart(2, "0");
+            return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(
+                d.getSeconds()
+            )}`;
         }
 
         function escapeHtml(v) {
-            return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+            return String(v)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         }
-        function s(v) { return v == null ? '—' : String(v); }
+        function s(v) {
+            return v == null ? "—" : String(v);
+        }
 
         function buildCategories(list) {
             const set = new Set();
             for (const r of list) if (r.category) set.add(r.category);
-            const arr = Array.from(set).sort((a, b) => a.localeCompare(b, 'ru'));
+            const arr = Array.from(set).sort((a, b) => a.localeCompare(b, "ru"));
             els.fCategory.innerHTML =
-                '<option value="">Все</option>' + arr.map(v => `<option>${escapeHtml(v)}</option>`).join('');
+                '<option value="">Все</option>' +
+                arr.map((v) => `<option>${escapeHtml(v)}</option>`).join("");
         }
 
         function applyFilters() {
-            const q = (els.q.value || '').trim().toLowerCase();
-            const cat = els.fCategory.value || '';
+            const q = (els.q.value || "").trim().toLowerCase();
+            const cat = els.fCategory.value || "";
             filtered = raw.filter((r) => {
-                if (q && !(r._name_lc || '').includes(q)) return false;
+                if (q && !(r._name_lc || "").includes(q)) return false;
                 if (cat && r.category !== cat) return false;
                 return true;
             });
             sortData();
-            renderTable();
+            render();
             els.status.textContent = `Найдено позиций — ${filtered.length}`;
         }
 
         function sortData() {
             const { key, dir } = sortState || {};
             if (!key) return;
-            const asc = dir === 'asc';
-            if (key === 'subjectName' || key === 'category') {
+            const asc = dir === "asc";
+            if (key === "subjectName" || key === "category") {
                 filtered.sort((a, b) =>
-                    asc ? coll.compare(a[key] || '', b[key] || '') : coll.compare(b[key] || '', a[key] || '')
+                    asc
+                        ? coll.compare(a[key] || "", b[key] || "")
+                        : coll.compare(b[key] || "", a[key] || "")
                 );
             } else {
                 filtered.sort((a, b) => {
-                    const na = Number(a[key]); const nb = Number(b[key]);
-                    const av = Number.isFinite(na), bv = Number.isFinite(nb);
+                    const na = Number(a[key]);
+                    const nb = Number(b[key]);
+                    const av = Number.isFinite(na),
+                        bv = Number.isFinite(nb);
                     if (!av && !bv) return 0;
                     if (!av) return 1;
                     if (!bv) return -1;
                     return asc ? na - nb : nb - na;
                 });
             }
-            document.querySelectorAll('thead th[data-sort]').forEach(th => th.classList.remove('sorted'));
+            document
+                .querySelectorAll("thead th[data-sort]")
+                .forEach((th) => th.classList.remove("sorted"));
             const th = document.querySelector(`thead th[data-key="${key}"]`);
-            if (th) { th.classList.add('sorted'); th.setAttribute('data-dir', dir); }
-            localStorage.setItem('ozon_comm_sort', JSON.stringify(sortState));
+            if (th) {
+                th.classList.add("sorted");
+                th.setAttribute("data-dir", dir);
+            }
+            localStorage.setItem("ozon_comm_sort", JSON.stringify(sortState));
         }
 
-        function renderTable() {
+        function rowHtml(r) {
+            return `
+          <tr>
+            <td title="${escapeHtml(r.subjectName || "—")}">
+              ${escapeHtml(r.subjectName || "—")}
+            </td>
+            <td title="${escapeHtml(r.category || "—")}">
+              ${escapeHtml(r.category || "—")}
+            </td>
+            <td title="FBO до 100 руб.">${s(r.fbo0_100)}%</td>
+            <td title="FBO свыше 100 до 300 руб.">${s(r.fbo100_300)}%</td>
+            <td title="FBO свыше 300 до 500 руб.">${s(r.fbo300_500)}%</td>
+            <td title="FBO свыше 500 до 1500 руб.">${s(r.fbo500_1500)}%</td>
+            <td title="FBO свыше 1500 руб.">${s(r.fbo1500plus)}%</td>
+            <td title="FBO Fresh">${s(r.fboFresh)}%</td>
+            <td title="FBS до 100 руб.">${s(r.fbs0_100)}%</td>
+            <td title="FBS свыше 100 до 300 руб.">${s(r.fbs100_300)}%</td>
+            <td title="FBS свыше 300 руб.">${s(r.fbs300plus)}%</td>
+            <td title="RFBS">${s(r.rfbs)}%</td>
+          </tr>
+        `;
+        }
+
+        function renderAll() {
             if (!filtered.length) {
-                els.tbody.innerHTML = '<tr><td colspan="12" class="muted">Данные не найдены</td></tr>';
+                els.tbody.innerHTML =
+                    '<tr><td colspan="12" class="muted">Данные не найдены</td></tr>';
                 return;
             }
-            const rows = filtered.map(r => `
-      <tr>
-        <td>${escapeHtml(r.subjectName || '—')}</td>
-        <td>${escapeHtml(r.category || '—')}</td>
-        <td>${s(r.fbo0_100)}%</td>
-        <td>${s(r.fbo100_300)}%</td>
-        <td>${s(r.fbo300_500)}%</td>
-        <td>${s(r.fbo500_1500)}%</td>
-        <td>${s(r.fbo1500plus)}%</td>
-        <td>${s(r.fboFresh)}%</td>
-        <td>${s(r.fbs0_100)}%</td>
-        <td>${s(r.fbs100_300)}%</td>
-        <td>${s(r.fbs300plus)}%</td>
-        <td>${s(r.rfbs)}%</td>
-      </tr>
-    `);
-            els.tbody.innerHTML = rows.join('');
+            els.tbody.innerHTML = filtered.map(rowHtml).join("");
+        }
+
+        function computeWindow() {
+            const host = els.scrollHost;
+            const viewH = host.clientHeight || 600;
+            const scrollTop = host.scrollTop || 0;
+
+            const est = ROW_HEIGHT;
+            const total = filtered.length;
+
+            let start = Math.max(Math.floor(scrollTop / est) - OVERSCAN, 0);
+            let visibleCount = Math.ceil(viewH / est) + OVERSCAN * 2;
+            let end = Math.min(start + visibleCount, total);
+
+            const topPad = start * est;
+            const bottomPad = Math.max((total - end) * est, 0);
+
+            vState = { start, end, total, topPad, bottomPad };
+        }
+
+        function renderVirtual() {
+            if (!filtered.length) {
+                els.tbody.innerHTML =
+                    '<tr><td colspan="12" class="muted">Данные не найдены</td></tr>';
+                return;
+            }
+            computeWindow();
+            const { start, end, topPad, bottomPad } = vState;
+
+            const topSpacer =
+                start > 0
+                    ? `<tr style="height:${topPad}px"><td colspan="12"></td></tr>`
+                    : "";
+            const bottomSpacer =
+                bottomPad > 0
+                    ? `<tr style="height:${bottomPad}px"><td colspan="12"></td></tr>`
+                    : "";
+
+            let rows = "";
+            for (let i = start; i < end; i++) rows += rowHtml(filtered[i]);
+
+            els.tbody.innerHTML = topSpacer + rows + bottomSpacer;
+        }
+
+        function render() {
+            if (USE_VIRTUAL) renderVirtual();
+            else renderAll();
         }
 
         async function safeJson(res) {
             const text = await res.text();
             if (!text) return null;
-            try { return JSON.parse(text); } catch { return null; }
+            try {
+                return JSON.parse(text);
+            } catch {
+                return null;
+            }
         }
 
         async function loadData() {
-            els.tbody.innerHTML = '<tr><td colspan="12" class="muted">Загрузка…</td></tr>';
+            els.tbody.innerHTML =
+                '<tr><td colspan="12" class="muted">Загрузка…</td></tr>';
             try {
-                const res = await fetch('/api/data/ozon-commissions.json', { headers: { Accept: 'application/json' } });
+                const res = await fetch("/api/data/ozon-commissions.json", {
+                    headers: { Accept: "application/json" },
+                });
                 const data = await safeJson(res);
                 raw = res.ok && Array.isArray(data) ? data : [];
-                for (const r of raw) r._name_lc = (r.subjectName || '').toLowerCase();
+                for (const r of raw)
+                    r._name_lc = (r.subjectName || "").toLowerCase();
 
-                els.updated.textContent = 'Обновлено: ' + fmtTimeNow();
+                els.updated.textContent = "Обновлено: " + fmtTimeNow();
                 buildCategories(raw);
                 applyFilters();
             } catch (e) {
                 console.error(e);
-                els.tbody.innerHTML = '<tr><td colspan="12" class="muted">Ошибка загрузки</td></tr>';
-                els.status.textContent = 'Ошибка загрузки';
-                els.updated.textContent = 'Обновлено: ошибка';
+                els.tbody.innerHTML =
+                    '<tr><td colspan="12" class="muted">Ошибка загрузки</td></tr>';
+                els.status.textContent = "Ошибка загрузки";
+                els.updated.textContent = "Обновлено: ошибка";
             }
         }
 
         // Sort header click
-        document.querySelectorAll('thead th[data-sort]').forEach(th => {
-            th.addEventListener('click', () => {
-                const key = th.getAttribute('data-key');
-                if (sortState.key === key) sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
-                else { sortState.key = key; sortState.dir = 'asc'; }
+        document.querySelectorAll("thead th[data-sort]").forEach((th) => {
+            th.addEventListener("click", () => {
+                const key = th.getAttribute("data-key");
+                if (sortState.key === key)
+                    sortState.dir = sortState.dir === "asc" ? "desc" : "asc";
+                else {
+                    sortState.key = key;
+                    sortState.dir = "asc";
+                }
                 applyFilters();
             });
         });
 
         // Inputs
-        els.q.addEventListener('input', () => {
-            // Debounce lightly
+        els.q.addEventListener("input", () => {
             clearTimeout(window.__ozonQ);
             window.__ozonQ = setTimeout(applyFilters, 150);
         });
-        els.fCategory.addEventListener('change', applyFilters);
-        document.getElementById('btnReload').addEventListener('click', loadData);
+        els.fCategory.addEventListener("change", applyFilters);
+        document.getElementById("btnReload").addEventListener("click", loadData);
 
-        document.addEventListener('DOMContentLoaded', () => {
+        // Virtual scroll event binding
+        els.scrollHost.addEventListener("scroll", () => {
+            if (USE_VIRTUAL) renderVirtual();
+        });
+        window.addEventListener("resize", () => {
+            if (USE_VIRTUAL) renderVirtual();
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
             loadData();
         });
     </script>
