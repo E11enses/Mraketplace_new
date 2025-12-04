@@ -244,103 +244,15 @@
             }
         }
 
-        @media (max-width: 1024px) {
-            .table-wrap {
-                height: 75vh;
-            }
+        @media (max-width: 899px) {
 
             th,
             td {
-                font-size: 13px;
                 padding: 8px 10px;
             }
 
-            :root {
-                /* WB-like text priority on smaller screens */
-                --col-name: 30%;
-                --col-cat: 22%;
-                --col-num: calc((100% - var(--col-name) - var(--col-cat)) / 10);
-            }
-        }
-
-        /* Large phones / small tablets (portrait) */
-        @media (max-width: 820px) {
-            .table-wrap {
-                height: 68vh;
-            }
-
-            th,
-            td {
-                font-size: 12.5px;
-                padding: 7px 9px;
-            }
-
-            thead th:nth-child(n+3),
-            tbody td:nth-child(n+3) {
-                /* WB keeps numbers clear but compact */
-                font-size: 12.5px;
-                padding-left: 6px;
-                padding-right: 6px;
-            }
-
-            :root {
-                --col-name: 34%;
-                --col-cat: 24%;
-                --col-num: calc((100% - var(--col-name) - var(--col-cat)) / 10);
-            }
-        }
-
-        /* Typical phones */
-        @media (max-width: 640px) {
-            .table-wrap {
-                height: 65vh;
-            }
-
-            th,
-            td {
-                font-size: 12.5px;
-                padding: 7px 8px;
-            }
-
-            thead th:nth-child(n+3),
-            tbody td:nth-child(n+3) {
-                font-size: 12.5px;
-                padding-left: 5px;
-                padding-right: 5px;
-            }
-
-            :root {
-                /* WB-like balance: text ≈ 60% total, numbers share ≈ 40% */
-                --col-name: 36%;
-                --col-cat: 24%;
-                --col-num: calc((100% - var(--col-name) - var(--col-cat)) / 10);
-            }
-        }
-
-        /* Small phones */
-        @media (max-width: 420px) {
-            .table-wrap {
-                height: 60vh;
-            }
-
-            th,
-            td {
-                font-size: 12px;
-                padding: 6px 7px;
-            }
-
-            thead th:nth-child(n+3),
-            tbody td:nth-child(n+3) {
-                font-size: 12px;
-                padding-left: 4px;
-                padding-right: 4px;
-            }
-
-            :root {
-                /* Give a bit more to Name, WB style on very small screens */
-                --col-name: 38%;
-                --col-cat: 22%;
-                --col-num: calc((100% - var(--col-name) - var(--col-cat)) / 10);
+            .filters {
+                grid-template-columns: 1fr;
             }
         }
     </style>
