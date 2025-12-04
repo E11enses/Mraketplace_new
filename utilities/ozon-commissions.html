@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Ozon — Комиссии по категориям товара</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        :root {
+            --bg: #f6f7fb;
+            --card: #ffffff;
+            --text: #111827;
+            --muted: #6b7280;
+            --accent: #2563eb;
+            --border: #e5e7eb;
+            --border-soft: #eef2f7;
+            --row-alt: #fbfdff;
+            --num: #0f172a;
+            --wrap-w: 98vw;
+            /* overall width clamp */
+            --vh-desktop: 80vh;
+
+            /* Grid column fractions (desktop defaults)
+       We have 12 columns: [name, category, 10 numeric].
+       Below splits 45% to the two text columns (26% + 19%) and
+       the remaining 55% equally to 10 numeric columns.
+       Tweak name/category if you want (e.g., 28% / 17%). */
+            --col-name: 26%;
+            --col-cat: 19%;
+            --col-num: calc((100% - var(--col-name) - var(--col-cat)) / 10);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+            overflow-x: hidden;
+        }
+
+        .header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            background: #ffffffcc;
+            backdrop-filter: saturate(150%) blur(6px);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 20px;
+        }
+
+        .topbar {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .search-wrap input {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 10px;
+            width: 100%;
+        }
+
+        button {
+            background: var(--accent);
+            color: #fff;
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .filters {
+            display: grid;
+            gap: 8px;
+            grid-template-columns: minmax(220px, 320px) auto;
+            align-items: end;
+            margin-top: 10px;
+        }
+
+        .filters .field {
+            display: grid;
+            gap: 4px;
+        }
+
+        .filters label {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .filters select {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 10px;
+            width: 100%;
+        }
+
+        .status-row {
+            margin-top: 8px;
+            font-size: 14px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .updated {
+            color: var(--muted);
+            margin-left: auto;
+        }
+
+        .ok {
+            color: #059669;
+        }
+
+        .container {
+            padding: 12px 16px 16px;
+        }
+
+        .panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px;
+        }
+
+        .table-outer {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            background: #fff;
+            max-width: var(--wrap-w);
+            margin: 0 auto;
+        }
+
+        .table-wrap {
+            height: var(--vh-desktop);
+            overflow: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        thead th {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background: #f9fafb;
+        }
+
+        th,
+        td {
+            border-bottom: 1px solid var(--border-soft);
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 10px 12px;
+        }
+
+        /* Grid alignment in both header and body rows */
+        thead tr,
+        tbody tr {
+            display: grid;
+            grid-template-columns:
+                var(--col-name)
+                /* name */
+                var(--col-cat)
+                /* category */
+                /* 10 numeric columns */
+                var(--col-num) var(--col-num) var(--col-num) var(--col-num) var(--col-num) var(--col-num) var(--col-num) var(--col-num) var(--col-num) var(--col-num);
+            align-items: center;
+        }
+
+        /* Align numeric cells to the right, text cells to the left */
+        thead th:nth-child(n+3),
+        tbody td:nth-child(n+3) {
+            text-align: right;
+            color: var(--num);
+            font-variant-numeric: tabular-nums;
+        }
+
+        thead th:nth-child(-n+2),
+        tbody td:nth-child(-n+2) {
+            text-align: left;
+        }
+
+        tbody tr:nth-child(2n) td {
+            background: var(--row-alt);
+        }
+
+        .muted {
+            color: var(--muted);
+        }
+
+        .th-sort {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .th-sort .arrow {
+            font-size: 12px;
+            color: var(--muted);
+            visibility: hidden;
+        }
+
+        th[data-sort].sorted .arrow {
+            visibility: visible;
+        }
+
+        th[data-sort][data-dir="asc"].sorted .arrow::after {
+            content: "▲";
+        }
+
+        th[data-sort][data-dir="desc"].sorted .arrow::after {
+            content: "▼";
+        }
+
+        /* Responsiveness */
+        @media (max-width: 1200px) {
+            :root {
+                /* Give a bit more to text columns when space is tighter */
+                --col-name: 28%;
+                --col-cat: 20%;
+                --col-num: calc((100% - var(--col-name) - var(--col-cat)) / 10);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .table-wrap {
+                height: 75vh;
+            }
+
+            th,
+            td {
+                font-size: 13px;
+                padding: 8px 10px;
+            }
+
+            :root {
+                /* WB-like text priority on smaller screens */
+                --col-name: 30%;
+                --col-cat: 22%;
+                --col-num: calc((100% - var(--col-name) - var(--col-cat)) / 10);
+            }
+        }
+
+        /* Large phones / small tablets (portrait) */
+        @media (max-width: 820px) {
+            .table-wrap {
+                height: 68vh;
+            }
+
+            th,
+            td {
+                font-size: 12.5px;
+                padding: 7px 9px;
+            }
+
+            thead th:nth-child(n+3),
+            tbody td:nth-child(n+3) {
+                /* WB keeps numbers clear but compact */
+                font-size: 12.5px;
+                padding-left: 6px;
+                padding-right: 6px;
+            }
+
+            :root {
+                --col-name: 34%;
+                --col-cat: 24%;
+                --col-num: calc((100% - var(--col-name) - var(--col-cat)) / 10);
+            }
+        }
+
+        /* Typical phones */
+        @media (max-width: 640px) {
+            .table-wrap {
+                height: 65vh;
+            }
+
+            th,
+            td {
+                font-size: 12.5px;
+                padding: 7px 8px;
+            }
+
+            thead th:nth-child(n+3),
+            tbody td:nth-child(n+3) {
+                font-size: 12.5px;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+
+            :root {
+                /* WB-like balance: text ≈ 60% total, numbers share ≈ 40% */
+                --col-name: 36%;
+                --col-cat: 24%;
+                --col-num: calc((100% - var(--col-name) - var(--col-cat)) / 10);
+            }
+        }
+
+        /* Small phones */
+        @media (max-width: 420px) {
+            .table-wrap {
+                height: 60vh;
+            }
+
+            th,
+            td {
+                font-size: 12px;
+                padding: 6px 7px;
+            }
+
+            thead th:nth-child(n+3),
+            tbody td:nth-child(n+3) {
+                font-size: 12px;
+                padding-left: 4px;
+                padding-right: 4px;
+            }
+
+            :root {
+                /* Give a bit more to Name, WB style on very small screens */
+                --col-name: 38%;
+                --col-cat: 22%;
+                --col-num: calc((100% - var(--col-name) - var(--col-cat)) / 10);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <a style="text-decoration: none; color:black;" href="/utilities/utilities.html">⬅︎ Все инструменты</a>
+        <h1>Комиссии по товарным категориям на Ozon</h1>
+        <div class="topbar">
+            <div class="search-wrap"><input id="q" type="text" placeholder="поиск: товар" /></div>
+            <button id="btnReload">Обновить</button>
+        </div>
+        <div class="filters">
+            <div class="field">
+                <label>Категория</label>
+                <select id="fCategory">
+                    <option value="">Все</option>
+                </select>
+            </div>
+        </div>
+        <div class="status-row">
+            <div id="status" class="ok">Найдено позиций — 0</div>
+            <div id="updated" class="updated">Обновлено: —:—:—</div>
+        </div>
+    </header>
+    <main class="container">
+        <div class="panel">
+            <div class="table-outer">
+                <div class="table-wrap">
+                    <table id="grid">
+                        <thead>
+                            <tr>
+                                <th data-key="subjectName" data-sort="text">
+                                    <span class="th-sort">Товар <span class="arrow"></span></span>
+                                </th>
+                                <th data-key="category" data-sort="text">
+                                    <span class="th-sort">Категория <span class="arrow"></span></span>
+                                </th>
+                                <th data-key="fbo0_100" data-sort="num" title="FBO до 100 руб.">FBO ≤100</th>
+                                <th data-key="fbo100_300" data-sort="num" title="FBO свыше 100 до 300 руб.">FBO 100–300
+                                </th>
+                                <th data-key="fbo300_500" data-sort="num" title="FBO свыше 300 до 500 руб.">FBO 300–500
+                                </th>
+                                <th data-key="fbo500_1500" data-sort="num" title="FBO свыше 500 до 1500 руб.">FBO
+                                    500–1500</th>
+                                <th data-key="fbo1500plus" data-sort="num" title="FBO свыше 1500 руб.">FBO 1500+</th>
+                                <th data-key="fboFresh" data-sort="num" title="FBO Fresh">FBO Fresh</th>
+                                <th data-key="fbs0_100" data-sort="num" title="FBS до 100 руб.">FBS ≤100</th>
+                                <th data-key="fbs100_300" data-sort="num" title="FBS свыше 100 до 300 руб.">FBS 100–300
+                                </th>
+                                <th data-key="fbs300plus" data-sort="num" title="FBS свыше 300 руб.">FBS 300+</th>
+                                <th data-key="rfbs" data-sort="num" title="RFBS">RFBS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody">
+                            <tr>
+                                <td colspan="12" class="muted">Нет данных</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const els = {
+            q: document.getElementById('q'),
+            btnReload: document.getElementById('btnReload'),
+            status: document.getElementById('status'),
+            updated: document.getElementById('updated'),
+            tbody: document.getElementById('tbody'),
+            fCategory: document.getElementById('fCategory'),
+            table: document.getElementById('grid'),
+        };
+
+        let raw = [];
+        let filtered = [];
+        const coll = new Intl.Collator('ru');
+        let sortState =
+            JSON.parse(localStorage.getItem('ozon_comm_sort') || 'null') ||
+            { key: 'subjectName', dir: 'asc' };
+
+        function fmtTimeNow() {
+            const d = new Date();
+            const pad = (n) => String(n).padStart(2, '0');
+            return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+        }
+
+        function escapeHtml(v) {
+            return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+        function s(v) { return v == null ? '—' : String(v); }
+
+        function buildCategories(list) {
+            const set = new Set();
+            for (const r of list) if (r.category) set.add(r.category);
+            const arr = Array.from(set).sort((a, b) => a.localeCompare(b, 'ru'));
+            els.fCategory.innerHTML =
+                '<option value="">Все</option>' + arr.map(v => `<option>${escapeHtml(v)}</option>`).join('');
+        }
+
+        function applyFilters() {
+            const q = (els.q.value || '').trim().toLowerCase();
+            const cat = els.fCategory.value || '';
+            filtered = raw.filter((r) => {
+                if (q && !(r._name_lc || '').includes(q)) return false;
+                if (cat && r.category !== cat) return false;
+                return true;
+            });
+            sortData();
+            renderTable();
+            els.status.textContent = `Найдено позиций — ${filtered.length}`;
+        }
+
+        function sortData() {
+            const { key, dir } = sortState || {};
+            if (!key) return;
+            const asc = dir === 'asc';
+            if (key === 'subjectName' || key === 'category') {
+                filtered.sort((a, b) =>
+                    asc ? coll.compare(a[key] || '', b[key] || '') : coll.compare(b[key] || '', a[key] || '')
+                );
+            } else {
+                filtered.sort((a, b) => {
+                    const na = Number(a[key]); const nb = Number(b[key]);
+                    const av = Number.isFinite(na), bv = Number.isFinite(nb);
+                    if (!av && !bv) return 0;
+                    if (!av) return 1;
+                    if (!bv) return -1;
+                    return asc ? na - nb : nb - na;
+                });
+            }
+            document.querySelectorAll('thead th[data-sort]').forEach(th => th.classList.remove('sorted'));
+            const th = document.querySelector(`thead th[data-key="${key}"]`);
+            if (th) { th.classList.add('sorted'); th.setAttribute('data-dir', dir); }
+            localStorage.setItem('ozon_comm_sort', JSON.stringify(sortState));
+        }
+
+        function renderTable() {
+            if (!filtered.length) {
+                els.tbody.innerHTML = '<tr><td colspan="12" class="muted">Данные не найдены</td></tr>';
+                return;
+            }
+            const rows = filtered.map(r => `
+      <tr>
+        <td>${escapeHtml(r.subjectName || '—')}</td>
+        <td>${escapeHtml(r.category || '—')}</td>
+        <td>${s(r.fbo0_100)}%</td>
+        <td>${s(r.fbo100_300)}%</td>
+        <td>${s(r.fbo300_500)}%</td>
+        <td>${s(r.fbo500_1500)}%</td>
+        <td>${s(r.fbo1500plus)}%</td>
+        <td>${s(r.fboFresh)}%</td>
+        <td>${s(r.fbs0_100)}%</td>
+        <td>${s(r.fbs100_300)}%</td>
+        <td>${s(r.fbs300plus)}%</td>
+        <td>${s(r.rfbs)}%</td>
+      </tr>
+    `);
+            els.tbody.innerHTML = rows.join('');
+        }
+
+        async function safeJson(res) {
+            const text = await res.text();
+            if (!text) return null;
+            try { return JSON.parse(text); } catch { return null; }
+        }
+
+        async function loadData() {
+            els.tbody.innerHTML = '<tr><td colspan="12" class="muted">Загрузка…</td></tr>';
+            try {
+                const res = await fetch('/api/data/ozon-commissions.json', { headers: { Accept: 'application/json' } });
+                const data = await safeJson(res);
+                raw = res.ok && Array.isArray(data) ? data : [];
+                for (const r of raw) r._name_lc = (r.subjectName || '').toLowerCase();
+
+                els.updated.textContent = 'Обновлено: ' + fmtTimeNow();
+                buildCategories(raw);
+                applyFilters();
+            } catch (e) {
+                console.error(e);
+                els.tbody.innerHTML = '<tr><td colspan="12" class="muted">Ошибка загрузки</td></tr>';
+                els.status.textContent = 'Ошибка загрузки';
+                els.updated.textContent = 'Обновлено: ошибка';
+            }
+        }
+
+        // Sort header click
+        document.querySelectorAll('thead th[data-sort]').forEach(th => {
+            th.addEventListener('click', () => {
+                const key = th.getAttribute('data-key');
+                if (sortState.key === key) sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
+                else { sortState.key = key; sortState.dir = 'asc'; }
+                applyFilters();
+            });
+        });
+
+        // Inputs
+        els.q.addEventListener('input', () => {
+            // Debounce lightly
+            clearTimeout(window.__ozonQ);
+            window.__ozonQ = setTimeout(applyFilters, 150);
+        });
+        els.fCategory.addEventListener('change', applyFilters);
+        document.getElementById('btnReload').addEventListener('click', loadData);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+        });
+    </script>
+</body>
+
+</html>
