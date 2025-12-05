@@ -26,6 +26,10 @@
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
+  <url>
+    <loc>https://mraketplace.ru/storage.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>  
 
   <!-- Utilities section -->
   <url>
