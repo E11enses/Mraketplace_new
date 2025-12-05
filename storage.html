@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Ответственное хранение | МРАКЕТПЛЕЙСЫ</title>
+    <meta name="description"
+        content="Ответственное хранение внутри ТТК: платите за фактический объем в литрах в день, без переплат за ячейки и паллеты. WMS МойСклад + Честный Знак, API-интеграции с маркетплейсами, выдача день в день, склад застрахован." />
+    <link rel="canonical" href="https://mraketplace.ru/storage.html" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:title" content="Ответственное хранение — МРАКЕТПЛЕЙСЫ" />
+    <meta property="og:description"
+        content="Два склада внутри ТТК, тариф по литрам/день, WMS МойСклад + ЧЗ, интеграции с маркетплейсами, выдача день в день, страховка склада." />
+    <meta property="og:url" content="https://mraketplace.ru/storage.html" />
+    <meta property="og:site_name" content="МРАКЕТПЛЕЙСЫ" />
+    <meta property="og:image" content="https://mraketplace.ru/images/og-preview.jpg" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
+    <link rel="manifest" href="/favicon/site.webmanifest" />
+
+    <!-- CSS -->
+    <link href="tooplate-minimal-white-style.css" rel="stylesheet" />
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "name": "Ответственное хранение в Москве",
+        "areaServed": "RU",
+        "serviceType": "Ответственное хранение",
+        "provider": {
+          "@type": "LocalBusiness",
+          "name": "МРАКЕТПЛЕЙСЫ",
+          "telephone": "+7 916 240 44 26",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Москва",
+            "addressCountry": "RU"
+          }
+        },
+        "hasOfferCatalog": {
+          "@type": "OfferCatalog",
+          "name": "Тарифы хранения",
+          "itemListElement": [
+            {
+              "@type": "Offer",
+              "name": "Хранение по объему",
+              "price": "0.25",
+              "priceCurrency": "RUB",
+              "description": "Цена за 1 литр в день. Скидки при объеме."
+            }
+          ]
+        }
+      }
+    </script>
+
+    <style>
+        /* Page enhancements */
+        .hero--storage {
+            min-height: 64vh;
+            display: grid;
+            place-items: center;
+            padding-top: 120px;
+            padding-bottom: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero--storage .hero-content {
+            max-width: 1000px;
+            text-align: center;
+        }
+
+        .hero--storage h1 {
+            font-size: clamp(44px, 6.5vw, 76px);
+            font-weight: 100;
+            letter-spacing: -1px;
+            line-height: 0.95;
+            margin-bottom: 18px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 22px;
+        }
+
+        .hero-badges {
+            display: inline-flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .hero-badge {
+            border: 1px solid #000;
+            padding: 6px 10px;
+            font: 700 11px/1 Inter, system-ui;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            background: #fff;
+        }
+
+        .hero-numbers {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(160px, 1fr));
+            gap: 8px;
+            margin-top: 18px;
+        }
+
+        .hero-num {
+            border: 1px solid #000;
+            padding: 16px;
+            background: #fff;
+        }
+
+        .hero-num b {
+            display: block;
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: -0.5px;
+        }
+
+        .hero-num span {
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #666;
+        }
+
+        .section {
+            padding: 80px 20px;
+            background: #fff;
+        }
+
+        .section.alt {
+            background: #fafafa;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .split {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .split.reverse {
+            grid-template-columns: 1fr 1.2fr;
+        }
+
+        .lead {
+            font-size: 20px;
+            line-height: 1.7;
+            color: #222;
+        }
+
+        .checklist {
+            display: grid;
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .check {
+            display: grid;
+            grid-template-columns: 18px 1fr;
+            gap: 10px;
+            align-items: start;
+        }
+
+        .check i {
+            width: 8px;
+            height: 8px;
+            border-right: 2px solid #000;
+            border-bottom: 2px solid #000;
+            transform: rotate(45deg);
+            margin-top: 6px;
+        }
+
+        .muted {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .btn {
+            border: 2px solid #000;
+            background: #000;
+            color: #fff;
+            padding: 14px 18px;
+            text-decoration: none;
+            font: 700 12px/1 Inter, system-ui;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #fff;
+            color: #000;
+            transform: translateY(-2px);
+        }
+
+        .btn.alt {
+            background: #fff;
+            color: #000;
+        }
+
+        .cta-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .card {
+            border: 1px solid #000;
+            padding: 20px;
+            background: #fff;
+        }
+
+        .card h4 {
+            font-size: 16px;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .feature {
+            border: 1px solid #e3e3e3;
+            background: #fff;
+            padding: 24px;
+        }
+
+        .feature h3 {
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: -0.5px;
+            margin-bottom: 10px;
+        }
+
+        .feature p {
+            color: #333;
+            line-height: 1.7;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        /* Mini calculator */
+        .calc {
+            border: 1px solid #000;
+            padding: 20px;
+            background: #fff;
+        }
+
+        .calc-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .calc label {
+            display: block;
+            font: 600 12px/1 Inter, system-ui;
+            margin-bottom: 6px;
+        }
+
+        .calc input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #000;
+            font: 14px/1.4 Inter, system-ui;
+        }
+
+        .calc .result {
+            margin-top: 12px;
+            font: 700 14px/1.3 Inter, system-ui;
+        }
+
+        /* How it works */
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+
+        .step {
+            border: 1px solid #e3e3e3;
+            background: #fff;
+            padding: 18px;
+        }
+
+        .step b {
+            display: inline-block;
+            font: 700 12px/1 Inter, system-ui;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 6px;
+        }
+
+        /* FAQ */
+        .faq {
+            display: grid;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .faq details {
+            border: 1px solid #e3e3e3;
+            background: #fff;
+        }
+
+        .faq summary {
+            padding: 12px 14px;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .faq .faq-content {
+            padding: 0 14px 14px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .faq .chev {
+            width: 16px;
+            height: 16px;
+            display: inline-grid;
+            place-items: center;
+        }
+
+        .faq .chev i {
+            width: 8px;
+            height: 8px;
+            border-right: 2px solid #000;
+            border-bottom: 2px solid #000;
+            transform: rotate(-45deg);
+            transition: transform 200ms ease;
+        }
+
+        .faq details[open] .chev i {
+            transform: rotate(45deg);
+        }
+
+        /* Small motion */
+        .reveal {
+            opacity: 0;
+            transform: translateY(18px);
+            transition: all 500ms ease;
+        }
+
+        .reveal.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 980px) {
+
+            .split,
+            .split.reverse,
+            .grid-3,
+            .hero-numbers,
+            .steps {
+                grid-template-columns: 1fr;
+            }
+
+            .hero--storage {
+                min-height: auto;
+                padding-top: 120px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">МРАКЕТПЛЕЙСЫ</a>
+            <div class="menu-toggle" id="menuToggle">
+                <span></span><span></span><span></span>
+            </div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="/index.html" class="nav-link">ГЛАВНАЯ</a></li>
+                <li><a href="/utilities/utilities.html" class="nav-link">ИНСТРУМЕНТЫ</a></li>
+                <li><a href="/blog/index.php" class="nav-link">БЛОГ</a></li>
+                <li><a href="/#contact" class="nav-link">КОНТАКТЫ</a></li>
+                <li><a href="/pricing.html" class="nav-link">ПРАЙС</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="hero hero--storage">
+        <div class="hero-content">
+            <h1>Ответственное хранение в Москве</h1>
+
+            <div class="hero-numbers" style="margin-top: 28px;">
+                <div class="hero-num"><b>10:00–22:00</b><span>ежедневно</span></div>
+                <div class="hero-num"><b>0,25 ₽/л·день</b><span>базовый тариф</span></div>
+                <div class="hero-num"><b>день в день</b><span>выдача по запросу</span></div>
+            </div>
+
+            <div class="cta-row" style="justify-content:center; margin-top:22px;">
+                <a href="tel:+79162404426" class="btn">Позвонить</a>
+                <a href="https://t.me/m/yDxRZjA-OTdi" class="btn alt">Написать в Telegram</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2 склада внутри ТТК -->
+    <section class="section">
+        <div class="container split">
+            <div class="reveal">
+                <h2 class="section-subtitle" style="text-align:left;">2 склада внутри ТТК</h2>
+                <p class="lead">
+                    Приём и выдача на двух площадках: Проезд Загорского, 7к1 и Орлово‑Давыдовский
+                    пер., 1. Вы экономите на логистике — склады находятся внутри ТТК. Особенно удобно
+                    при частых привозах и срочных поставках.
+                </p>
+                <div class="checklist">
+                    <div class="check"><i></i>
+                        <div>Лёгкий доступ из центра, без “пробега” за МКАД</div>
+                    </div>
+                    <div class="check"><i></i>
+                        <div>Можно разбивать поставки на короткие привозы</div>
+                    </div>
+                    <div class="check"><i></i>
+                        <div>Выдача товара или личных вещей в день обращения с 10:00 до 22:00</div>
+                    </div>
+                </div>
+                <div class="cta-row">
+                    <a href="/locations.html" class="btn alt">Адреса и маршрут</a>
+                    <a href="https://t.me/m/yDxRZjA-OTdi" class="btn">Забронировать место в ТГ</a>
+                </div>
+            </div>
+            <div class="reveal">
+                <div class="card">
+                    <h4>График</h4>
+                    <p>Ежедневно: 10:00 — 22:00</p>
+                    <p class="muted">Вне графика — по запросу менеджеру.</p>
+                    <div class="black-line" style="margin:16px 0;"></div>
+                    <h4>Контакты</h4>
+                    <p><a class="links" href="tel:+79162404426">+7 916 240 44 26</a></p>
+                    <p><a class="links" href="mailto:info@mraketplace.ru">info@mraketplace.ru</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Тариф по объёму + мини-калькулятор -->
+    <section class="section alt">
+        <div class="container split reverse">
+            <div class="reveal">
+                <div class="feature">
+                    <h3>Платите только за объём — без “воздуха”</h3>
+                    <p>
+                        Тариф — за реальный объём в литрах в день, а не за паллеты, ячейки или короба.
+                        Начисления ежедневные: ни одного лишнего дня хранения.
+                    </p>
+                    <div class="checklist" style="margin-top:12px;">
+                        <div class="check"><i></i>
+                            <div>0,25 руб/л·день — ориентир (скидки при объёмах)</div>
+                        </div>
+                        <div class="check"><i></i>
+                            <div>Отчётность по дням и фактическому объёму</div>
+                        </div>
+                        <div class="check"><i></i>
+                            <div>Любая упаковка — как удобно вашему процессу</div>
+                        </div>
+                    </div>
+                    <div class="cta-row">
+                        <a href="/pricing.html#priceList" class="btn">Открыть прайс</a>
+                        <a href="/pricing.html#calc" class="btn alt">Запросить расчёт</a>
+                    </div>
+                </div>
+            </div>
+            <div class="reveal">
+                <div class="calc" id="volCalc">
+                    <h4 style="margin-bottom:10px;">Быстрый расчёт объёма</h4>
+                    <div class="calc-row">
+                        <div>
+                            <label>Объём, литры</label>
+                            <input type="number" id="cVol" min="1" step="1" placeholder="например, 500" />
+                        </div>
+                        <div>
+                            <label>Дней хранения</label>
+                            <input type="number" id="cDays" min="1" step="1" placeholder="например, 7" />
+                        </div>
+                    </div>
+                    <div class="calc-row" style="margin-top:10px;">
+                        <div>
+                            <label>Тариф, ₽/л·день</label>
+                            <input type="number" id="cRate" min="0" step="0.01" value="0.25" />
+                        </div>
+                    </div>
+                    <div class="result" id="cOut">Итог появится здесь</div>
+                    <div class="cta-row">
+                        <a href="https://t.me/m/yDxRZjA-OTdi" class="btn alt">Сделать точный расчёт</a>
+                    </div>
+                    <p class="muted" style="margin-top:8px;">
+                        Черновой расчёт. Итоговую цену подтвердит менеджер после приёмки.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WMS + интеграции -->
+    <section class="section">
+        <div class="container reveal">
+            <h2 class="section-subtitle" style="text-align:center;">WMS “МойСклад”, ЧЗ и интеграции с маркетплейсами
+            </h2>
+            <div class="features-grid" style="margin-top:24px;">
+                <article class="feature">
+                    <h3>Полный контроль движения</h3>
+                    <p>
+                        “МойСклад” + Честный Знак: учёт от приёмки до отгрузки, маркировка, серийные номера, комплекты.
+                        Потерь и пересортицы избегаем регламентами и двойным контролем.
+                    </p>
+                </article>
+                <article class="feature">
+                    <h3>Остатки по API для FBS/realFBS</h3>
+                    <p>
+                        Передаём фактические остатки на WB и Ozon. Меньше отмен, выше оборачиваемость.
+                        Подключаем внешние сервисы по согласованию.
+                    </p>
+                </article>
+                <article class="feature">
+                    <h3>Документы и прозрачность</h3>
+                    <p>
+                        Акты, фото/видео по операциям, выгрузки. Согласуем SLA по срокам и качеству.
+                    </p>
+                </article>
+            </div>
+            <div class="cta-row" style="margin-top:20px;">
+                <a href="/pricing.html#priceList" class="btn">Тарифы по услугами</a>
+                <a href="https://t.me/m/yDxRZjA-OTdi" class="btn alt">Связаться по поводу интегарции</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Выдача день в день -->
+    <section class="section alt">
+        <div class="container split">
+            <div class="reveal">
+                <h2 class="section-subtitle" style="text-align:left;">Выдача день в день</h2>
+                <p class="lead">
+                    Работаем с 10:00 до 22:00. По запросу выдадим любое количество товара в день обращения
+                    — под поставку на МП, интернет‑заказ или оптовую отгрузку. Вне графика — по согласованию.
+                </p>
+                <div class="checklist">
+                    <div class="check"><i></i>
+                        <div>Плановые отгрузки — ежедневно</div>
+                    </div>
+                    <div class="check"><i></i>
+                        <div>Экстренные — по уведомлению менеджера</div>
+                    </div>
+                    <div class="check"><i></i>
+                        <div>Пломбы, фотофиксация и маркировка — по запросу</div>
+                    </div>
+                </div>
+            </div>
+            <div class="reveal">
+                <div class="steps">
+                    <div class="step">
+                        <b>1. Заявка</b>
+                        <p class="muted">Напишите или позвоните. Укажите SKU и объёмы.</p>
+                    </div>
+                    <div class="step">
+                        <b>2. Детали</b>
+                        <p class="muted">Назначим время, транспорт, упаковку/маркировку.</p>
+                    </div>
+                    <div class="step">
+                        <b>3. Выдача</b>
+                        <p class="muted">Подготовим и отдадим. При необходимости — упакуем.</p>
+                    </div>
+                    <div class="step">
+                        <b>4. Отчёт</b>
+                        <p class="muted">Акт и фото/видео — по вашему запросу.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Страхование и безопасность -->
+    <section class="section">
+        <div class="container split reverse">
+            <div class="reveal">
+                <div class="feature">
+                    <h3>Склад застрахован: риски — на нас, не на вас</h3>
+                    <p>
+                        Помещения и товар на ответственном хранении застрахованы. В случае ЧП оформим акт, подтвердим
+                        объём
+                        и обеспечим компенсацию по договору хранения.
+                    </p>
+                    <div class="checklist" style="margin-top:12px;">
+                        <div class="check"><i></i>
+                            <div>Охрана 24/7 и контроль доступа</div>
+                        </div>
+                        <div class="check"><i></i>
+                            <div>Видеонаблюдение и журналы операций</div>
+                        </div>
+                        <div class="check"><i></i>
+                            <div>Договор хранения с прописанными обязательствами</div>
+                        </div>
+                    </div>
+                    <div class="cta-row">
+                        <a href="/pricing.html#priceList" class="btn">Посмотреть тариф</a>
+                        <a href="#contact" class="btn alt">Получить шаблон договора</a>
+                    </div>
+                </div>
+            </div>
+            <div class="reveal">
+                <div class="grid-3">
+                    <div class="card">
+                        <h4>Безопасность</h4>
+                        <p class="muted">Доступ по заявкам, видеоархив, регламенты.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Ответственность</h4>
+                        <p class="muted">Компенсация по договору хранения.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Под отчёт</h4>
+                        <p class="muted">Акты, фото/видео — по запросу.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section alt">
+        <div class="container reveal">
+            <h2 class="section-subtitle" style="text-align:center;">Частые вопросы</h2>
+            <div class="faq" style="max-width:900px; margin:18px auto 0;">
+                <details>
+                    <summary>
+                        Как считается объём в литрах?
+                        <span class="chev" aria-hidden="true"><i></i></span>
+                    </summary>
+                    <div class="faq-content">
+                        Берём габариты единицы хранения (Д×Ш×В), считаем кубический объём и переводим в литры
+                        (1 куб. дм = 1 литр). Итоги суммируются по факту размещения.
+                    </div>
+                </details>
+                <details>
+                    <summary>
+                        Есть ли минималка по дням или объёму?
+                        <span class="chev" aria-hidden="true"><i></i></span>
+                    </summary>
+                    <div class="faq-content">
+                        Начисления — по дням, без минималки по сроку. По объёму — базовый тариф, скидки согласуем при
+                        стабильном объёме или длительном хранении.
+                    </div>
+                </details>
+                <details>
+                    <summary>
+                        Можно ли хранить хрупкое/опасное/габаритное?
+                        <span class="chev" aria-hidden="true"><i></i></span>
+                    </summary>
+                    <div class="faq-content">
+                        Да, работаем со сложными категориями. Сообщите заранее — подберём упаковку, маркировку и
+                        регламенты.
+                    </div>
+                </details>
+                <details>
+                    <summary>
+                        Передаёте ли вы остатки на маркетплейсы?
+                        <span class="chev" aria-hidden="true"><i></i></span>
+                    </summary>
+                    <div class="faq-content">
+                        Передаём в WB/Ozon по API для FBS/realFBS. Подключим под вашу схему продаж.
+                    </div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- Контакты -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <div class="contact-grid fade-in visible">
+                <div class="contact-info">
+                    <h2>Коннект</h2>
+                    <div class="info-item">
+                        <h4>Email</h4>
+                        <p class="links">
+                            <a class="links" href="mailto:info@mraketplace.ru">info@mraketplace.ru⤴</a>
+                        </p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Phone</h4>
+                        <p class="links">
+                            <a class="links" href="tel:+79162404426">+7 916 240 44 26</a>
+                        </p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Гео</h4>
+                        <p>Москва, внутри ТТК</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Whatsapp</h4>
+                        <p class="links">
+                            <a class="links" href="https://wa.me/message/LAERCUXKXQNKC1">Написать нам в WA</a>
+                        </p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Telegram</h4>
+                        <p class="links">
+                            <a class="links" href="https://t.me/m/yDxRZjA-OTdi">Написать нам в Telegram</a>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="contact-divider"></div>
+
+                <div class="contact-form">
+                    <form id="storageForm">
+                        <div class="form-group">
+                            <input type="text" name="name" placeholder=" " required />
+                            <label>Ваше имя</label>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" name="email" placeholder=" " />
+                            <label>Ваша почта или телеграм</label>
+                        </div>
+                        <div class="form-group">
+                            <textarea name="message" rows="4" placeholder=" " required></textarea>
+                            <label>Кратко опишите объём (литры), срок, адрес привоза</label>
+                        </div>
+                        <button type="submit" class="submit-btn">Отправить</button>
+                    </form>
+                    <div id="formMsg" class="price-meta" style="margin-top:10px;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2021-2025 МРАКЕТПЛЕЙСЫ</p>
+        <p>Все права защищены.</p>
+        <p>ИП Куракин Егор Дмитриевич • ИНН 773167683579</p>
+        <ul>
+            <li><a href="/privacy.html">Политика Конфиденциальности</a></li>
+            <li><a href="/terms.html">Условия Использования</a></li>
+            <li><a href="/locations.html">Адреса Филиалов</a></li>
+        </ul>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="tooplate-minimal-script.js"></script>
+    <script src="storage.js"></script>
+    <script>
+        // Mobile menu
+        (function () {
+            var t = document.getElementById("menuToggle");
+            var l = document.getElementById("navLinks");
+            if (t && l) {
+                t.addEventListener("click", function () {
+                    t.classList.toggle("active");
+                    l.classList.toggle("active");
+                });
+            }
+        })();
+
+        // Reveal on scroll
+        (function () {
+            var obs = new IntersectionObserver(
+                function (entries) {
+                    entries.forEach(function (e) {
+                        if (e.isIntersecting) {
+                            e.target.classList.add("show");
+                            obs.unobserve(e.target);
+                        }
+                    });
+                },
+                { threshold: 0.1 }
+            );
+            document.querySelectorAll(".reveal").forEach(function (el) {
+                obs.observe(el);
+            });
+        })();
+
+        // Mini volume calculator
+        (function () {
+            var vol = document.getElementById("cVol");
+            var days = document.getElementById("cDays");
+            var rate = document.getElementById("cRate");
+            var disc = document.getElementById("cDisc");
+            var out = document.getElementById("cOut");
+            if (!vol || !days || !rate || !out) return;
+
+            function fmt(n) {
+                return new Intl.NumberFormat("ru-RU").format(n);
+            }
+
+            function calc() {
+                var v = Math.max(0, Number(vol.value || 0));
+                var d = Math.max(0, Number(days.value || 0));
+                var r = Math.max(0, Number(rate.value || 0));
+                var dc = Math.max(0, Math.min(100, Number(disc.value || 0)));
+                if (!v || !d || !r) {
+                    out.textContent = "Итог появится здесь";
+                    return;
+                }
+                var base = v * d * r;
+                var discount = base * (dc / 100);
+                var total = base - discount;
+                out.textContent =
+                    "Оценка: " +
+                    fmt(total.toFixed(2)) +
+                    " ₽ (без НДС, " +
+                    fmt(v) +
+                    " л × " +
+                    fmt(d) +
+                    " дн × " +
+                    r +
+                    " ₽/л·день" +
+                    (dc ? ", скидка " + dc + "%" : "") +
+                    ")";
+            }
+
+            ["input", "change"].forEach(function (ev) {
+                vol.addEventListener(ev, calc);
+                days.addEventListener(ev, calc);
+                rate.addEventListener(ev, calc);
+                disc.addEventListener(ev, calc);
+            });
+        })();
+
+        // Form handler (placeholder)
+        (function () {
+            var f = document.getElementById("storageForm");
+            var m = document.getElementById("formMsg");
+            if (!f) return;
+            f.addEventListener("submit", function (e) {
+                e.preventDefault();
+                var data = {
+                    name: f.name.value.trim(),
+                    contact: f.email.value.trim(),
+                    message: f.message.value.trim(),
+                    page: "storage",
+                    ts: new Date().toISOString()
+                };
+                m.style.color = "#6b6b6b";
+                m.textContent =
+                    "Заявка отправлена. Мы свяжемся в ближайшее время. Если срочно — позвоните +7 916 240 44 26.";
+                // TODO: axios.post('/api/storage-request', data)
+                f.reset();
+            });
+        })();
+    </script>
+</body>
+
+</html>
