@@ -7,7 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Наши филиалы | МРАКЕТПЛЕЙСЫ</title>
-    <meta name="description" content="Адреса филиалов фулфилмента МРАКЕТПЛЕЙСЫ в Москве." />
+    <meta name="description"
+        content="Адреса филиалов фулфилмента МРАКЕТПЛЕЙСЫ в Москве: Проезд Загорского 7к1 и Орлово‑Давыдовский пер. 1. График, контакты и карта." />
 
     <link rel="canonical" href="https://mraketplace.ru/locations.html" />
     <meta name="robots" content="index,follow" />
@@ -19,8 +20,6 @@
     <meta property="og:url" content="https://mraketplace.ru/locations.html" />
     <meta property="og:site_name" content="МРАКЕТПЛЕЙСЫ" />
     <meta property="og:locale" content="ru_RU" />
-
-    <!-- IMPORTANT: ensure this image exists, is public, and 1200x630 -->
     <meta property="og:image" content="https://mraketplace.ru/images/og-adr.jpg" />
     <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
@@ -32,44 +31,407 @@
     <meta name="twitter:title" content="Наши филиалы | МРАКЕТПЛЕЙСЫ" />
     <meta name="twitter:description" content="Адреса филиалов фулфилмента в Москве." />
     <meta name="twitter:image" content="https://mraketplace.ru/images/og-adr.jpg" />
+
+    <!-- Favicon (optional if already global) -->
+    <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
+    <link rel="manifest" href="/favicon/site.webmanifest" />
+
+    <!-- Site CSS (if available) -->
+    <link href="tooplate-minimal-white-style.css" rel="stylesheet" />
+
+    <!-- Minimal inline styling to look fine even without the external CSS -->
+    <style>
+        :root {
+            --text: #000;
+            --muted: #666;
+            --bg: #fff;
+            --bg-alt: #fafafa;
+            --border: #000;
+            --border-soft: #e3e3e3;
+            --accent: #000;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            color: var(--text);
+            background: var(--bg);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        /* Nav (lightweight fallback; your global nav will override if present) */
+        nav {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 16px 0;
+            border-bottom: 2px solid #000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: #000;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+            position: relative;
+        }
+
+        .logo::after {
+            content: "";
+            position: absolute;
+            right: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 6px;
+            background: #000;
+        }
+
+        .menu-toggle {
+            display: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 28px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links a {
+            color: #000;
+            text-decoration: none;
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+
+        /* Page header */
+        .locations-hero {
+            padding: 80px 20px 20px;
+            text-align: center;
+        }
+
+        .locations-hero h1 {
+            font-size: clamp(34px, 6vw, 56px);
+            font-weight: 100;
+            letter-spacing: -1px;
+            margin: 10px 0 8px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #444;
+        }
+
+        /* Content container */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Address blocks */
+        .address-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .address-block {
+            border: 1px solid var(--border-soft);
+            background: var(--bg);
+        }
+
+        .address-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        .address-title {
+            font: 800 18px/1.3 Inter, system-ui;
+            letter-spacing: -0.2px;
+            margin: 0;
+        }
+
+        .address-meta {
+            font: 600 11px/1 Inter, system-ui;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .address-body {
+            padding: 16px 18px 6px;
+        }
+
+        .address-body p {
+            margin: 0 0 10px;
+        }
+
+        .contact-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .btn {
+            border: 1px solid #000;
+            background: #fff;
+            color: #000;
+            padding: 10px 12px;
+            text-decoration: none;
+            font: 700 12px/1 Inter, system-ui;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #000;
+            color: #fff;
+        }
+
+        .map {
+            border-top: 1px solid var(--border-soft);
+            background: var(--bg-alt);
+        }
+
+        .map iframe {
+            display: block;
+            width: 100%;
+            height: 420px;
+            border: 0;
+        }
+
+        /* Utility */
+        .links {
+            text-decoration: underline dotted;
+            color: inherit;
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        /* Footer (simple fallback) */
+        footer {
+            padding: 40px 20px;
+            text-align: center;
+            border-top: 3px solid #000;
+            margin-top: 30px;
+        }
+
+        footer p {
+            color: #000;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 500;
+            margin: 6px 0;
+        }
+
+        footer ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin: 16px 0 0;
+            padding: 0;
+        }
+
+        footer a {
+            color: #000;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+                flex-direction: column;
+                width: 30px;
+                height: 30px;
+                justify-content: center;
+                gap: 6px;
+                cursor: pointer;
+            }
+
+            .menu-toggle span {
+                display: block;
+                height: 2px;
+                width: 100%;
+                background: #000;
+            }
+
+            .nav-links {
+                display: none;
+                position: fixed;
+                top: 0;
+                right: 0;
+                width: 100%;
+                height: 100vh;
+                background: rgba(255, 255, 255, 0.98);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 24px;
+                z-index: 1000;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .locations-hero {
+                padding-top: 100px;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <section class="locations">
-        <h1>Наши филиалы</h1>
-        <p>
-            Компания <strong>МРАКЕТПЛЕЙСЫ</strong> предоставляет услуги фулфилмента
-            и складского хранения в Москве. Ниже указаны адреса наших филиалов.
-        </p>
+    <!-- Navigation (consistent with site) -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">МРАКЕТПЛЕЙСЫ</a>
+            <div class="menu-toggle" id="menuToggle"><span></span><span></span><span></span></div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="/#home" class="nav-link">ГЛАВНАЯ</a></li>
+                <li><a href="/#about" class="nav-link">О НАС</a></li>
+                <li><a href="/#services" class="nav-link">УСЛУГИ</a></li>
+                <li><a href="/utilities/utilities.html" class="nav-link">ИНСТРУМЕНТЫ</a></li>
+                <li><a href="/blog/" class="nav-link">БЛОГ</a></li>
+                <li><a href="/#contact" class="nav-link">КОНТАКТЫ</a></li>
+                <li><a href="/pricing.html" class="nav-link">ПРАЙС</a></li>
+            </ul>
+        </div>
+    </nav>
 
-        <div class="address-block">
-            <h2>Филиал №1 — Проезд Загорского, 7к1</h2>
-            <p>
-                Адрес: г. Москва, Проезд Загорского, д. 7, корпус 1<br />
-                Время работы: Пн–Вс, 10:00–22:00<br />
-                Телефон: <a href="tel:+79162404426">+7 (916) 240-44-26</a>
+    <header class="locations-hero">
+        <div class="container">
+            <h1>Наши филиалы</h1>
+            <p class="subtitle">Москва • внутри ТТК • 10:00–22:00 ежедневно</p>
+            <p class="muted" style="margin-top:8px;">
+                Компания <strong>МРАКЕТПЛЕЙСЫ</strong> предоставляет услуги фулфилмента
+                и ответственного хранения. Ниже — адреса и карты проезда.
             </p>
-            <div class="map">
-                <iframe
-                    src="https://yandex.ru/map-widget/v1/?um=constructor%3A2d20ff14ec79a2d53fd9548ded2d5e3071ee20d010cbd9d740a6aa341abd2fff&amp;source=constructor"
-                    width="100%" height="400" frameborder="0"></iframe>
-            </div>
+        </div>
+    </header>
+
+    <section class="container">
+        <div class="address-list">
+            <!-- Address 1 -->
+            <article class="address-block">
+                <div class="address-head">
+                    <h2 class="address-title">Филиал №1 — Проезд Загорского, 7к1</h2>
+                    <span class="address-meta">FBS, Офис</span>
+                </div>
+                <div class="address-body">
+                    <p>
+                        Адрес: г. Москва, Проезд Загорского, д. 7, корпус 1<br />
+                        Время работы: Пн–Вс, 10:00–22:00<br />
+                        Телефон: <a class="links" href="tel:+79162404426">+7 (916) 240‑44‑26</a>
+                    </p>
+                    <div class="contact-row">
+                        <a class="btn" href="tel:+79162404426">Позвонить</a>
+                        <a class="btn" href="https://t.me/m/yDxRZjA-OTdi">Telegram</a>
+                        <a class="btn" href="https://wa.me/message/LAERCUXKXQNKC1">WhatsApp</a>
+                    </div>
+                </div>
+                <div class="map">
+                    <iframe
+                        src="https://yandex.ru/map-widget/v1/?um=constructor%3A2d20ff14ec79a2d53fd9548ded2d5e3071ee20d010cbd9d740a6aa341abd2fff&amp;source=constructor"
+                        loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </article>
+
+            <!-- Address 2 -->
+            <article class="address-block">
+                <div class="address-head">
+                    <h2 class="address-title">Филиал №2 — Орлово‑Давыдовский пер., 1</h2>
+                    <span class="address-meta">Основной склад</span>
+                </div>
+                <div class="address-body">
+                    <p>
+                        Адрес: г. Москва, Орлово‑Давыдовский пер., д. 1<br />
+                        Время работы: Пн–Вс, 10:00–22:00<br />
+                        Телефон: <a class="links" href="tel:+79162404426">+7 (916) 240‑44‑26</a>
+                    </p>
+                    <div class="contact-row">
+                        <a class="btn" href="tel:+79162404426">Позвонить</a>
+                        <a class="btn" href="https://t.me/m/yDxRZjA-OTdi">Telegram</a>
+                        <a class="btn" href="https://wa.me/message/LAERCUXKXQNKC1">WhatsApp</a>
+                    </div>
+                </div>
+                <div class="map">
+                    <iframe
+                        src="https://yandex.ru/map-widget/v1/?um=constructor%3Ae4e0ae6ac999c6b238aef5e3953218bd0cc9d5066a4f11041f9cd7b66d36711f&amp;source=constructor"
+                        loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </article>
         </div>
 
-        <div class="address-block">
-            <h2>Филиал №2 — Орлово-Давыдовский переулок, 1</h2>
-            <p>
-                Адрес: г. Москва, Орлово-Давыдовский пер., д. 1<br />
-                Время работы: Пн–Вс, 10:00–22:00<br />
-                Телефон: <a href="tel:+79162404426">+7 (916) 240-44-26</a>
-            </p>
-            <div class="map">
-                <iframe
-                    src="https://yandex.ru/map-widget/v1/?um=constructor%3Ae4e0ae6ac999c6b238aef5e3953218bd0cc9d5066a4f11041f9cd7b66d36711f&amp;source=constructor"
-                    width="100%" height="400" frameborder="0"></iframe>
-            </div>
+        <div class="contact-row" style="margin-top:14px;">
+            <a class="btn" href="/index.html#services">Услуги</a>
+            <a class="btn" href="/pricing.html">Прайс</a>
+            <a class="btn" href="/blog/index.php">Блог</a>
         </div>
     </section>
+
+    <footer>
+        <p>© 2021-2025 МРАКЕТПЛЕЙСЫ</p>
+        <p>Все права защищены.</p>
+        <p>ИП Куракин Егор Дмитриевич • ИНН 773167683579</p>
+        <ul>
+            <li><a href="/privacy.html">Политика Конфиденциальности</a></li>
+            <li><a href="/terms.html">Условия Использования</a></li>
+            <li><a href="/locations.html">Адреса Филиалов</a></li>
+        </ul>
+    </footer>
+
+    <script>
+        // Simple mobile menu toggle (if global script missing)
+        (function () {
+            var t = document.getElementById("menuToggle");
+            var l = document.getElementById("navLinks");
+            if (t && l) {
+                t.addEventListener("click", function () {
+                    l.classList.toggle("active");
+                });
+            }
+        })();
+    </script>
 </body>
 
 </html>

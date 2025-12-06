@@ -402,9 +402,11 @@
     <!-- Navigation -->
     <nav id="navbar">
         <div class="nav-container">
-            <a href="/" class="logo">МРАКЕТПЛЕЙСЫ</a>
+            <a href="/index.html" class="logo">МРАКЕТПЛЕЙСЫ</a>
             <div class="menu-toggle" id="menuToggle">
-                <span></span><span></span><span></span>
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
             <ul class="nav-links" id="navLinks">
                 <li><a href="/index.html" class="nav-link">ГЛАВНАЯ</a></li>
@@ -519,16 +521,21 @@
                             <label>Тариф, ₽/л·день</label>
                             <input type="number" id="cRate" min="0" step="0.01" value="0.25" />
                         </div>
+                        <div>
+                            <label>Скидка, % (согласованная)</label>
+                            <input type="number" id="cDisc" min="0" max="100" step="1" placeholder="например, 10" />
+                        </div>
                     </div>
-                    <div class="result" id="cOut">Итог появится здесь</div>
-                    <div class="cta-row">
-                        <a href="https://t.me/m/yDxRZjA-OTdi" class="btn alt">Сделать точный расчёт</a>
-                    </div>
-                    <p class="muted" style="margin-top:8px;">
-                        Черновой расчёт. Итоговую цену подтвердит менеджер после приёмки.
-                    </p>
                 </div>
+                <div class="result" id="cOut">Итог появится здесь</div>
+                <div class="cta-row">
+                    <a href="https://t.me/m/yDxRZjA-OTdi" class="btn alt">Сделать точный расчёт</a>
+                </div>
+                <p class="muted" style="margin-top:8px;">
+                    Черновой расчёт. Итоговую цену подтвердит менеджер после приёмки.
+                </p>
             </div>
+        </div>
         </div>
     </section>
 
@@ -782,18 +789,6 @@
     <script src="tooplate-minimal-script.js"></script>
     <script src="storage.js"></script>
     <script>
-        // Mobile menu
-        (function () {
-            var t = document.getElementById("menuToggle");
-            var l = document.getElementById("navLinks");
-            if (t && l) {
-                t.addEventListener("click", function () {
-                    t.classList.toggle("active");
-                    l.classList.toggle("active");
-                });
-            }
-        })();
-
         // Reveal on scroll
         (function () {
             var obs = new IntersectionObserver(

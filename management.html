@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Премиальное ведение магазина на маркетплейсах | МРАКЕТПЛЕЙСЫ</title>
+    <meta name="description"
+        content="Комплексное ведение магазинов на Wildberries и Ozon: операционка, реклама, аналитика, финансовая модель и рост. Реальные кейсы и профессионально сверстанные HTML‑отчёты." />
+    <link rel="canonical" href="https://mraketplace.ru/manage.html" />
+
+    <!-- OG -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:title" content="Премиальное ведение магазина — МРАКЕТПЛЕЙСЫ" />
+    <meta property="og:description"
+        content="Ведение, реклама и аналитика на маркетплейсах. Реальные кейсы и HTML‑отчёты без картинок." />
+    <meta property="og:url" content="https://mraketplace.ru/manage.html" />
+    <meta property="og:site_name" content="МРАКЕТПЛЕЙСЫ" />
+    <meta property="og:image" content="https://mraketplace.ru/images/og-preview.jpg" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
+    <link rel="manifest" href="/favicon/site.webmanifest" />
+
+    <!-- Site CSS -->
+    <link href="tooplate-minimal-white-style.css" rel="stylesheet" />
+
+    <style>
+        .hero-manage {
+            min-height: 56vh;
+            display: grid;
+            place-items: center;
+            padding-top: 120px;
+            padding-bottom: 40px;
+            text-align: center;
+        }
+
+        .hero-manage h1 {
+            font-size: clamp(42px, 6vw, 74px);
+            font-weight: 100;
+            letter-spacing: -1px;
+            line-height: 0.95;
+            margin-bottom: 16px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .badges {
+            display: inline-flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .badge {
+            border: 1px solid #000;
+            padding: 6px 10px;
+            font: 700 11px/1 Inter, system-ui;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .section {
+            padding: 80px 20px;
+            background: #fff;
+        }
+
+        .section.alt {
+            background: #fafafa;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .split {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .split.reverse {
+            grid-template-columns: 1fr 1.2fr;
+        }
+
+        .h2-like {
+            font-size: 36px;
+            font-weight: 100;
+            letter-spacing: -1px;
+            margin: 0 0 10px;
+        }
+
+        .lead {
+            font-size: 20px;
+            line-height: 1.75;
+            color: #222;
+        }
+
+        .muted {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .nowrap {
+            white-space: nowrap;
+        }
+
+        .block {
+            border: 1px solid #e3e3e3;
+            background: #fff;
+            padding: 22px;
+        }
+
+        .block h3 {
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: -0.4px;
+            margin: 0 0 10px;
+        }
+
+        .list {
+            display: grid;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .li {
+            display: grid;
+            grid-template-columns: 18px 1fr;
+            gap: 8px;
+            align-items: start;
+        }
+
+        .li i {
+            width: 8px;
+            height: 8px;
+            border-right: 2px solid #000;
+            border-bottom: 2px solid #000;
+            transform: rotate(45deg);
+            margin-top: 6px;
+        }
+
+        .kpi {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .kpi .card {
+            border: 1px solid #000;
+            background: #fff;
+            padding: 14px;
+        }
+
+        .kpi b {
+            display: block;
+            font-size: 26px;
+            font-weight: 300;
+            letter-spacing: -.4px;
+        }
+
+        .kpi span {
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #666;
+        }
+
+        .cta-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .btn {
+            border: 2px solid #000;
+            background: #000;
+            color: #fff;
+            padding: 12px 16px;
+            text-decoration: none;
+            font: 700 12px/1 Inter, system-ui;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            transition: .3s;
+        }
+
+        .btn:hover {
+            background: #fff;
+            color: #000;
+            transform: translateY(-2px);
+        }
+
+        /* Tooltip */
+        .tip {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tip .ico {
+            width: 16px;
+            height: 16px;
+            border: 1px solid #000;
+            display: inline-grid;
+            place-items: center;
+            font: 700 10px/1 Inter, system-ui;
+            background: #fff;
+            cursor: default;
+        }
+
+        .tip .bubble {
+            position: absolute;
+            left: 0;
+            top: 125%;
+            min-width: 220px;
+            max-width: 320px;
+            padding: 10px 12px;
+            border: 1px solid #000;
+            background: #fff;
+            color: #111;
+            font: 500 12px/1.45 Inter, system-ui;
+            display: none;
+            z-index: 10;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
+        }
+
+        .tip:hover .bubble {
+            display: block;
+        }
+
+        /* Reports (HTML, non-interactive) */
+        .reports {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .report {
+            border: 1px solid #000;
+            background: #fff;
+        }
+
+        .report-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 1px solid #000;
+            padding: 14px 16px;
+        }
+
+        .report-title {
+            font: 800 16px/1.2 Inter, system-ui;
+            letter-spacing: .02em;
+        }
+
+        .report-sub {
+            font: 600 11px/1 Inter, system-ui;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+
+        .report-body {
+            padding: 14px 16px;
+        }
+
+        .tbl {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .tbl th,
+        .tbl td {
+            border-bottom: 1px solid #eaeaea;
+            padding: 10px 8px;
+            text-align: left;
+            font: 500 13px/1.5 Inter, system-ui;
+            vertical-align: top;
+        }
+
+        .tbl th {
+            font: 700 11px/1.2 Inter, system-ui;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: #fafafa;
+        }
+
+        .tr-total td {
+            border-top: 2px solid #000;
+            font-weight: 700;
+        }
+
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .kpi-tile {
+            border: 1px solid #000;
+            background: #fff;
+            padding: 12px;
+        }
+
+        .kpi-tile b {
+            display: block;
+            font-size: 22px;
+            font-weight: 300;
+        }
+
+        .kpi-tile span {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: #666;
+        }
+
+        /* Big dashboard */
+        .dash-wrap {
+            border: 1px solid #000;
+            background: #fff;
+            padding: 16px;
+        }
+
+        .dash-grid {
+            display: grid;
+            grid-template-columns: 2.2fr 1fr;
+            gap: 16px;
+        }
+
+        .dash-box {
+            border: 1px solid #000;
+            background: #fff;
+            padding: 14px;
+        }
+
+        .dash-title {
+            margin: 0 0 8px;
+            font: 700 13px/1 Inter, system-ui;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+
+        .chart-bar {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 8px;
+            align-items: end;
+            height: 180px;
+        }
+
+        .bar {
+            background: #111;
+        }
+
+        .legend {
+            display: flex;
+            gap: 14px;
+            margin-top: 8px;
+            font: 600 11px/1 Inter, system-ui;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .dash-kpis {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .dash-kpi {
+            border: 1px solid #000;
+            background: #fff;
+            padding: 14px;
+        }
+
+        .dash-kpi b {
+            display: block;
+            font-size: 28px;
+            font-weight: 300;
+        }
+
+        .dash-kpi span {
+            font-size: 11px;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: #666;
+        }
+
+        /* ABC/XYZ tables */
+        .matrix {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .caption {
+            font: 700 12px/1 Inter, system-ui;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin: 8px 0;
+            color: #333;
+        }
+
+        .legend-row {
+            display: flex;
+            gap: 16px;
+            font: 600 11px/1 Inter, system-ui;
+            color: #666;
+            text-transform: uppercase;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 980px) {
+
+            .split,
+            .split.reverse,
+            .kpi,
+            .kpi-row,
+            .dash-grid,
+            .dash-kpis,
+            .matrix {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-manage {
+                min-height: auto;
+                padding-top: 120px;
+            }
+
+            .chart-bar {
+                height: 160px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Навигация -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">МРАКЕТПЛЕЙСЫ</a>
+            <div class="menu-toggle" id="menuToggle"><span></span><span></span><span></span></div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="/#home" class="nav-link">ГЛАВНАЯ</a></li>
+                <li><a href="/#about" class="nav-link">О НАС</a></li>
+                <li><a href="/#services" class="nav-link">УСЛУГИ</a></li>
+                <li><a href="/utilities/utilities.html" class="nav-link">ИНСТРУМЕНТЫ</a></li>
+                <li><a href="/blog/" class="nav-link">БЛОГ</a></li>
+                <li><a href="/#contact" class="nav-link">КОНТАКТЫ</a></li>
+                <li><a href="/pricing.html" class="nav-link">ПРАЙС</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="hero-manage">
+        <div class="hero-content">
+            <h1>Премиальное ведение магазина на маркетплейсах</h1>
+            <p class="subtitle">Wildberries • Ozon • Управление, реклама и аналитика</p>
+            <div class="badges">
+                <span class="badge">операционка</span>
+                <span class="badge">реклама</span>
+                <span class="badge">аналитика</span>
+                <span class="badge">финмодель</span>
+                <span class="badge">дашборд</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Раздел 1 -->
+    <section class="section" id="lvl1">
+        <div class="container split">
+            <div>
+                <h2 class="h2-like">Операционное ведение</h2>
+                <p class="lead">Ежедневная операционка без потерь: остатки, поставки, цены, отзывы, базовая реклама. На
+                    старте — юнит‑экономика, в конце месяца — отчёт по доходам и расходам.</p>
+                <div class="list">
+                    <div class="li"><i></i>
+                        <div>Остатки и поставки по <span class="tip"><span class="ico">i</span><span
+                                    class="bubble"><b>FBO</b> — склад МП; <b>FBS</b> — склад продавца; <b>realFBS</b> —
+                                    доставка со склада продавца.</span></span> схемам</div>
+                    </div>
+                    <div class="li"><i></i>
+                        <div>Ответы на отзывы, работа с рейтингом и вопросами</div>
+                    </div>
+                    <div class="li"><i></i>
+                        <div>Контроль цен/скидок/акций, соблюдение МРЦ, план акций</div>
+                    </div>
+                    <div class="li"><i></i>
+                        <div>Базовые кампании: поиск/авто, минус‑запросы, корректировки ставок</div>
+                    </div>
+                    <div class="li"><i></i>
+                        <div>Ежемесячный P&L: доходы/расходы, рекомендации</div>
+                    </div>
+                </div>
+                <div class="kpi">
+                    <div class="card"><b>15&nbsp;000&nbsp;₽</b><span>в месяц</span></div>
+                    <div class="card"><b>до 20 SKU</b><span>1 кабинет</span></div>
+                    <div class="card"><b>WB/Ozon</b><span>выбор</span></div>
+                </div>
+                <div class="block" style="margin-top:14px;">
+                    <h3>Кейс: аксессуары, WB, FBO, 18 SKU</h3>
+                    <p class="muted">Проблема — OOS и просадки рейтинга. Ввели календарь мини‑поставок (каждые 3–4 дня),
+                        автоматизировали контроль остатков, регламент ответов на отзывы, выровняли цены под акции. 6
+                        недель: OOS −72%, рейтинг 4,48→4,71, оборот +19% без роста бюджета.</p>
+                </div>
+                <div class="cta-row">
+                    <a href="tel:+79162404426" class="btn">Позвонить</a>
+                    <a href="https://t.me/m/yDxRZjA-OTdi" class="btn">Написать в Telegram</a>
+                </div>
+            </div>
+            <div class="block">
+                <h3>Что делаем на практике</h3>
+                <div class="list">
+                    <div class="li"><i></i>
+                        <div>Поставки: слоты, УЛ, маркировка, фотофиксация</div>
+                    </div>
+                    <div class="li"><i></i>
+                        <div>Карточки: атрибуты, медиаконтент, релевантность</div>
+                    </div>
+                    <div class="li"><i></i>
+                        <div>Реклама: поиск/авто, корректировки, минус‑списки</div>
+                    </div>
+                    <div class="li"><i></i>
+                        <div>Отчёты: P&L, движение остатков, план работ</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Раздел 2 -->
+    <section class="section alt" id="lvl2">
+        <div class="container split reverse">
+            <div>
+                <h2 class="h2-like">Расширенное ведение: реклама и аналитика</h2>
+                <p class="lead">Полное управление рекламой, конкурентный анализ, расширение ассортимента, детальные
+                    отчёты и консультации.</p>
+                <div class="list">
+                    <div class="li"><i></i>
+                        <div>Сегментация семантики: ядро/хвост/бренд; авто/ручные стратегии; A/B‑тесты;
+                            бюджет‑менеджмент</div>
+                    </div>
+                    <div class="li"><i></i>
+                        <div>KPI: <span class="tip"><span class="ico">i</span><span class="bubble"><b>CTR</b> —
+                                    кликабельность; <b>CR</b> — конверсия; <b>CPA</b> — стоимость заказа; <b>ROMI</b> —
+                                    окупаемость маркетинга.</span></span></div>
+                    </div>
+                    <div class="li"><i></i>
+                        <div>Конкуренты: медианы, эластичность цен, сезонность, контент‑аудит</div>
+                    </div>
+                    <div class="li"><i></i>
+                        <div>Смежные ниши: оценка спроса, тест‑матрица, финмодель по SKU</div>
+                    </div>
+                    <div class="li"><i></i>
+                        <div>Отчёты: недельные/месячные, план тестов на 4–6 недель</div>
+                    </div>
+                </div>
+                <div class="block" style="margin-top:14px;">
+                    <h3>Кейс: товары для дома, Ozon, 42 SKU</h3>
+                    <p class="muted">Высокий CPA и низкий CR. Разбили семантику на кластеры, пересобрали кампании,
+                        доработали атрибуты и медиа, ввели минус‑списки и A/B‑тесты. 8 недель: CPA −27%, CR +22%, ROMI
+                        +41%, оборот +28% при прежнем бюджете.</p>
+                </div>
+                <div class="cta-row">
+                    <a href="tel:+79162404426" class="btn">Позвонить</a>
+                    <a href="https://t.me/m/yDxRZjA-OTdi" class="btn">Написать в Telegram</a>
+                </div>
+            </div>
+            <div class="block">
+                <h3>Финансовые условия</h3>
+                <div class="kpi">
+                    <div class="card"><b>9%</b><span>от оборота</span></div>
+                    <div class="card"><b>89&nbsp;000&nbsp;₽</b><span>минималка</span></div>
+                    <div class="card"><b>WB + Ozon</b><span>по желанию</span></div>
+                </div>
+                <p class="muted" style="margin-top:10px;">Оборот считаем по отчётам МП без НДС и штрафов (фиксируем в
+                    договоре).</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Раздел 3 -->
+    <section class="section" id="lvl3">
+        <div class="container split">
+            <div>
+                <h2 class="h2-like">Премиум: аналитика, дашборды и масштаб</h2>
+                <p class="lead">Финансовая аналитика (P&L, Cash‑Flow), ABC/XYZ, “тепловые” карты, дашборд “в одном
+                    окне”, внешняя реклама и развитие бренда.</p>
+                <div class="list">
+                    <div class="li"><i></i>
+                        <div>Маржинальность по SKU, налоговая оптимизация</div>
+                    </div>
+                    <div class="li"><i></i>
+                        <div>ABC/XYZ, фокус на якорных SKU, ассортиментная стратегия</div>
+                    </div>
+                    <div class="li"><i></i>
+                        <div>Дашборд с KPI и алертами: CR/CTR/CPA/ROMI, остатки, прогноз поставок</div>
+                    </div>
+                    <div class="li"><i></i>
+                        <div>Внешняя реклама: поиск/медийка/инфлюенсеры, вклад в органику</div>
+                    </div>
+                    <div class="li"><i></i>
+                        <div>Честный Знак и сертификация — сопровождение включено</div>
+                    </div>
+                </div>
+                <div class="block" style="margin-top:14px;">
+                    <h3>Кейс: электроника, WB+Ozon, 67 SKU</h3>
+                    <p class="muted">ABC/XYZ → фокус на 20 SKU класса A; корректировка цен по эластичности; чистка
+                        ассортимента; усиление контента и внешнего трафика; дашборд с алертами по OOS/ставкам. 10
+                        недель: оборот +35%, маржа +6 п.п., OOS −63%, ROMI +29%.</p>
+                </div>
+                <div class="cta-row">
+                    <a href="tel:+79162404426" class="btn">Позвонить</a>
+                    <a href="https://t.me/m/yDxRZjA-OTdi" class="btn">Написать в Telegram</a>
+                </div>
+            </div>
+            <div class="block">
+                <h3>Финансовые условия</h3>
+                <div class="kpi">
+                    <div class="card"><b>8%</b><span>от оборота</span></div>
+                    <div class="card"><b class="nowrap">480&nbsp;000&nbsp;₽</b><span>минималка</span></div>
+                    <div class="card"><b>дашборд</b><span>1 окно</span></div>
+                </div>
+                <p class="muted" style="margin-top:10px;">KPI и методики прозрачны; доступ к отчётам — по графику.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Отчёты (HTML) -->
+    <section class="section alt" id="reports">
+        <div class="container">
+            <h2 class="h2-like" style="margin-bottom:12px;">Примеры отчётов (HTML)</h2>
+            <p class="muted" style="margin-bottom:16px;">Статическая вёрстка отчётов: KPI, P&amp;L, большой дашборд и
+                матрицы ABC/XYZ. Без JS‑логики — только аккуратная типографика и структура.</p>
+
+            <div class="reports">
+                <!-- KPI Report -->
+                <article class="report">
+                    <div class="report-head">
+                        <div>
+                            <div class="report-title">KPI Report — Сводка</div>
+                            <div class="report-sub">WB • Период: 01–30.09 • Сравнение с 01–31.08</div>
+                        </div>
+                        <div class="report-sub">Версия макета</div>
+                    </div>
+                    <div class="report-body">
+                        <div class="kpi-row">
+                            <div class="kpi-tile"><b>2,14%</b><span>CTR</span></div>
+                            <div class="kpi-tile"><b>5,8%</b><span>CR</span></div>
+                            <div class="kpi-tile"><b class="nowrap">214&nbsp;₽</b><span>CPA</span></div>
+                            <div class="kpi-tile"><b>162%</b><span>ROMI</span></div>
+                        </div>
+                        <table class="tbl">
+                            <thead>
+                                <tr>
+                                    <th>Канал</th>
+                                    <th>Показы</th>
+                                    <th>Клики</th>
+                                    <th>Заказы</th>
+                                    <th>CTR</th>
+                                    <th>CR</th>
+                                    <th>CPA, ₽</th>
+                                    <th>ROMI</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Поиск — ядро</td>
+                                    <td>1 240 000</td>
+                                    <td>26 500</td>
+                                    <td>1 540</td>
+                                    <td>2,14%</td>
+                                    <td>5,8%</td>
+                                    <td>207</td>
+                                    <td>171%</td>
+                                </tr>
+                                <tr>
+                                    <td>Поиск — хвост</td>
+                                    <td>680 000</td>
+                                    <td>8 600</td>
+                                    <td>430</td>
+                                    <td>1,26%</td>
+                                    <td>5,0%</td>
+                                    <td>238</td>
+                                    <td>148%</td>
+                                </tr>
+                                <tr>
+                                    <td>Бренд</td>
+                                    <td>210 000</td>
+                                    <td>5 100</td>
+                                    <td>420</td>
+                                    <td>2,43%</td>
+                                    <td>8,2%</td>
+                                    <td>151</td>
+                                    <td>196%</td>
+                                </tr>
+                                <tr class="tr-total">
+                                    <td>Итого</td>
+                                    <td>2 130 000</td>
+                                    <td>40 200</td>
+                                    <td>2 390</td>
+                                    <td>1,89%</td>
+                                    <td>5,9%</td>
+                                    <td>214</td>
+                                    <td>162%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <!-- P&L Report -->
+                <article class="report">
+                    <div class="report-head">
+                        <div>
+                            <div class="report-title">P&amp;L Report — Доходы/Расходы</div>
+                            <div class="report-sub">Ozon • Период: 01–30.09 • Валюта: ₽</div>
+                        </div>
+                        <div class="report-sub">Версия макета</div>
+                    </div>
+                    <div class="report-body">
+                        <table class="tbl">
+                            <thead>
+                                <tr>
+                                    <th>Статья</th>
+                                    <th>Сумма, ₽</th>
+                                    <th>Доля</th>
+                                    <th>Комментарий</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Выручка (нетто)</td>
+                                    <td class="nowrap">12&nbsp;480&nbsp;000</td>
+                                    <td>100%</td>
+                                    <td>После комиссий МП</td>
+                                </tr>
+                                <tr>
+                                    <td>Себестоимость (COGS)</td>
+                                    <td class="nowrap">7&nbsp;980&nbsp;000</td>
+                                    <td>64%</td>
+                                    <td>Закуп и производство</td>
+                                </tr>
+                                <tr>
+                                    <td>Логистика и хранение</td>
+                                    <td class="nowrap">820&nbsp;000</td>
+                                    <td>6,6%</td>
+                                    <td>FBO/FBS + фулфилмент</td>
+                                </tr>
+                                <tr>
+                                    <td>Реклама внутренняя</td>
+                                    <td class="nowrap">1&nbsp;090&nbsp;000</td>
+                                    <td>8,7%</td>
+                                    <td>Поиск/авто/бренд</td>
+                                </tr>
+                                <tr>
+                                    <td>Прочие расходы</td>
+                                    <td class="nowrap">210&nbsp;000</td>
+                                    <td>1,7%</td>
+                                    <td>Сервисные сборы</td>
+                                </tr>
+                                <tr class="tr-total">
+                                    <td>Валовая прибыль</td>
+                                    <td class="nowrap">2&nbsp;380&nbsp;000</td>
+                                    <td>19,1%</td>
+                                    <td>Рекомендации по улучшению</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <!-- Big Dashboard -->
+                <article class="report">
+                    <div class="report-head">
+                        <div>
+                            <div class="report-title">Dashboard — Сводный обзор</div>
+                            <div class="report-sub">WB + Ozon • KPI, оборот, алерты, остатки</div>
+                        </div>
+                        <div class="report-sub">Версия макета</div>
+                    </div>
+                    <div class="report-body">
+                        <div class="dash-wrap">
+                            <div class="dash-grid">
+                                <div class="dash-box">
+                                    <h4 class="dash-title">Оборот по неделям</h4>
+                                    <div class="chart-bar">
+                                        <div class="bar" style="height:42%"></div>
+                                        <div class="bar" style="height:48%"></div>
+                                        <div class="bar" style="height:56%"></div>
+                                        <div class="bar" style="height:60%"></div>
+                                        <div class="bar" style="height:66%"></div>
+                                        <div class="bar" style="height:72%"></div>
+                                        <div class="bar" style="height:70%"></div>
+                                        <div class="bar" style="height:78%"></div>
+                                        <div class="bar" style="height:74%"></div>
+                                        <div class="bar" style="height:80%"></div>
+                                        <div class="bar" style="height:77%"></div>
+                                        <div class="bar" style="height:83%"></div>
+                                    </div>
+                                    <div class="legend"><span>WB</span><span>Ozon</span></div>
+                                </div>
+                                <div class="dash-box">
+                                    <h4 class="dash-title">Алерты</h4>
+                                    <ul style="margin:0; padding-left:18px; line-height:1.7;">
+                                        <li>Риск OOS: 7 SKU (класс A)</li>
+                                        <li>CR в “хвосте” ниже медианы на 12%</li>
+                                        <li>Ставки ядра перегреты на 8%</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="dash-kpis">
+                                <div class="dash-kpi"><b>2,10%</b><span>CTR общий</span></div>
+                                <div class="dash-kpi"><b>6,0%</b><span>CR общий</span></div>
+                                <div class="dash-kpi"><b class="nowrap">224&nbsp;₽</b><span>CPA</span></div>
+                                <div class="dash-kpi"><b>+29%</b><span>ROMI реклама</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- ABC / XYZ Matrix -->
+                <article class="report">
+                    <div class="report-head">
+                        <div>
+                            <div class="report-title">ABC/XYZ Matrix — Ассортимент</div>
+                            <div class="report-sub">WB + Ozon • Период: 01–30.09</div>
+                        </div>
+                        <div class="report-sub">Версия макета</div>
+                    </div>
+                    <div class="report-body">
+                        <div class="caption">ABC — вклад SKU в оборот</div>
+                        <div class="matrix">
+                            <table class="tbl">
+                                <thead>
+                                    <tr>
+                                        <th>Группа</th>
+                                        <th>SKU</th>
+                                        <th>Доля оборота</th>
+                                        <th>Комментарий</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>A</td>
+                                        <td>20</td>
+                                        <td>80%</td>
+                                        <td>Ядро ассортимента, приоритетная поддержка</td>
+                                    </tr>
+                                    <tr>
+                                        <td>B</td>
+                                        <td>30</td>
+                                        <td>15%</td>
+                                        <td>Потенциал роста при доработке карточек</td>
+                                    </tr>
+                                    <tr>
+                                        <td>C</td>
+                                        <td>17</td>
+                                        <td>5%</td>
+                                        <td>Хвост, к оптимизации</td>
+                                    </tr>
+                                    <tr class="tr-total">
+                                        <td>Итого</td>
+                                        <td>67</td>
+                                        <td>100%</td>
+                                        <td>Контроль ассортиментной стратегии</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <table class="tbl">
+                                <thead>
+                                    <tr>
+                                        <th>Группа</th>
+                                        <th>SKU</th>
+                                        <th>Оборот, ₽</th>
+                                        <th>Средн. маржа</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>A</td>
+                                        <td>20</td>
+                                        <td class="nowrap">8&nbsp;960&nbsp;000</td>
+                                        <td>23%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>B</td>
+                                        <td>30</td>
+                                        <td class="nowrap">1&nbsp;680&nbsp;000</td>
+                                        <td>18%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>C</td>
+                                        <td>17</td>
+                                        <td class="nowrap">560&nbsp;000</td>
+                                        <td>12%</td>
+                                    </tr>
+                                    <tr class="tr-total">
+                                        <td>Итого</td>
+                                        <td>67</td>
+                                        <td class="nowrap">11&nbsp;200&nbsp;000</td>
+                                        <td>—</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="caption" style="margin-top:18px;">XYZ — стабильность спроса</div>
+                        <div class="matrix">
+                            <table class="tbl">
+                                <thead>
+                                    <tr>
+                                        <th>Группа</th>
+                                        <th>SKU</th>
+                                        <th>Варьируемость</th>
+                                        <th>Комментарий</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>X</td>
+                                        <td>28</td>
+                                        <td>Низкая</td>
+                                        <td>Стабильный спрос, прогнозируемые поставки</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Y</td>
+                                        <td>24</td>
+                                        <td>Средняя</td>
+                                        <td>Сезонные пики, контроль запасов</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Z</td>
+                                        <td>15</td>
+                                        <td>Высокая</td>
+                                        <td>Тесты, осторожный выкуп</td>
+                                    </tr>
+                                    <tr class="tr-total">
+                                        <td>Итого</td>
+                                        <td>67</td>
+                                        <td>—</td>
+                                        <td>Планирование через ABC/XYZ‑связки</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <table class="tbl">
+                                <thead>
+                                    <tr>
+                                        <th>Связка</th>
+                                        <th>SKU</th>
+                                        <th>Приоритет</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>AX</td>
+                                        <td>14</td>
+                                        <td>Максимальный</td>
+                                        <td>Поддержка наличия, ставка на органику и бренд</td>
+                                    </tr>
+                                    <tr>
+                                        <td>AY</td>
+                                        <td>4</td>
+                                        <td>Высокий</td>
+                                        <td>Подготовка к пикам, промо‑календарь</td>
+                                    </tr>
+                                    <tr>
+                                        <td>AZ</td>
+                                        <td>2</td>
+                                        <td>Средний</td>
+                                        <td>Осторожные тесты, запасы на короткий срок</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BX</td>
+                                        <td>10</td>
+                                        <td>Средний</td>
+                                        <td>Доработка карточек, расширение семантики</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BY</td>
+                                        <td>12</td>
+                                        <td>Средний</td>
+                                        <td>Сезонные промо и контент</td>
+                                    </tr>
+                                    <tr>
+                                        <td>CZ</td>
+                                        <td>9</td>
+                                        <td>Низкий</td>
+                                        <td>Оптимизация/вывод из матрицы</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="legend-row">
+                            <span>ABC — вклад в оборот</span>
+                            <span>XYZ — стабильность спроса</span>
+                            <span>AX — топ‑приоритет</span>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Контакты -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <div class="contact-grid fade-in visible">
+                <div class="contact-info">
+                    <h2>Коннект</h2>
+                    <div class="info-item">
+                        <h4>Email</h4>
+                        <p class="links"><a class="links" href="mailto:info@mraketplace.ru">info@mraketplace.ru⤴</a></p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Phone</h4>
+                        <p class="links"><a class="links" href="tel:+79162404426">+7 916 240 44 26</a></p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Гео</h4>
+                        <p>Москва</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Whatsapp</h4>
+                        <p class="links"><a class="links" href="https://wa.me/message/LAERCUXKXQNKC1">Написать нам в
+                                WA</a></p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Telegram</h4>
+                        <p class="links"><a class="links" href="https://t.me/m/yDxRZjA-OTdi">Написать нам в Telegram</a>
+                        </p>
+                    </div>
+                </div>
+                <div class="contact-divider"></div>
+                <div class="contact-form">
+                    <form id="manageForm">
+                        <div class="form-group"><input type="text" name="name" placeholder=" " required /><label>Ваше
+                                имя</label></div>
+                        <div class="form-group"><input type="text" name="contact" placeholder=" "
+                                required /><label>Телефон или Telegram</label></div>
+                        <div class="form-group"><textarea name="message" rows="4" placeholder=" "
+                                required></textarea><label>Кратко: МП, оборот/SKU, цели</label></div>
+                        <button type="submit" class="submit-btn">Отправить</button>
+                    </form>
+                    <div id="formMsg" class="price-meta" style="margin-top:10px;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2021-2025 МРАКЕТПЛЕЙСЫ</p>
+        <p>Все права защищены.</p>
+        <p>ИП Куракин Егор Дмитриевич • ИНН 773167683579</p>
+        <ul>
+            <li><a href="/privacy.html">Политика Конфиденциальности</a></li>
+            <li><a href="/terms.html">Условия Использования</a></li>
+            <li><a href="/locations.html">Адреса Филиалов</a></li>
+        </ul>
+    </footer>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="tooplate-minimal-script.js"></script>
+    <script>
+        (function () {
+            var t = document.getElementById("menuToggle");
+            var l = document.getElementById("navLinks");
+            if (t && l) { t.addEventListener("click", function () { t.classList.toggle("active"); l.classList.toggle("active"); }); }
+        })();
+
+        (function () {
+            var f = document.getElementById("manageForm");
+            var m = document.getElementById("formMsg");
+            if (!f) return;
+            f.addEventListener("submit", function (e) {
+                e.preventDefault();
+                var payload = {
+                    name: f.name.value.trim(),
+                    contact: f.contact.value.trim(),
+                    message: f.message.value.trim(),
+                    page: "manage",
+                    ts: new Date().toISOString()
+                };
+                m.style.color = "#6b6b6b";
+                m.textContent = "Заявка отправлена. Менеджер свяжется с вами. Если срочно — позвоните +7 916 240 44 26.";
+                // TODO: axios.post('/api/manage-request', payload)
+                f.reset();
+            });
+        })();
+    </script>
+</body>
+
+</html>
