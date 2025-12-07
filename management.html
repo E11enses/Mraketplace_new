@@ -449,6 +449,101 @@
                 height: 160px;
             }
         }
+
+        /* Responsive fixes for reports on mobile */
+
+        /* Constrain report content to viewport */
+        .report,
+        .report-head,
+        .report-body {
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        /* Make wide tables scroll inside, not the whole page */
+        .report-body .tbl {
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-collapse: separate;
+            /* helps avoid clipping on iOS when scrolling */
+        }
+
+        .report-body .tbl thead,
+        .report-body .tbl tbody,
+        .report-body .tbl tr,
+        .report-body .tbl th,
+        .report-body .tbl td {
+            white-space: nowrap;
+            /* keep table cells from wrapping awkwardly */
+        }
+
+        /* Optional: on very narrow screens, allow wrapping of long text cells except headers */
+        @media (max-width: 420px) {
+            .report-body .tbl td {
+                white-space: normal;
+                /* wrap long comments/notes */
+            }
+
+            .report-body .tbl th {
+                white-space: nowrap;
+                /* keep headers compact */
+            }
+        }
+
+        /* Dashboard: stack and shrink gracefully on mobile */
+        @media (max-width: 980px) {
+            .dash-wrap {
+                padding: 12px;
+            }
+
+            .dash-grid {
+                grid-template-columns: 1fr;
+                /* stack charts/alerts */
+                gap: 12px;
+            }
+
+            .chart-bar {
+                grid-template-columns: repeat(12, minmax(8px, 1fr));
+                gap: 6px;
+                height: 140px;
+                /* reduce bar height to fit viewport */
+            }
+
+            .dash-kpis {
+                grid-template-columns: repeat(2, 1fr);
+                /* 2-up tiles on small screens */
+                gap: 8px;
+            }
+        }
+
+        /* Extra safety for very small devices */
+        @media (max-width: 360px) {
+
+            .kpi-row,
+            .dash-kpis {
+                grid-template-columns: 1fr;
+                /* stack KPI tiles */
+            }
+
+            .kpi-tile b,
+            .dash-kpi b {
+                font-size: 22px;
+            }
+        }
+
+        /* Make matrices scroll if needed */
+        .matrix {
+            overflow: hidden;
+        }
+
+        .matrix .tbl {
+            display: block;
+            width: 100%;
+            overflow-x: auto;
+        }
     </style>
 </head>
 
