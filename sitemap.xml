@@ -30,7 +30,17 @@
     <loc>https://mraketplace.ru/storage.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>  
-
+</url>
+  <url>
+    <loc>https://mraketplace.ru/management.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>  
+</url>
+  <url>
+    <loc>https://mraketplace.ru/promotion.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>  
+</url>
   <!-- Utilities section -->
   <url>
     <loc>https://mraketplace.ru/utilities/index.html</loc>
