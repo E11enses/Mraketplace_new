@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Дубликатор ЧЗ — Дублирование честных знаков</title>
+    <meta name="description"
+        content="Приложение для дублирования и автоматической печати кодов Честный Знак. Сканируете код — печать начинается автоматически.">
+    <link rel="canonical" href="https://mraketplace.ru/utilities/duplicator.html">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Дубликатор ЧЗ — Дублирование (копирование) и печать кодов маркировки">
+    <meta property="og:description" content="Локальное приложение для печати кодов Честный Знак">
+    <meta property="og:url" content="https://mraketplace.ru/utilities/duplicator.html">
+
+    <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+
+    <link href="tooplate-minimal-white-style.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bwip-js@4.1.1/dist/bwip-js-min.js"></script>
+
+    <style>
+        /* Hero */
+        .hero-duplicator {
+            min-height: 60vh;
+            display: grid;
+            place-items: center;
+            padding-top: 120px;
+            padding-bottom: 60px;
+            text-align: center;
+        }
+
+        .hero-duplicator h1 {
+            font-size: clamp(42px, 6vw, 68px);
+            font-weight: 100;
+            letter-spacing: -1px;
+            line-height: 0.95;
+            margin-bottom: 20px;
+        }
+
+        .hero-duplicator p {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 40px;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .download-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .download-btn {
+            border: 2px solid #000;
+            background: #000;
+            color: #fff;
+            padding: 14px 28px;
+            text-decoration: none;
+            font: 700 12px/1 Inter, system-ui;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+        }
+
+        .download-btn:hover:not(:disabled) {
+            background: #fff;
+            color: #000;
+            transform: translateY(-2px);
+        }
+
+        .download-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .version-text {
+            font-size: 10px;
+            opacity: 0.7;
+        }
+
+        .tooltip {
+            visibility: hidden;
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+            padding: 8px 12px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-size: 11px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #000 transparent transparent transparent;
+        }
+
+        .download-btn:disabled:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Sections */
+        .section-dup {
+            padding: 80px 20px;
+            border-bottom: 1px solid #e3e3e3;
+        }
+
+        .section-dup:last-child {
+            border-bottom: none;
+        }
+
+        .section-dup.alt {
+            background: #fafafa;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .h2-dup {
+            font-size: 42px;
+            font-weight: 100;
+            letter-spacing: -1px;
+            margin: 0 0 40px;
+            line-height: 1.1;
+        }
+
+        /* About Grid */
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+        }
+
+        .about-item h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .about-item p {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Instructions */
+        .instructions-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .instructions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .instruction-item {
+            border: 1px solid #e3e3e3;
+            padding: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fff;
+        }
+
+        .instruction-item:hover {
+            border-color: #000;
+            background: #f9f9f9;
+        }
+
+        .instruction-item.active {
+            background: #000;
+            color: #fff;
+            border-color: #000;
+        }
+
+        .instruction-number {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            opacity: 0.6;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .instruction-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .instruction-desc {
+            font-size: 13px;
+            opacity: 0.7;
+            line-height: 1.5;
+        }
+
+        /* Preview */
+        .preview-box {
+            background: #f5f5f5;
+            border: 1px solid #e3e3e3;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+            color: #999;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .preview-box.active {
+            background: #fff;
+            border: 1px solid #000;
+            color: #333;
+        }
+
+        .preview-content {
+            display: none;
+            width: 100%;
+        }
+
+        .preview-content.active {
+            display: block;
+        }
+
+        .field-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-align: left;
+            color: #000;
+        }
+
+        .field-value {
+            background: #f9f9f9;
+            padding: 10px 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin-bottom: 16px;
+            border: 1px solid #eee;
+            word-break: break-all;
+            text-align: left;
+            color: #333;
+        }
+
+        .datamatrix-preview {
+            background: white;
+            padding: 20px;
+            border: 1px solid #e3e3e3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 180px;
+        }
+
+        .datamatrix-preview canvas {
+            max-width: 100%;
+            height: auto;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+
+        .status-text {
+            color: #999;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+
+        /* Why Desktop */
+        .why-block {
+            background: #fff;
+            border: 1px solid #e3e3e3;
+            padding: 40px;
+            margin-bottom: 60px;
+        }
+
+        .why-block h3 {
+            font-size: 28px;
+            font-weight: 100;
+            letter-spacing: -0.5px;
+            margin-bottom: 30px;
+        }
+
+        .why-reasons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .reason {
+            border-left: 2px solid #000;
+            padding-left: 20px;
+        }
+
+        .reason-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .reason-text {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .algorithm-box {
+            background: #fafafa;
+            border: 1px solid #e3e3e3;
+            padding: 24px;
+            margin-top: 30px;
+        }
+
+        .algorithm-title {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .algorithm-text {
+            font-size: 13px;
+            color: #333;
+            line-height: 1.8;
+        }
+
+        .algorithm-text strong {
+            color: #000;
+        }
+
+        /* Requirements */
+        .requirements-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+        }
+
+        .requirement {
+            border: 1px solid #e3e3e3;
+            padding: 24px;
+        }
+
+        .requirement h3 {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 16px;
+            font-weight: 700;
+            border-bottom: 1px solid #e3e3e3;
+            padding-bottom: 12px;
+        }
+
+        .requirement ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .requirement li {
+            font-size: 13px;
+            color: #666;
+            padding: 6px 0;
+            line-height: 1.6;
+        }
+
+        .requirement li:before {
+            content: "—";
+            margin-right: 8px;
+            color: #000;
+        }
+
+        /* Navigation */
+        #navbar {
+            border-bottom: 1px solid #e3e3e3;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+
+            .about-grid,
+            .requirements-grid,
+            .why-reasons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .instructions-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-duplicator h1 {
+                font-size: 36px;
+            }
+
+            .h2-dup {
+                font-size: 28px;
+            }
+
+            .about-grid,
+            .requirements-grid,
+            .why-reasons,
+            .instructions-wrapper {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .download-buttons {
+                gap: 8px;
+            }
+
+            .download-btn {
+                width: 100%;
+                justify-content: center;
+                padding: 12px 16px;
+            }
+
+            .section-dup {
+                padding: 60px 20px;
+            }
+
+            .why-block {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">МРАКЕТПЛЕЙСЫ</a>
+            <div class="menu-toggle" id="menuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="/" class="nav-link">ГЛАВНАЯ</a></li>
+                <li><a href="/#about" class="nav-link">О НАС</a></li>
+                <li><a href="/#services" class="nav-link">УСЛУГИ</a></li>
+                <li><a href="/utilities/utilities.html" class="nav-link">ИНСТРУМЕНТЫ</a></li>
+                <li><a href="/blog/" class="nav-link">БЛОГ</a></li>
+                <li><a href="/#contact" class="nav-link">КОНТАКТЫ</a></li>
+                <li><a href="/pricing.html" class="nav-link">ПРАЙС</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="hero-duplicator">
+        <div class="hero-content">
+            <h1>Дубликатор ЧЗ — Дублирование и печать кодов маркировки</h1>
+            <p>Приложение для дублирования и автоматической печати кодов Честный Знак. Сканируете код — печать
+                начинается автоматически.</p>
+            <div class="download-buttons">
+                <a href="dist/M-Dublikator-CZ-1.0.0.dmg" class="download-btn" download>
+                    🍎 macOS
+                    <span class="version-text">v1.0.0</span>
+                </a>
+                <a href="dist/M-Dublikator-CZ-1.0.0.AppImage" class="download-btn" download>
+                    🐧 Linux
+                    <span class="version-text">v1.0.0</span>
+                </a>
+                <a href="dist/M-Dublikator-CZ-1.0.0.exe" class="download-btn" download>
+                    🪟 Windows
+                    <span class="version-text">v1.0.0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- About -->
+    <section class="section-dup" id="about">
+        <div class="container">
+            <h2 class="h2-dup">О программе</h2>
+            <div class="about-grid">
+                <div class="about-item">
+                    <h3>Локально</h3>
+                    <p>Все данные обрабатываются на вашем компьютере. Никаких серверов или облачных сервисов.</p>
+                </div>
+                <div class="about-item">
+                    <h3>Быстро</h3>
+                    <p>Сканируете код → код автоматически печатается. Никаких лишних кликов и действий.</p>
+                </div>
+                <div class="about-item">
+                    <h3>Просто</h3>
+                    <p>Выберите принтер один раз. Дальше система все сделает сама за вас.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="section-dup alt" id="how">
+        <div class="container">
+            <h2 class="h2-dup">Как это работает</h2>
+            <div class="instructions-wrapper">
+                <div class="instructions-list">
+                    <div class="instruction-item active" onclick="selectInstruction(0)">
+                        <div class="instruction-number">Шаг 1</div>
+                        <div class="instruction-title">Подготовка</div>
+                        <div class="instruction-desc">Выберите размер этикетки и подключенный принтер</div>
+                    </div>
+                    <div class="instruction-item" onclick="selectInstruction(1)">
+                        <div class="instruction-number">Шаг 2</div>
+                        <div class="instruction-title">Сканирование</div>
+                        <div class="instruction-desc">Отсканируйте код маркировки сканером или вставьте вручную</div>
+                    </div>
+                    <div class="instruction-item" onclick="selectInstruction(2)">
+                        <div class="instruction-number">Шаг 3</div>
+                        <div class="instruction-title">Обработка</div>
+                        <div class="instruction-desc">Система автоматически обработает код и покажет превью</div>
+                    </div>
+                    <div class="instruction-item" onclick="selectInstruction(3)">
+                        <div class="instruction-number">Шаг 4</div>
+                        <div class="instruction-title">Печать</div>
+                        <div class="instruction-desc">Код автоматически отправляется на печать на выбранный принтер
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preview-box active">
+                    <div class="preview-content active" id="preview-0">
+                        <div class="field-label">Размер этикетки</div>
+                        <div class="field-value">58×40 мм</div>
+                        <div class="field-label">Принтер</div>
+                        <div class="field-value">4BARCODE_4B_2054L</div>
+                        <div class="status-text">Статус: Готов к сканированию ✓</div>
+                    </div>
+
+                    <div class="preview-content" id="preview-1">
+                        <div class="field-label">Код маркировки</div>
+                        <div class="field-value">0104680837103448215haedvXS8LBDJ91EF1092mE4t4kyJc7aTAay01dSA...</div>
+                        <div class="status-text">Ввод кода или вставка из буфера обмена</div>
+                    </div>
+
+                    <div class="preview-content" id="preview-2">
+                        <div class="field-label">Тип кода</div>
+                        <div class="field-value">Стандартный</div>
+                        <div class="field-label">GTIN</div>
+                        <div class="field-value">0468083710344</div>
+                        <div class="field-label">ИСН</div>
+                        <div class="field-value">5haedvXS8LBDJ</div>
+                        <div class="status-text">Код успешно обработан</div>
+                    </div>
+
+                    <div class="preview-content" id="preview-3">
+                        <div class="field-label">DataMatrix код для печати</div>
+                        <div class="datamatrix-preview" id="datamatrixContainer"></div>
+                        <div class="status-text">Отправлено на печать</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Desktop -->
+    <section class="section-dup" id="why">
+        <div class="container">
+            <div class="why-block">
+                <h3>Почему нужно приложение, а не браузер?</h3>
+                <div class="why-reasons">
+                    <div class="reason">
+                        <div class="reason-title">Доступ к принтерам</div>
+                        <div class="reason-text">Браузеры не имеют прямого доступа к системным принтерам по соображениям
+                            безопасности. Приложение работает напрямую с драйверами принтера на вашем компьютере.</div>
+                    </div>
+                    <div class="reason">
+                        <div class="reason-title">Работа с любым принтером</div>
+                        <div class="reason-text">Благодаря специальному алгоритму, приложение печатает на любом принтере
+                            — без необходимости поддержки ZPL или других специальных команд.</div>
+                    </div>
+                    <div class="reason">
+                        <div class="reason-title">Скорость и надёжность</div>
+                        <div class="reason-text">Прямой доступ к системе обеспечивает минимальные задержки. Печать
+                            начинается мгновенно после сканирования без обращений к серверам.</div>
+                    </div>
+                    <div class="reason">
+                        <div class="reason-title">Офлайн-работа</div>
+                        <div class="reason-text">Приложение работает полностью локально. Интернет нужен только для
+                            первого скачивания. Сбои сети не помешают вашей работе.</div>
+                    </div>
+                </div>
+
+                <div class="algorithm-box">
+                    <div class="algorithm-title">🔧 Специальный алгоритм обработки DataMatrix</div>
+                    <div class="algorithm-text">
+                        Приложение использует специальный алгоритм обработки кодов маркировки, который преобразует
+                        данные Честного Знака в <strong>универсальный формат изображения</strong>. Это означает, что
+                        печать работает на <strong>любом принтере</strong> — от специализированных термопринтеров до
+                        обычных офисных устройств.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Requirements -->
+    <section class="section-dup alt" id="requirements">
+        <div class="container">
+            <h2 class="h2-dup">Системные требования</h2>
+            <div class="requirements-grid">
+                <div class="requirement">
+                    <h3>macOS</h3>
+                    <ul>
+                        <li>macOS 10.13 или новее</li>
+                        <li>Процессор Intel или Apple Silicon</li>
+                        <li>200 МБ свободного места</li>
+                        <li>Принтер USB или сетевой</li>
+                    </ul>
+                </div>
+                <div class="requirement">
+                    <h3>Linux</h3>
+                    <ul>
+                        <li>Ubuntu 18.04 или аналог</li>
+                        <li>CUPS установлен в системе</li>
+                        <li>200 МБ свободного места</li>
+                        <li>Принтер USB или сетевой</li>
+                    </ul>
+                </div>
+                <div class="requirement">
+                    <h3>Оборудование</h3>
+                    <ul>
+                        <li>Принтер USB или сетевой</li>
+                        <li>Сканер штрих-кодов (опционально)</li>
+                        <li>Интернет для скачивания (один раз)</li>
+                        <li>Admin права на установку</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="tooplate-minimal-script.js"></script>
+    <script>
+        const GS = String.fromCharCode(29);
+        const sampleCode = `^FNC104680837103448215haedvXS8LBDJ${GS}91EF10${GS}92mE4t4kyJc7aTAay01dSA`;
+
+        function generateDataMatrix() {
+            const container = document.getElementById('datamatrixContainer');
+            container.innerHTML = '';
+
+            const canvas = document.createElement('canvas');
+            try {
+                bwipjs.toCanvas(canvas, {
+                    bcid: 'datamatrix',
+                    text: sampleCode,
+                    scale: 4,
+                    height: 10,
+                    width: 10,
+                    includetext: false,
+                    parsefnc: true,
+                });
+                container.appendChild(canvas);
+            } catch (e) {
+                container.innerHTML = '<div style="color: #999; font-size: 12px;">Ошибка генерации кода</div>';
+            }
+        }
+
+        function selectInstruction(index) {
+            document.querySelectorAll('.instruction-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.preview-content').forEach(el => el.classList.remove('active'));
+
+            document.querySelectorAll('.instruction-item')[index].classList.add('active');
+            document.getElementById(`preview-${index}`).classList.add('active');
+
+            if (index === 3) {
+                setTimeout(generateDataMatrix, 100);
+            }
+        }
+    </script>
+</body>
+
+</html>
