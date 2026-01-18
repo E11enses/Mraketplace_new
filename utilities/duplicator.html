@@ -20,133 +20,93 @@
     <link rel="shortcut icon" href="/favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
 
-    <link href="tooplate-minimal-white-style.css" rel="stylesheet">
+    <link href="../tooplate-minimal-white-style.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bwip-js@4.1.1/dist/bwip-js-min.js"></script>
 
     <style>
-        /* Hero */
-        .hero-duplicator {
-            min-height: 60vh;
-            display: grid;
-            place-items: center;
-            padding-top: 120px;
-            padding-bottom: 60px;
-            text-align: center;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .hero-duplicator h1 {
-            font-size: clamp(42px, 6vw, 68px);
-            font-weight: 100;
-            letter-spacing: -1px;
-            line-height: 0.95;
-            margin-bottom: 20px;
-        }
-
-        .hero-duplicator p {
-            font-size: 18px;
-            color: #666;
-            margin-bottom: 40px;
-            max-width: 600px;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #ffffff;
+            color: #000;
             line-height: 1.6;
         }
 
-        .download-buttons {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            justify-content: center;
+        .wrap {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
 
-        .download-btn {
-            border: 2px solid #000;
+        /* Header */
+        header {
+            padding: 60px 0;
+            border-bottom: 1px solid #e3e3e3;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        header a {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #000;
+            text-decoration: none;
+            transition: opacity 0.2s;
+            white-space: nowrap;
+        }
+
+        header a:hover {
+            opacity: 0.6;
+        }
+
+        header h1 {
+            font-size: clamp(28px, 4vw, 48px);
+            font-weight: 100;
+            letter-spacing: -1px;
+            line-height: 1.2;
+            flex: 1;
+            text-align: center;
+        }
+
+        .pill {
             background: #000;
             color: #fff;
-            padding: 14px 28px;
-            text-decoration: none;
-            font: 700 12px/1 Inter, system-ui;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-            transition: all 0.3s;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            position: relative;
-        }
-
-        .download-btn:hover:not(:disabled) {
-            background: #fff;
-            color: #000;
-            transform: translateY(-2px);
-        }
-
-        .download-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        .version-text {
-            font-size: 10px;
-            opacity: 0.7;
-        }
-
-        .tooltip {
-            visibility: hidden;
-            background-color: #000;
-            color: #fff;
-            text-align: center;
-            padding: 8px 12px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            white-space: nowrap;
+            padding: 6px 12px;
             font-size: 11px;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-
-        .tooltip::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: #000 transparent transparent transparent;
-        }
-
-        .download-btn:disabled:hover .tooltip {
-            visibility: visible;
-            opacity: 1;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            white-space: nowrap;
         }
 
         /* Sections */
-        .section-dup {
-            padding: 80px 20px;
+        section {
+            padding: 80px 0;
             border-bottom: 1px solid #e3e3e3;
         }
 
-        .section-dup:last-child {
+        section:last-of-type {
             border-bottom: none;
         }
 
-        .section-dup.alt {
+        section.alt {
             background: #fafafa;
         }
 
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
-        .h2-dup {
-            font-size: 42px;
+        h2 {
+            font-size: 36px;
             font-weight: 100;
             letter-spacing: -1px;
-            margin: 0 0 40px;
+            margin-bottom: 40px;
             line-height: 1.1;
         }
 
@@ -305,7 +265,7 @@
             background: #fff;
             border: 1px solid #e3e3e3;
             padding: 40px;
-            margin-bottom: 60px;
+            margin-bottom: 0;
         }
 
         .why-block h3 {
@@ -405,9 +365,91 @@
             color: #000;
         }
 
-        /* Navigation */
-        #navbar {
-            border-bottom: 1px solid #e3e3e3;
+        /* Download Buttons */
+        .download-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .download-btn {
+            border: 2px solid #000;
+            background: #000;
+            color: #fff;
+            padding: 12px 24px;
+            text-decoration: none;
+            font: 700 12px/1 system-ui;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+        }
+
+        .download-btn:hover:not(:disabled) {
+            background: #fff;
+            color: #000;
+            transform: translateY(-2px);
+        }
+
+        .download-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .version-text {
+            font-size: 10px;
+            opacity: 0.7;
+        }
+
+        .tooltip {
+            visibility: hidden;
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+            padding: 8px 12px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-size: 11px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #000 transparent transparent transparent;
+        }
+
+        .download-btn:disabled:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Intro text */
+        .hero-text {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .hero-text p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
         }
 
         /* Responsive */
@@ -422,14 +464,35 @@
             .instructions-wrapper {
                 grid-template-columns: 1fr;
             }
+
+            header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            header h1 {
+                order: 2;
+            }
+
+            header a {
+                order: 1;
+            }
+
+            .pill {
+                order: 3;
+            }
         }
 
         @media (max-width: 768px) {
-            .hero-duplicator h1 {
-                font-size: 36px;
+            header {
+                padding: 40px 0;
             }
 
-            .h2-dup {
+            header h1 {
+                font-size: 28px;
+            }
+
+            h2 {
                 font-size: 28px;
             }
 
@@ -451,8 +514,8 @@
                 padding: 12px 16px;
             }
 
-            .section-dup {
-                padding: 60px 20px;
+            section {
+                padding: 60px 0;
             }
 
             .why-block {
@@ -463,54 +526,39 @@
 </head>
 
 <body>
-    <!-- Navigation -->
-    <nav id="navbar">
-        <div class="nav-container">
-            <a href="/" class="logo">МРАКЕТПЛЕЙСЫ</a>
-            <div class="menu-toggle" id="menuToggle">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            <ul class="nav-links" id="navLinks">
-                <li><a href="/" class="nav-link">ГЛАВНАЯ</a></li>
-                <li><a href="/#about" class="nav-link">О НАС</a></li>
-                <li><a href="/#services" class="nav-link">УСЛУГИ</a></li>
-                <li><a href="/utilities/utilities.html" class="nav-link">ИНСТРУМЕНТЫ</a></li>
-                <li><a href="/blog/" class="nav-link">БЛОГ</a></li>
-                <li><a href="/#contact" class="nav-link">КОНТАКТЫ</a></li>
-                <li><a href="/pricing.html" class="nav-link">ПРАЙС</a></li>
-            </ul>
-        </div>
-    </nav>
+    <div class="wrap">
+        <!-- Header -->
+        <header>
+            <a href="/utilities/utilities.html">⬅︎ Все инструменты</a>
+            <h1>Дубликатор ЧЗ</h1>
+            <div class="pill">Готово</div>
+        </header>
 
-    <!-- Hero -->
-    <header class="hero-duplicator">
-        <div class="hero-content">
-            <h1>Дубликатор ЧЗ — Дублирование и печать кодов маркировки</h1>
-            <p>Приложение для дублирования и автоматической печати кодов Честный Знак. Сканируете код — печать
-                начинается автоматически.</p>
-            <div class="download-buttons">
-                <a href="dist/M-Dublikator-CZ-1.0.0.dmg" class="download-btn" download>
-                    🍎 macOS
-                    <span class="version-text">v1.0.0</span>
-                </a>
-                <a href="dist/M-Dublikator-CZ-1.0.0.AppImage" class="download-btn" download>
-                    🐧 Linux
-                    <span class="version-text">v1.0.0</span>
-                </a>
-                <a href="dist/M-Dublikator-CZ-1.0.0.exe" class="download-btn" download>
-                    🪟 Windows
-                    <span class="version-text">v1.0.0</span>
-                </a>
+        <!-- Hero section with download -->
+        <section class="hero">
+            <div class="hero-text">
+                <p>Приложение для дублирования и автоматической печати кодов Честный Знак. Сканируете код — печать
+                    начинается автоматически.</p>
+                <div class="download-buttons">
+                    <a href="dist/M-Dublikator-CZ-1.0.0.dmg" class="download-btn" download>
+                        🍎 macOS
+                        <span class="version-text">v1.0.0</span>
+                    </a>
+                    <a href="dist/M-Dublikator-CZ-1.0.0.AppImage" class="download-btn" download>
+                        🐧 Linux
+                        <span class="version-text">v1.0.0</span>
+                    </a>
+                    <a href="dist/M-Dublikator-CZ-1.0.0.exe" class="download-btn" download>
+                        🪟 Windows
+                        <span class="version-text">v1.0.0</span>
+                    </a>
+                </div>
             </div>
-        </div>
-    </header>
+        </section>
 
-    <!-- About -->
-    <section class="section-dup" id="about">
-        <div class="container">
-            <h2 class="h2-dup">О программе</h2>
+        <!-- About -->
+        <section id="about">
+            <h2>О программе</h2>
             <div class="about-grid">
                 <div class="about-item">
                     <h3>Локально</h3>
@@ -525,13 +573,11 @@
                     <p>Выберите принтер один раз. Дальше система все сделает сама за вас.</p>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- How it works -->
-    <section class="section-dup alt" id="how">
-        <div class="container">
-            <h2 class="h2-dup">Как это работает</h2>
+        <!-- How it works -->
+        <section class="alt" id="how">
+            <h2>Как это работает</h2>
             <div class="instructions-wrapper">
                 <div class="instructions-list">
                     <div class="instruction-item active" onclick="selectInstruction(0)">
@@ -589,12 +635,10 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Why Desktop -->
-    <section class="section-dup" id="why">
-        <div class="container">
+        <!-- Why Desktop -->
+        <section id="why">
             <div class="why-block">
                 <h3>Почему нужно приложение, а не браузер?</h3>
                 <div class="why-reasons">
@@ -630,13 +674,11 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Requirements -->
-    <section class="section-dup alt" id="requirements">
-        <div class="container">
-            <h2 class="h2-dup">Системные требования</h2>
+        <!-- Requirements -->
+        <section class="alt" id="requirements">
+            <h2>Системные требования</h2>
             <div class="requirements-grid">
                 <div class="requirement">
                     <h3>macOS</h3>
@@ -666,10 +708,9 @@
                     </ul>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
 
-    <script src="tooplate-minimal-script.js"></script>
     <script>
         const GS = String.fromCharCode(29);
         const sampleCode = `^FNC104680837103448215haedvXS8LBDJ${GS}91EF10${GS}92mE4t4kyJc7aTAay01dSA`;
