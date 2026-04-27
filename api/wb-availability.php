@@ -21,7 +21,7 @@ if (!$token) {
   exit;
 }
 
-$ch = curl_init('https://supplies-api.wildberries.ru/api/v1/acceptance/coefficients');
+$ch = curl_init('https://common-api.wildberries.ru/api/tariffs/v1/acceptance/coefficients');
 curl_setopt($ch, CURLOPT_HTTPHEADER, array(
   'Authorization: ' . $token,
   'Accept: application/json'
