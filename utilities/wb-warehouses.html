@@ -457,10 +457,11 @@
     }
 
     // Доступность
+    // NEW — matches current WB API rules
     function rowAvailable(r) {
       if (!r) return false;
-      if (r.coefficient === -1 || r.coefficient === -1.0) return false;
-      return !!r.allowUnload;
+      if (!r.allowUnload) return false;
+      return r.coefficient === 0 || r.coefficient === 1;
     }
     function isAvailable(wh) { return (wh.rows || []).some(rowAvailable); }
     function isPartial(wh) {
