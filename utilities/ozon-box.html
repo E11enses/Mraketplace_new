@@ -1,0 +1,1456 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Генератор штрихкодов коробов Ozon</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" crossorigin="anonymous"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #0f1220;
+      color: #e7e9f3;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+
+    .header {
+      padding: 12px 16px;
+      border-bottom: 1px solid #2a2f4a;
+      background: #0f1220e6;
+      backdrop-filter: saturate(150%) blur(6px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 20px;
+    }
+
+    .topbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    input,
+    button {
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid #2a2f4a;
+      font-size: 14px;
+      background: #171a2b;
+      color: #e7e9f3;
+      padding: 0 12px;
+    }
+
+    input::placeholder {
+      color: #6a6f8a;
+      font-size: 13px;
+    }
+
+    button {
+      background: linear-gradient(180deg, #3853a1, #2d3a8c);
+      color: #fff;
+      border-color: #2f448f;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: linear-gradient(180deg, #202542, #171a2b);
+      color: #e7e9f3;
+      border: 1px solid #2a2f4a;
+    }
+
+    button.danger {
+      background: #8b1a1a;
+      border-color: #6b1414;
+      color: #fff;
+    }
+
+    button.success {
+      background: linear-gradient(180deg, #1a8a3a, #146a2a);
+      border-color: #1a7a3a;
+      color: #fff;
+    }
+
+    .container {
+      padding: 12px 16px 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(360px, 560px) 1fr;
+      gap: 16px;
+    }
+
+    .panel {
+      background: #171a2b;
+      border: 1px solid #2a2f4a;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .panel h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      color: #a6accd;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #a6accd;
+      margin-bottom: 6px;
+    }
+
+    .row-inline {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .list-pages {
+      display: grid;
+      gap: 8px;
+      margin-top: 8px;
+      max-height: 40vh;
+      overflow: auto;
+    }
+
+    .page-item {
+      border: 1px solid #2a2f4a;
+      border-radius: 10px;
+      padding: 8px;
+      background: #1e2235;
+      cursor: pointer;
+    }
+
+    .page-item.active {
+      border-color: #7aa2f7;
+      background: #202542;
+    }
+
+    .page-item.mismatch {
+      border-color: #8a3a1a;
+      background: #2a1a1a;
+    }
+
+    .page-item .warning-badge {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 700;
+      margin-left: 6px;
+    }
+
+    .page-item .warning-badge.missing {
+      background: #8a3a1a;
+      color: #ffaa7a;
+    }
+
+    .page-item .warning-badge.extra {
+      background: #1a4a3a;
+      color: #7ae0b0;
+    }
+
+    .item-title {
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .item-sub {
+      color: #a6accd;
+      font-size: 11px;
+    }
+
+    .preview-viewport {
+      border: 1px solid #2a2f4a;
+      border-radius: 10px;
+      background: #0f1220;
+      padding: 12px;
+      height: calc(100vh - 260px);
+      overflow-y: auto;
+    }
+
+    .pages {
+      display: grid;
+      gap: 16px;
+    }
+
+    .page-stage {
+      background: #0f1220;
+      border-radius: 8px;
+      border: 1px solid #22263a;
+      padding: 8px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .page-stage img {
+      width: 100%;
+      max-width: 600px;
+      height: auto;
+      border-radius: 4px;
+      image-rendering: crisp-edges;
+    }
+
+    .file-upload-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      padding: 8px;
+      background: #1e2235;
+      border-radius: 8px;
+      margin-top: 6px;
+    }
+
+    .file-upload-group label {
+      color: #a6accd;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .file-upload-group input[type="file"] {
+      display: none;
+    }
+
+    .file-upload-group .file-name {
+      color: #e7e9f3;
+      font-size: 13px;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .file-upload-group .file-btn {
+      background: #2a2f4a;
+      border: 1px solid #3a3f5a;
+      color: #e7e9f3;
+      padding: 6px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    .file-upload-group .file-btn:hover {
+      background: #3a3f5a;
+    }
+
+    .parsed-data-panel {
+      background: #1a2235;
+      border: 1px solid #2a3a5a;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 8px 0;
+    }
+
+    .parsed-data-panel .label {
+      color: #8a9abb;
+      font-size: 12px;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .parsed-data-panel .value {
+      color: #e7e9f3;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .parsed-data-panel .value.empty {
+      color: #6a6f8a;
+      font-weight: 400;
+    }
+
+    .confirm-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #2a2f4a;
+    }
+
+    .comparison-panel {
+      background: #1a1a2a;
+      border: 1px solid #2a2f4a;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 8px 0;
+    }
+
+    .comparison-panel .status-ok {
+      color: #7ae0b0;
+    }
+
+    .comparison-panel .status-error {
+      color: #ff7a4a;
+    }
+
+    .comparison-panel .status-warning {
+      color: #e0c87a;
+    }
+
+    @media (max-width: 960px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .topbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .topbar input,
+      .topbar button {
+        width: 100%;
+      }
+      .file-upload-group {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <h1>Генератор этикеток Ozon</h1>
+    <div class="topbar">
+      <input id="supplyNumber" type="text" placeholder="Номер поставки" />
+      <input id="supplierName" type="text" placeholder="Поставщик (ИП/ООО)" />
+      <input id="warehouseName" type="text" placeholder="Склад назначения" />
+      <input id="deliveryType" type="text" placeholder="ПРЯМАЯ / X-DOCK" />
+      <input id="dropoffPoint" type="text" placeholder="Точка сдачи" />
+      <button id="btnExport">Скачать PDF</button>
+      <span id="status" style="color:#a6accd;">Готово</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="grid">
+      <section class="panel">
+        <h3>Загрузка данных</h3>
+
+        <div class="file-upload-group">
+          <label>Excel:</label>
+          <span class="file-name" id="excelFileName">Файл не выбран</span>
+          <button class="file-btn" id="btnSelectExcel">Выбрать файл</button>
+          <button id="btnImportExcel" class="secondary">Загрузить</button>
+          <input id="excelFile" type="file" accept=".xlsx,.xls" />
+        </div>
+
+        <div class="file-upload-group">
+          <label>PDF:</label>
+          <span class="file-name" id="pdfFileName">Файл не выбран</span>
+          <button class="file-btn" id="btnSelectPDF">Выбрать файл</button>
+          <button id="btnParsePDF" class="secondary">Распарсить</button>
+          <input id="pdfFile" type="file" accept=".pdf" multiple />
+        </div>
+
+        <div id="comparisonPanel" class="comparison-panel" style="display:none;">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
+            <span id="comparisonStatus" class="status-ok">✅ ID совпадают</span>
+            <span id="comparisonDetail" style="color:#8a9abb;font-size:12px;"></span>
+          </div>
+          <div style="margin-top:6px;font-size:12px;color:#8a9abb;">
+            <span id="comparisonExcelCount">Excel: 0</span> |
+            <span id="comparisonPdfCount">PDF: 0</span> |
+            <span id="comparisonMatchCount">Совпадают: 0</span>
+          </div>
+        </div>
+
+        <div id="parsedDataPanel" class="parsed-data-panel" style="display:none;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div>
+              <span class="label">📋 Номер поставки</span>
+              <span class="value" id="parsedSupplyNumber">—</span>
+            </div>
+            <div>
+              <span class="label">🏢 Поставщик</span>
+              <span class="value" id="parsedSupplier">—</span>
+            </div>
+            <div>
+              <span class="label">🏭 Склад назначения</span>
+              <span class="value" id="parsedWarehouse">—</span>
+            </div>
+            <div>
+              <span class="label">📦 Тип поставки</span>
+              <span class="value" id="parsedDeliveryType">—</span>
+            </div>
+            <div style="grid-column: span 2;">
+              <span class="label">📍 Точка сдачи</span>
+              <span class="value" id="parsedDropoffPoint">—</span>
+            </div>
+            <div style="grid-column: span 2;">
+              <span class="label">📦 Найдено грузовых мест</span>
+              <span class="value" id="parsedGmCount">—</span>
+            </div>
+          </div>
+          <div class="confirm-row">
+            <button id="btnConfirmData" class="success" style="flex:1;">✅ Данные корректны</button>
+            <button id="btnCancelData" class="secondary">Отмена</button>
+          </div>
+        </div>
+
+        <div style="height:1px;background:#2a2f4a;margin:10px 0"></div>
+
+        <h3>Грузовые места</h3>
+        <div id="labelsList" class="list-pages"></div>
+
+        <div style="height:1px;background:#2a2f4a;margin:10px 0"></div>
+
+        <div class="row-inline">
+          <button id="btnAddEmpty" class="secondary">➕ Добавить</button>
+          <button id="btnDelete" class="danger">🗑 Удалить</button>
+          <button id="btnClearAll" class="secondary">🧹 Очистить всё</button>
+        </div>
+
+        <div style="height:1px;background:#2a2f4a;margin:10px 0"></div>
+
+        <h3>Редактор</h3>
+        <div style="display:grid;gap:8px;">
+          <input id="i_text" type="text" placeholder="ШК ГМ" />
+          <input id="i_gmType" type="text" placeholder="Тип ГМ (Коробка/Паллета)" />
+          <textarea id="i_extra" rows="3" placeholder="Состав (каждый на новой строке)"></textarea>
+          <button id="btnApply" class="secondary">Сохранить</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h3>Предпросмотр</h3>
+        <div id="previewViewport" class="preview-viewport">
+          <div id="pagesPreview" class="pages"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    const els = {
+      labelsList: document.getElementById('labelsList'),
+      pagesPreview: document.getElementById('pagesPreview'),
+      excelFile: document.getElementById('excelFile'),
+      pdfFile: document.getElementById('pdfFile'),
+      btnSelectExcel: document.getElementById('btnSelectExcel'),
+      btnSelectPDF: document.getElementById('btnSelectPDF'),
+      btnImportExcel: document.getElementById('btnImportExcel'),
+      btnParsePDF: document.getElementById('btnParsePDF'),
+      btnAddEmpty: document.getElementById('btnAddEmpty'),
+      btnExport: document.getElementById('btnExport'),
+      btnApply: document.getElementById('btnApply'),
+      btnDelete: document.getElementById('btnDelete'),
+      btnClearAll: document.getElementById('btnClearAll'),
+      btnConfirmData: document.getElementById('btnConfirmData'),
+      btnCancelData: document.getElementById('btnCancelData'),
+      supplyNumber: document.getElementById('supplyNumber'),
+      supplierName: document.getElementById('supplierName'),
+      warehouseName: document.getElementById('warehouseName'),
+      deliveryType: document.getElementById('deliveryType'),
+      dropoffPoint: document.getElementById('dropoffPoint'),
+      status: document.getElementById('status'),
+      excelFileName: document.getElementById('excelFileName'),
+      pdfFileName: document.getElementById('pdfFileName'),
+      i_text: document.getElementById('i_text'),
+      i_gmType: document.getElementById('i_gmType'),
+      i_extra: document.getElementById('i_extra'),
+      parsedDataPanel: document.getElementById('parsedDataPanel'),
+      parsedSupplyNumber: document.getElementById('parsedSupplyNumber'),
+      parsedSupplier: document.getElementById('parsedSupplier'),
+      parsedWarehouse: document.getElementById('parsedWarehouse'),
+      parsedDeliveryType: document.getElementById('parsedDeliveryType'),
+      parsedDropoffPoint: document.getElementById('parsedDropoffPoint'),
+      parsedGmCount: document.getElementById('parsedGmCount'),
+      comparisonPanel: document.getElementById('comparisonPanel'),
+      comparisonStatus: document.getElementById('comparisonStatus'),
+      comparisonDetail: document.getElementById('comparisonDetail'),
+      comparisonExcelCount: document.getElementById('comparisonExcelCount'),
+      comparisonPdfCount: document.getElementById('comparisonPdfCount'),
+      comparisonMatchCount: document.getElementById('comparisonMatchCount'),
+    };
+
+    let labels = [];
+    let activeIndex = -1;
+    const barcodeCache = new Map();
+    let parsedData = null;
+    let excelGmIds = new Set();
+    let pdfGmIds = new Set();
+
+    function extractSupplyNumberFromFilename(filename) {
+      const match = filename.match(/supply[-_](\d{13})/i) ||
+        filename.match(/(\d{13})\.pdf$/i) ||
+        filename.match(/[-_](\d{13})/);
+      if (match) {
+        return match[1];
+      }
+      return null;
+    }
+
+    function parsePDFText(text) {
+      const result = {
+        supplyNumber: null,
+        supplier: null,
+        warehouse: null,
+        deliveryType: null,
+        dropoffPoint: null,
+        gmIds: []
+      };
+
+      if (text.includes('X-DOCK ПОСТАВКА')) {
+        result.deliveryType = 'X-DOCK';
+      } else if (text.includes('ПРЯМАЯ ПОСТАВКА')) {
+        result.deliveryType = 'ПРЯМАЯ';
+      }
+
+      const warehouseMatch = text.match(/(?:X-DOCK|ПРЯМАЯ)\s+ПОСТАВКА В\s+([^№]+?)(?=\s*№\s*ПОСТАВКИ)/i);
+      if (warehouseMatch) {
+        result.warehouse = warehouseMatch[1].trim();
+      }
+
+      const supplyMatch = text.match(/№\s*ПОСТАВКИ\s*\/\s*ПОСТАВЩИК\s*([0-9\s]+)/i);
+      if (supplyMatch) {
+        result.supplyNumber = supplyMatch[1].replace(/\s/g, '');
+      }
+
+      const supplierMatch = text.match(/(ИП|ООО|АО|ЗАО)\s+[А-ЯЁ][а-яё]+\s+[А-ЯЁ][а-яё]+(?:\s+[А-ЯЁ][а-яё]+)?/i);
+      if (supplierMatch) {
+        result.supplier = supplierMatch[0].trim();
+      }
+
+      const dropoffMatch = text.match(/ТОЧКА СДАЧИ\s+([^\d]+)/i);
+      if (dropoffMatch) {
+        result.dropoffPoint = dropoffMatch[1].trim();
+      }
+
+      const gmMatches = text.match(/\b[0-9]{16,19}\b/g) || [];
+      for (const gm of gmMatches) {
+        if (!result.gmIds.includes(gm)) {
+          result.gmIds.push(gm);
+        }
+      }
+
+      return result;
+    }
+
+    async function parsePDFFiles(files) {
+      const results = {
+        supplyNumber: null,
+        supplier: null,
+        warehouse: null,
+        deliveryType: null,
+        dropoffPoint: null,
+        gmIds: []
+      };
+
+      for (const file of files) {
+        const supplyFromFilename = extractSupplyNumberFromFilename(file.name);
+        if (supplyFromFilename && !results.supplyNumber) {
+          results.supplyNumber = supplyFromFilename;
+        }
+
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          let fullText = '';
+
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map(item => item.str).join(' ');
+            fullText += pageText + '\n';
+          }
+
+          const parsed = parsePDFText(fullText);
+
+          if (parsed.supplyNumber && !results.supplyNumber) results.supplyNumber = parsed.supplyNumber;
+          if (parsed.supplier && !results.supplier) results.supplier = parsed.supplier;
+          if (parsed.warehouse && !results.warehouse) results.warehouse = parsed.warehouse;
+          if (parsed.deliveryType && !results.deliveryType) results.deliveryType = parsed.deliveryType;
+          if (parsed.dropoffPoint && !results.dropoffPoint) results.dropoffPoint = parsed.dropoffPoint;
+          for (const gm of parsed.gmIds) {
+            if (!results.gmIds.includes(gm)) results.gmIds.push(gm);
+          }
+
+        } catch (e) {
+          console.warn('Ошибка парсинга PDF:', e);
+        }
+      }
+
+      return results;
+    }
+
+    function compareGmIds() {
+      const excelSet = new Set();
+      const pdfSet = new Set();
+
+      for (const l of labels) {
+        const id = String(l.text || '').trim();
+        if (id) excelSet.add(id);
+      }
+
+      if (parsedData && parsedData.gmIds) {
+        for (const id of parsedData.gmIds) {
+          pdfSet.add(id);
+        }
+      }
+
+      excelGmIds = excelSet;
+      pdfGmIds = pdfSet;
+
+      const onlyInExcel = [];
+      const onlyInPdf = [];
+      const matched = [];
+
+      for (const id of excelSet) {
+        if (pdfSet.has(id)) {
+          matched.push(id);
+        } else {
+          onlyInExcel.push(id);
+        }
+      }
+
+      for (const id of pdfSet) {
+        if (!excelSet.has(id)) {
+          onlyInPdf.push(id);
+        }
+      }
+
+      const panel = els.comparisonPanel;
+      panel.style.display = 'block';
+
+      els.comparisonExcelCount.textContent = `Excel: ${excelSet.size}`;
+      els.comparisonPdfCount.textContent = `PDF: ${pdfSet.size}`;
+      els.comparisonMatchCount.textContent = `Совпадают: ${matched.length}`;
+
+      const statusEl = els.comparisonStatus;
+      const detailEl = els.comparisonDetail;
+
+      if (onlyInExcel.length === 0 && onlyInPdf.length === 0 && excelSet.size > 0) {
+        statusEl.className = 'status-ok';
+        statusEl.textContent = '✅ Все ID совпадают';
+        detailEl.textContent = '';
+      } else if (excelSet.size === 0) {
+        statusEl.className = 'status-warning';
+        statusEl.textContent = '⚠️ Нет ID в Excel';
+        detailEl.textContent = 'Загрузите Excel с составом';
+      } else if (onlyInExcel.length > 0 && onlyInPdf.length === 0) {
+        statusEl.className = 'status-warning';
+        statusEl.textContent = '⚠️ Есть ID только в Excel';
+        detailEl.textContent = `В PDF не найдены: ${onlyInExcel.join(', ')}`;
+      } else if (onlyInExcel.length === 0 && onlyInPdf.length > 0) {
+        statusEl.className = 'status-warning';
+        statusEl.textContent = '⚠️ Есть ID только в PDF';
+        detailEl.textContent = `В Excel не найдены: ${onlyInPdf.join(', ')}`;
+      } else if (onlyInExcel.length > 0 && onlyInPdf.length > 0) {
+        statusEl.className = 'status-error';
+        statusEl.textContent = '❌ ID не совпадают!';
+        detailEl.textContent = `Только в Excel: ${onlyInExcel.join(', ')} | Только в PDF: ${onlyInPdf.join(', ')}`;
+      }
+
+      renderList();
+      return { onlyInExcel, onlyInPdf, matched };
+    }
+
+    function showParsedData(data) {
+      parsedData = data;
+      els.parsedDataPanel.style.display = 'block';
+
+      els.parsedSupplyNumber.textContent = data.supplyNumber || '—';
+      els.parsedSupplyNumber.className = 'value' + (data.supplyNumber ? '' : ' empty');
+
+      els.parsedSupplier.textContent = data.supplier || '—';
+      els.parsedSupplier.className = 'value' + (data.supplier ? '' : ' empty');
+
+      els.parsedWarehouse.textContent = data.warehouse || '—';
+      els.parsedWarehouse.className = 'value' + (data.warehouse ? '' : ' empty');
+
+      els.parsedDeliveryType.textContent = data.deliveryType || '—';
+      els.parsedDeliveryType.className = 'value' + (data.deliveryType ? '' : ' empty');
+
+      els.parsedDropoffPoint.textContent = data.dropoffPoint || '—';
+      els.parsedDropoffPoint.className = 'value' + (data.dropoffPoint ? '' : ' empty');
+
+      els.parsedGmCount.textContent = data.gmIds.length > 0 ? `${data.gmIds.length} шт.` : '—';
+      els.parsedGmCount.className = 'value' + (data.gmIds.length > 0 ? '' : ' empty');
+
+      compareGmIds();
+      // Обновляем предпросмотр после показа данных
+      renderPreview();
+    }
+
+    function confirmParsedData() {
+      if (!parsedData) return;
+
+      if (parsedData.supplyNumber) els.supplyNumber.value = parsedData.supplyNumber;
+      if (parsedData.supplier) els.supplierName.value = parsedData.supplier;
+      if (parsedData.warehouse) els.warehouseName.value = parsedData.warehouse;
+      if (parsedData.deliveryType) els.deliveryType.value = parsedData.deliveryType;
+      if (parsedData.dropoffPoint) els.dropoffPoint.value = parsedData.dropoffPoint;
+
+      els.parsedDataPanel.style.display = 'none';
+      parsedData = null;
+      els.status.textContent = 'Данные подтверждены и применены';
+      renderPreview();
+    }
+
+    function cancelParsedData() {
+      els.parsedDataPanel.style.display = 'none';
+      parsedData = null;
+      els.status.textContent = 'Данные отклонены';
+    }
+
+    async function importExcelFile(file) {
+      if (!window.XLSX) throw new Error('XLSX library is not available');
+      els.status.textContent = 'Чтение Excel...';
+
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf, { type: 'array' });
+      let sheetName = 'Состав ГМ поставки';
+      if (!wb.SheetNames.includes(sheetName)) {
+        const candidates = wb.SheetNames.filter(n => n !== 'Инструкция');
+        sheetName = candidates.length ? candidates[0] : wb.SheetNames[0];
+      }
+
+      const ws = wb.Sheets[sheetName];
+      const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false });
+
+      if (!rows || rows.length < 2) {
+        els.status.textContent = 'Файл пуст';
+        return;
+      }
+
+      const header = rows[0];
+      let colArticle = -1,
+        colQty = -1,
+        colGM = -1,
+        colGMType = -1;
+      for (let i = 0; i < header.length; i++) {
+        const h = String(header[i] || '').trim().toLowerCase();
+        if (h.includes('артикул') || h === 'артикул товара') colArticle = i;
+        if (h.includes('кол-во') || h === 'кол-во товаров') colQty = i;
+        if (h.includes('шк гм') || h === 'шк гм') colGM = i;
+        if (h.includes('тип гм') || h.includes('тип гм')) colGMType = i;
+      }
+
+      if (colArticle === -1 && colGM === -1) {
+        colArticle = 1;
+        colQty = 2;
+        colGM = 5;
+        colGMType = 6;
+      }
+
+      const groups = new Map();
+      for (const r of rows.slice(1)) {
+        if (!r || r.length === 0) continue;
+        const gm = colGM >= 0 ? String(r[colGM] || '').trim() : '';
+        const article = colArticle >= 0 ? String(r[colArticle] || '').trim() : '';
+        const qty = colQty >= 0 ? parseInt(String(r[colQty] || '1').replace(/\s/g, '')) || 1 : 1;
+        const gmType = colGMType >= 0 ? String(r[colGMType] || '').trim() : '';
+        if (!gm) continue;
+        if (!groups.has(gm)) {
+          groups.set(gm, { items: [], gmType: gmType });
+        }
+        groups.get(gm).items.push(`${article || 'Товар'} × ${qty}`);
+        if (gmType && !groups.get(gm).gmType) {
+          groups.get(gm).gmType = gmType;
+        }
+      }
+
+      if (!groups.size) {
+        els.status.textContent = 'Данные не найдены';
+        return;
+      }
+
+      const existingGMs = new Map();
+      for (const l of labels) {
+        existingGMs.set(l.text, l);
+      }
+
+      for (const [gm, data] of groups.entries()) {
+        if (existingGMs.has(gm)) {
+          const existing = existingGMs.get(gm);
+          const existingLines = getLines(existing);
+          const newLines = data.items.filter(item => !existingLines.includes(item));
+          if (newLines.length > 0) {
+            existing.extraText = [...existingLines, ...newLines].join('\n');
+          }
+          if (data.gmType && !existing.gmType) {
+            existing.gmType = data.gmType;
+          }
+        } else {
+          labels.push({ text: gm, extraText: data.items.join('\n'), gmType: data.gmType });
+        }
+      }
+
+      activeIndex = labels.length ? 0 : -1;
+      renderList();
+      loadEditor();
+
+      if (parsedData) {
+        compareGmIds();
+      }
+
+      renderPreview();
+      els.status.textContent = `Импортировано: ${labels.length} ГМ`;
+    }
+
+    function emptyLabel() {
+      return { text: '', extraText: '', gmType: '' };
+    }
+
+    function getLines(item) {
+      return String(item.extraText || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+    }
+
+    function escapeHtml(v) {
+      return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function getBarcodeDataURL(text, width, height) {
+      const t = String(text || '').trim();
+      if (!t) return null;
+      const key = `${t}::${width}::${height}`;
+      if (barcodeCache.has(key)) return barcodeCache.get(key);
+      const canvas = document.createElement('canvas');
+      const scale = 4;
+      JsBarcode(canvas, t, {
+        format: 'CODE128',
+        lineColor: '#000000',
+        background: '#FFFFFF',
+        width: width * scale,
+        height: height * scale,
+        margin: 10 * scale,
+        displayValue: true,
+        fontOptions: 'bold',
+        font: 'monospace',
+        textMargin: 6 * scale,
+        fontSize: 20 * scale,
+      });
+      const url = canvas.toDataURL('image/png');
+      barcodeCache.set(key, url);
+      return url;
+    }
+
+    function getGMTypeLabel(gmType) {
+      const t = String(gmType || '').toLowerCase().trim();
+      if (t.includes('палл') || t.includes('палет')) {
+        return 'ПАЛЛЕТА';
+      }
+      return 'КОРОБ';
+    }
+
+    function formatGMId(gmId) {
+      const id = String(gmId || '').trim();
+      if (!id) return { parts: [''], highlightIndex: -1, spacing: 0 };
+
+      const length = id.length;
+
+      if (length === 16) {
+        if (id.endsWith('000')) {
+          const prefix = id.slice(0, -10);
+          const highlight = id.slice(-10, -3);
+          const suffix = id.slice(-3);
+          return {
+            parts: [prefix, highlight, suffix],
+            highlightIndex: 1,
+            spacing: 1
+          };
+        }
+        if (length >= 6) {
+          return {
+            parts: [id.slice(0, -6), id.slice(-6)],
+            highlightIndex: 1,
+            spacing: 1
+          };
+        }
+        return { parts: [id], highlightIndex: -1, spacing: 0 };
+      } else if (length === 19) {
+        return {
+          parts: [id.slice(0, -6), id.slice(-6)],
+          highlightIndex: 1,
+          spacing: 1
+        };
+      } else {
+        if (id.endsWith('000') && length >= 10) {
+          const prefix = id.slice(0, -10);
+          const highlight = id.slice(-10, -3);
+          const suffix = id.slice(-3);
+          return {
+            parts: [prefix, highlight, suffix],
+            highlightIndex: 1,
+            spacing: 1
+          };
+        } else if (length >= 6) {
+          return {
+            parts: [id.slice(0, -6), id.slice(-6)],
+            highlightIndex: 1,
+            spacing: 1
+          };
+        }
+        return { parts: [id], highlightIndex: -1, spacing: 0 };
+      }
+    }
+
+    function getWarehouseFontSize(ctx, text, maxWidth, baseSize) {
+      let size = baseSize;
+      ctx.font = `bold ${size}px Arial`;
+      while (ctx.measureText(text).width > maxWidth && size > 8) {
+        size -= 0.5;
+        ctx.font = `bold ${size}px Arial`;
+      }
+      return size;
+    }
+
+    function renderLabelOnCanvas(item, supplyNum, supplier, warehouse, deliveryType, dropoffPoint, totalGmCount) {
+      const scale = 3;
+      const mmToPx = 3.78 * scale;
+      const mmW = 120;
+      const mmH = 75;
+      const pad = 4;
+
+      const pxW = Math.round(mmW * mmToPx);
+      const pxH = Math.round(mmH * mmToPx);
+
+      const canvas = document.createElement('canvas');
+      canvas.width = pxW;
+      canvas.height = pxH;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, pxW, pxH);
+
+      const mm = (val) => val * mmToPx;
+      const leftW = mm(82);
+
+      let x = mm(pad);
+      let y = mm(pad);
+
+      // === 1) [КОРОБ] / [ПАЛЛЕТА] + нумерация + тип поставки + склад (одна строка) ===
+      const typeLabel = getGMTypeLabel(item.gmType);
+      const currentIndex = labels.indexOf(item);
+      const gmNumber = currentIndex !== -1 ? currentIndex + 1 : 0;
+
+      ctx.fillStyle = '#1a1a2e';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+
+      // [КОРОБ] — крупный
+      ctx.font = `700 ${Math.round(12 * scale)}px Arial`;
+      ctx.fillText(`[${typeLabel}]`, x, y);
+
+      // Номер — крупный и жирный
+      if (totalGmCount > 0 && gmNumber > 0) {
+        ctx.font = `800 ${Math.round(14 * scale)}px Arial`;
+        ctx.fillText(`${gmNumber} / ${totalGmCount}`, x, y + mm(6));
+      }
+
+      // Правая часть: тип поставки и склад (одна строка с авто-размером)
+      const deliveryText = (deliveryType || 'ПРЯМАЯ').toUpperCase();
+      ctx.font = `bold ${Math.round(10 * scale)}px Arial`;
+      ctx.fillStyle = '#1a1a2e';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      ctx.fillText(`${deliveryText} ПОСТАВКА`, x + mm(22), y);
+
+      if (warehouse) {
+        const warehouseText = warehouse.toUpperCase();
+        const maxWidth = leftW - mm(22) - mm(pad);
+        const baseSize = 16 * scale;
+        const fontSize = getWarehouseFontSize(ctx, warehouseText, maxWidth, baseSize);
+        ctx.font = `bold ${fontSize}px Arial`;
+        ctx.fillStyle = '#1a1a2e';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillText(warehouseText, x + mm(22), y + mm(5));
+        y += mm(6);
+      } else {
+        y += mm(6);
+      }
+
+      y += mm(6);
+
+      ctx.strokeStyle = '#cccccc';
+      ctx.lineWidth = 1 * scale;
+      ctx.beginPath();
+      ctx.moveTo(mm(pad), y);
+      ctx.lineTo(leftW, y);
+      ctx.stroke();
+      y += mm(3);
+
+      // === 2) № поставки / поставщик ===
+      ctx.fillStyle = '#333333';
+      ctx.font = `600 ${Math.round(7 * scale)}px Arial`;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      const supplyText = String(supplyNum || '').replace(/\s/g, '');
+      const supplierText = supplier || '';
+      ctx.fillText(`№ поставки: ${supplyText}    Поставщик: ${supplierText}`, x, y);
+      y += mm(6);
+
+      ctx.strokeStyle = '#cccccc';
+      ctx.lineWidth = 1 * scale;
+      ctx.beginPath();
+      ctx.moveTo(mm(pad), y);
+      ctx.lineTo(leftW, y);
+      ctx.stroke();
+      y += mm(3);
+
+      // === 3) ID грузового места с заголовком ===
+      const gmText = String(item.text || '').trim();
+      const formatted = formatGMId(gmText);
+
+      ctx.fillStyle = '#1a1a2e';
+      ctx.font = `700 ${Math.round(7 * scale)}px Arial`;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      ctx.fillText('ID грузоместа', x, y);
+      y += mm(4.5);
+
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+
+      let currentX = x;
+      const fontSizeId = Math.round(18 * scale);
+      const cornerRadius = mm(1.2);
+      const paddingH = mm(0.8);
+      const paddingV = mm(0.6);
+      const spacing = mm(formatted.spacing || 0.5);
+
+      for (let i = 0; i < formatted.parts.length; i++) {
+        const part = formatted.parts[i];
+        const isHighlighted = (i === formatted.highlightIndex);
+
+        if (i > 0 && formatted.spacing > 0) {
+          currentX += spacing;
+        }
+
+        if (isHighlighted && part) {
+          const metrics = ctx.measureText(part);
+          const textWidth = metrics.width;
+          const textHeight = fontSizeId * 1.2;
+
+          const rectX = currentX - paddingH;
+          const rectY = y - paddingV;
+          const rectW = textWidth + paddingH * 2;
+          const rectH = textHeight + paddingV * 2;
+
+          ctx.beginPath();
+          ctx.moveTo(rectX + cornerRadius, rectY);
+          ctx.arcTo(rectX + rectW, rectY, rectX + rectW, rectY + rectH, cornerRadius);
+          ctx.arcTo(rectX + rectW, rectY + rectH, rectX, rectY + rectH, cornerRadius);
+          ctx.arcTo(rectX, rectY + rectH, rectX, rectY, cornerRadius);
+          ctx.arcTo(rectX, rectY, rectX + rectW, rectY, cornerRadius);
+          ctx.closePath();
+          ctx.fillStyle = '#000000';
+          ctx.fill();
+
+          ctx.fillStyle = '#FFFFFF';
+          ctx.font = `700 ${fontSizeId}px Courier New`;
+          ctx.textBaseline = 'top';
+          ctx.fillText(part, currentX, y);
+          currentX += textWidth;
+        } else {
+          ctx.fillStyle = '#1a1a2e';
+          ctx.font = `700 ${fontSizeId}px Courier New`;
+          ctx.textBaseline = 'top';
+          ctx.fillText(part, currentX, y);
+          currentX += ctx.measureText(part).width;
+        }
+      }
+
+      y += mm(10);
+
+      ctx.strokeStyle = '#cccccc';
+      ctx.lineWidth = 1 * scale;
+      ctx.beginPath();
+      ctx.moveTo(mm(pad), y);
+      ctx.lineTo(leftW, y);
+      ctx.stroke();
+      y += mm(3);
+
+      // === 4) Состав грузового места ===
+      const lines = getLines(item);
+      if (lines.length > 0) {
+        ctx.fillStyle = '#1a1a2e';
+        ctx.font = `700 ${Math.round(7 * scale)}px Arial`;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillText('СОСТАВ ГРУЗОВОГО МЕСТА:', x, y);
+        y += mm(5);
+
+        ctx.fillStyle = '#111111';
+        ctx.font = `600 ${Math.round(7.5 * scale)}px Courier New`;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+
+        const maxCols = lines.length <= 5 ? 1 : 2;
+        const colW = (leftW - mm(pad) * 2 - (maxCols > 1 ? mm(3) : 0)) / maxCols;
+
+        for (let i = 0; i < lines.length; i++) {
+          const col = i % maxCols;
+          const row = Math.floor(i / maxCols);
+          const lx = mm(pad) + col * (colW + mm(3));
+          const ly = y + row * mm(4.5);
+          let text = lines[i];
+          while (ctx.measureText(text).width > colW - mm(1) && text.length > 3) {
+            text = text.slice(0, -2).trimEnd();
+          }
+          if (text !== lines[i]) text += '…';
+          ctx.fillText(text, lx, ly);
+        }
+        y += Math.ceil(lines.length / maxCols) * mm(4.5) + mm(2);
+      }
+
+      ctx.strokeStyle = '#cccccc';
+      ctx.lineWidth = 1 * scale;
+      ctx.beginPath();
+      ctx.moveTo(mm(pad), y);
+      ctx.lineTo(leftW, y);
+      ctx.stroke();
+      y += mm(3);
+
+      // === 5) Точка сдачи ===
+      if (dropoffPoint) {
+        ctx.fillStyle = '#555555';
+        ctx.font = `600 ${Math.round(6.5 * scale)}px Arial`;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillText(`ТОЧКА СДАЧИ: ${dropoffPoint}`, x, y);
+      }
+
+      // === Штрихкод справа ===
+      const barcodeX = mm(86);
+      const barcodeW = mm(30);
+      const barcodeH = mm(62);
+
+      const barcodeImg = getBarcodeDataURL(item.text, 2, 50);
+      if (barcodeImg) {
+        const img = new Image();
+        img.src = barcodeImg;
+        ctx.save();
+        ctx.translate(barcodeX + barcodeW / 2, mm(pad) + barcodeH / 2);
+        ctx.rotate(-Math.PI / 2);
+        const imgW = 200;
+        const imgH = 50;
+        const aspectRatio = imgW / imgH;
+        let drawW = barcodeH;
+        let drawH = barcodeW;
+        if (imgW / imgH > barcodeH / barcodeW) {
+          drawW = barcodeH;
+          drawH = barcodeH / aspectRatio;
+        } else {
+          drawH = barcodeW;
+          drawW = barcodeW * aspectRatio;
+        }
+        if (img.complete && img.naturalWidth > 0) {
+          ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+        } else {
+          return new Promise((resolve) => {
+            img.onload = () => {
+              ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+              ctx.restore();
+              resolve(canvas);
+            };
+            img.onerror = () => {
+              ctx.restore();
+              resolve(canvas);
+            };
+          });
+        }
+        ctx.restore();
+      }
+
+      return canvas;
+    }
+
+    async function renderPreview() {
+      const supplyNum = els.supplyNumber.value.trim();
+      const supplier = els.supplierName.value.trim();
+      const warehouse = els.warehouseName.value.trim();
+      const deliveryType = els.deliveryType.value.trim();
+      const dropoffPoint = els.dropoffPoint.value.trim();
+      const totalGmCount = labels.length;
+
+      els.pagesPreview.innerHTML = '';
+
+      if (labels.length === 0) {
+        els.pagesPreview.innerHTML = '<div style="color:#6a6f8a;text-align:center;padding:40px 0;">Нет грузовых мест для отображения</div>';
+        return;
+      }
+
+      for (let i = 0; i < labels.length; i++) {
+        const canvas = renderLabelOnCanvas(labels[i], supplyNum, supplier, warehouse, deliveryType, dropoffPoint, totalGmCount);
+        const result = canvas instanceof Promise ? await canvas : canvas;
+        const dataUrl = result.toDataURL('image/png');
+        const div = document.createElement('div');
+        div.className = 'page-stage';
+        div.innerHTML =
+          `<img src="${dataUrl}" alt="Этикетка ${i + 1}" style="width:100%;max-width:600px;height:auto;image-rendering:crisp-edges;" />`;
+        els.pagesPreview.appendChild(div);
+      }
+    }
+
+    function renderList() {
+      const onlyInExcel = [];
+      const onlyInPdf = [];
+
+      const excelSet = new Set();
+      const pdfSet = new Set();
+
+      for (const l of labels) {
+        const id = String(l.text || '').trim();
+        if (id) excelSet.add(id);
+      }
+
+      if (parsedData && parsedData.gmIds) {
+        for (const id of parsedData.gmIds) {
+          pdfSet.add(id);
+        }
+      }
+
+      for (const id of excelSet) {
+        if (!pdfSet.has(id)) onlyInExcel.push(id);
+      }
+      for (const id of pdfSet) {
+        if (!excelSet.has(id)) onlyInPdf.push(id);
+      }
+
+      const onlyInExcelSet = new Set(onlyInExcel);
+      const onlyInPdfSet = new Set(onlyInPdf);
+
+      els.labelsList.innerHTML = labels.map((l, i) => {
+        const id = String(l.text || '').trim();
+        let warningHtml = '';
+        let itemClass = 'page-item';
+
+        if (onlyInExcelSet.has(id)) {
+          itemClass += ' mismatch';
+          warningHtml = `<span class="warning-badge missing">только в Excel</span>`;
+        } else if (onlyInPdfSet.has(id)) {
+          itemClass += ' mismatch';
+          warningHtml = `<span class="warning-badge extra">только в PDF</span>`;
+        }
+
+        return `
+          <div class="${itemClass} ${i === activeIndex ? 'active' : ''}" data-i="${i}">
+            <div class="item-title">${escapeHtml((l.text || '').trim() || `ГМ ${i + 1}`)} ${warningHtml}</div>
+            <div class="item-sub">${getLines(l).length} позиций ${l.gmType ? '| ' + l.gmType : ''}</div>
+          </div>
+        `;
+      }).join('');
+
+      els.labelsList.querySelectorAll('.page-item').forEach(el => {
+        el.addEventListener('click', () => {
+          activeIndex = Number(el.getAttribute('data-i'));
+          loadEditor();
+          renderList();
+        });
+      });
+    }
+
+    function loadEditor() {
+      if (activeIndex < 0) {
+        els.i_text.disabled = true;
+        els.i_gmType.disabled = true;
+        els.i_extra.disabled = true;
+        return;
+      }
+      els.i_text.disabled = false;
+      els.i_gmType.disabled = false;
+      els.i_extra.disabled = false;
+      const l = labels[activeIndex];
+      els.i_text.value = l.text || '';
+      els.i_gmType.value = l.gmType || '';
+      els.i_extra.value = l.extraText || '';
+    }
+
+    function saveEditor() {
+      if (activeIndex < 0) return;
+      labels[activeIndex].text = els.i_text.value.trim();
+      labels[activeIndex].gmType = els.i_gmType.value.trim();
+      labels[activeIndex].extraText = els.i_extra.value.trim();
+    }
+
+    async function exportPDF() {
+      if (!labels.length) {
+        els.status.textContent = 'Нет этикеток';
+        return;
+      }
+
+      els.btnExport.disabled = true;
+      els.btnExport.textContent = 'Генерация...';
+      els.status.textContent = 'Генерация PDF...';
+
+      try {
+        const supplyNum = els.supplyNumber.value.trim();
+        const supplier = els.supplierName.value.trim();
+        const warehouse = els.warehouseName.value.trim();
+        const deliveryType = els.deliveryType.value.trim();
+        const dropoffPoint = els.dropoffPoint.value.trim();
+        const totalGmCount = labels.length;
+
+        const mmW = 120;
+        const mmH = 75;
+        const JS = getJsPDF();
+        const pdf = new JS({
+          unit: 'mm',
+          format: [mmW, mmH],
+          orientation: 'landscape',
+          compress: true
+        });
+
+        for (let i = 0; i < labels.length; i++) {
+          if (i > 0) pdf.addPage([mmW, mmH], 'landscape');
+
+          const canvas = renderLabelOnCanvas(labels[i], supplyNum, supplier, warehouse, deliveryType, dropoffPoint, totalGmCount);
+          const result = canvas instanceof Promise ? await canvas : canvas;
+          const imgData = result.toDataURL('image/png');
+
+          pdf.addImage(imgData, 'PNG', 0, 0, mmW, mmH);
+        }
+
+        const filename = `Ozon_этикетки_${labels.length}ГМ.pdf`;
+        pdf.save(filename);
+        els.status.textContent = 'PDF сохранён';
+      } catch (e) {
+        console.error(e);
+        alert('Ошибка: ' + e.message);
+        els.status.textContent = 'Ошибка';
+      } finally {
+        els.btnExport.disabled = false;
+        els.btnExport.textContent = 'Скачать PDF';
+      }
+    }
+
+    function getJsPDF() {
+      if (window.jspdf && window.jspdf.jsPDF) return window.jspdf.jsPDF;
+      if (window.jsPDF) return window.jsPDF;
+      throw new Error('jsPDF library is not available');
+    }
+
+    els.btnSelectExcel.addEventListener('click', () => { els.excelFile.click(); });
+    els.btnSelectPDF.addEventListener('click', () => { els.pdfFile.click(); });
+
+    els.excelFile.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      els.excelFileName.textContent = file ? file.name : 'Файл не выбран';
+    });
+
+    els.pdfFile.addEventListener('change', (e) => {
+      const files = e.target.files;
+      els.pdfFileName.textContent = files && files.length > 0 ? Array.from(files).map(f => f.name).join(', ') : 'Файл не выбран';
+    });
+
+    els.btnImportExcel.addEventListener('click', async () => {
+      const f = els.excelFile.files?.[0];
+      if (!f) { alert('Выберите Excel-файл'); return; }
+      try {
+        await importExcelFile(f);
+      } catch (e) {
+        alert('Ошибка: ' + e.message);
+        els.status.textContent = 'Ошибка импорта';
+      }
+    });
+
+    els.btnParsePDF.addEventListener('click', async () => {
+      const files = els.pdfFile.files;
+      if (!files || files.length === 0) { alert('Выберите PDF-файлы'); return; }
+
+      els.status.textContent = 'Парсинг PDF...';
+      els.btnParsePDF.disabled = true;
+
+      try {
+        const data = await parsePDFFiles(files);
+        showParsedData(data);
+        els.status.textContent = 'Данные распарсены, проверьте и подтвердите';
+      } catch (e) {
+        alert('Ошибка парсинга: ' + e.message);
+        els.status.textContent = 'Ошибка парсинга';
+      } finally {
+        els.btnParsePDF.disabled = false;
+      }
+    });
+
+    els.btnConfirmData.addEventListener('click', confirmParsedData);
+    els.btnCancelData.addEventListener('click', cancelParsedData);
+
+    els.btnAddEmpty.addEventListener('click', () => {
+      labels.push(emptyLabel());
+      activeIndex = labels.length - 1;
+      renderList();
+      loadEditor();
+      renderPreview();
+    });
+
+    els.btnDelete.addEventListener('click', () => {
+      if (activeIndex < 0 || !confirm('Удалить?')) return;
+      labels.splice(activeIndex, 1);
+      activeIndex = labels.length ? Math.min(activeIndex, labels.length - 1) : -1;
+      renderList();
+      loadEditor();
+      renderPreview();
+    });
+
+    els.btnClearAll.addEventListener('click', () => {
+      if (labels.length === 0) return;
+      if (!confirm('Удалить все грузовые места?')) return;
+      labels = [];
+      activeIndex = -1;
+      renderList();
+      loadEditor();
+      renderPreview();
+      els.status.textContent = 'Все данные очищены';
+    });
+
+    els.btnApply.addEventListener('click', () => {
+      saveEditor();
+      renderList();
+      renderPreview();
+      els.status.textContent = 'Сохранено';
+    });
+
+    els.btnExport.addEventListener('click', exportPDF);
+
+    els.i_text.addEventListener('input', () => { saveEditor();
+      renderPreview(); });
+    els.i_gmType.addEventListener('input', () => { saveEditor();
+      renderPreview(); });
+    els.i_extra.addEventListener('input', () => { saveEditor();
+      renderPreview(); });
+
+    [els.supplyNumber, els.supplierName, els.warehouseName, els.deliveryType, els.dropoffPoint].forEach(el => {
+      el.addEventListener('input', renderPreview);
+    });
+
+    labels = [];
+    activeIndex = -1;
+    renderList();
+    loadEditor();
+    renderPreview();
+    els.status.textContent = 'Готово';
+  </script>
+</body>
+
+</html>
